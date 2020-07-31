@@ -1,0 +1,24 @@
+# History files
+.Rhistory
+.Rapp.history
+
+
+# Session Data files
+.RData
+*.Rproj
+*.RData
+
+
+# RStudio files
+.Rproj.user/
+.Ruserdata
+
+
+# data directories
+/Data
+
+
+# old material
+/00_old
+
+
