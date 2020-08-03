@@ -106,7 +106,7 @@ escape <- function(
           i.tmp <- order(adjR2.tmp, decreasing = TRUE)[k]
           # Check whether sign of corresponding predictor coefficient goes in line with pre-specified direction of effect
 
-          if(dirEff[i.tmp] == dirEstCoeff.tmp[i.tmp]){
+          if(dirEffAdj[i.tmp] %in% c(0,dirEstCoeff.tmp[i.tmp])){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred  <- colnames(X)[i.tmp]
             resModel <- lm(as.formula(paste("y ~",
@@ -152,7 +152,7 @@ escape <- function(
           i.tmp <- order(adjR2.tmp, decreasing = TRUE)[k]
           # Check whether signs of corresponding predictor coefficient goes in line with pre-specified directions of effects.
 
-          if(all(dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )] == dirEstCoeff.tmp[[i.tmp]])){
+          if(all(dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )] %in% cbind(0,dirEstCoeff.tmp[[i.tmp]]))){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred <- c(resPred, cols.tmp[i.tmp])
             resModel <- lm(as.formula(paste("y ~",
