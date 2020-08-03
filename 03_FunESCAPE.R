@@ -56,20 +56,6 @@
 #'    zero values; if the share is exceeded, the corresponding potential
 #'    predictor is excluded.
 #'
-#' Function has two function arguments:
-#' 'dirEff': data.frame with two columns;
-#'         first column contains names of potential predictors;
-#'         second column the respective pre-specified direction of effect
-#'         -> + 1, - -1, +/- 0
-#'
-#' 'data': data.frame with values of dependent variable in first column (Y);
-#'         values of potential predictors in remaining columns.
-#'         It is important that names of potential predictors in
-#'         1st column of 'dir_eff' correspond to respective column
-#'         names of 'Dat'!
-#'         Subsequently, number of rows in 'dir_eff' plus one corresponds
-#'         to number of columns in 'Dat'!
-#'
 escape <- function(
 			data
 			,pred
