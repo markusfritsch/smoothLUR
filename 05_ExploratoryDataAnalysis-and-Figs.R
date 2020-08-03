@@ -59,8 +59,14 @@ fivenum(dat.tr.ind$Y); mean(dat.tr.ind$Y); sd(dat.tr.ind$Y)
 dat.all <- data.frame(Y = c(dat.back$Y, dat.tr.ind$Y), 
                       type = c(rep("Backround", 246), rep("Traffic/Industrial", 157)))
 
+fivenum(dat.all$Y); mean(dat.all$Y); sd(dat.all$Y)
+
+dat.all2 <- data.frame(Y = rep(c(dat.back$Y, dat.tr.ind$Y),2), 
+                       type = c(rep("Backround", 246), rep("Traffic/Industrial", 157), rep("All", 403)))
+
+
 # Histograms with empirical density curve
-p.hist <- ggplot(dat.all, aes(x = Y, fill = type, color = type)) +
+(p.hist <- ggplot(dat.all, aes(x = Y, fill = type, color = type)) +
   theme_minimal() +
   theme_classic() +
   scale_x_continuous(breaks = seq(0, 90, by = 15), limits = c(-5, 95)) +
@@ -73,11 +79,32 @@ p.hist <- ggplot(dat.all, aes(x = Y, fill = type, color = type)) +
         axis.title = element_text(size = 18),
         legend.title = element_blank(),
         legend.text = element_text(size = 18),
-        legend.position = c(0.75, 0.9))
+        legend.position = c(0.75, 0.9)))
   
 
 pdf("img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)
 p.hist
+dev.off()
+
+
+(p.hist2 <- ggplot(dat.all2, aes(x = Y, fill = type, color = type)) +
+    theme_minimal() +
+    theme_classic() +
+    scale_x_continuous(breaks = seq(0, 90, by = 15), limits = c(-5, 95)) +
+    geom_histogram(aes(y=..density..), fill = "white", position = "identity", alpha = 0.5, binwidth = 5, lwd = 1.4) +
+    geom_density(alpha = 0.6, lwd = 1.2) +
+    xlab(expression(paste(NO[2], " concentration level in ", mu, "g/", m^3, sep = ""))) +
+    ylab("density") +
+    scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
+    theme(axis.text = element_text(size = 18), 
+          axis.title = element_text(size = 18),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 18),
+          legend.position = c(0.75, 0.9)))
+
+
+pdf("img/HistogramDensitiesBackTrInd2.pdf", height = 6, width = 9)
+p.hist2
 dev.off()
 
 
@@ -535,6 +562,18 @@ names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
 par1 <- lm(Y ~ popDens + Forest + Lat + Alt + Agri + NatMot, data = dat)
 
 
+DATA_TI <- read.csv("R/DATA/Data_built/DATA_DE_traffic_industrial.csv", header=TRUE)[, -1]
+dat_TI <- DATA_TI[ , c(2,5:7,11:20,26:30)] 
+#rename some columns
+names(dat_TI)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+
+parTI <- lm(Y ~ popDens + PriRoad + Alt + LowDens + HighDens, data = dat_TI)
+
+
+dat_A <- rbind(dat, dat_TI)  
+parA <- lm(Y ~ popDens + PriRoad + HighDens + LowDens + Lon, data = dat_A)  
+  
+
 if(FALSE){
 # Difference between loessLine smoother and gamLine smoother
 par(mfrow = c(1,2))
@@ -601,6 +640,71 @@ dev.off()
 
 
 
+pred.parTI <- predict(object = parTI, newdata = dat_TI, type = "terms")
+pred.res.parTI <- pred.parTI + residuals(parTI)
+
+pred.res.parTI.l <- melt(pred.res.parTI)
+names(dat_TI)
+colnames(pred.res.parTI)
+
+dat_TI.l <- melt(dat_TI[, c(15, 16, 4, 6, 5)])
+names(dat_TI.l)[2] <- "observed"
+
+dat.scatter <- cbind(dat_TI.l, pred.res.parTI.l[,3])
+names(dat.scatter)[3] <- "partial.residual"
+
+str(dat.scatter)
+dat.scatter$variable <- factor(dat.scatter$variable)
+
+pdf("img/PartialResidual_ggplot_TI.pdf", width = 12, height = 7)
+ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
+  theme_bw() +
+  xlab("") + 
+  ylab("") +
+  geom_point() +
+  geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE, col = "darkorange", lwd = 1.2) +
+  facet_wrap(~variable, nrow = 2, scale = "free_x") +
+  theme(axis.text = element_text(size = 14),
+        strip.text = element_text(size = 14),
+        plot.margin = unit(c(0,0.5,0,0), "cm"))
+dev.off()
+
+
+
+
+pred.parA <- predict(object = parA, newdata = dat_A, type = "terms")
+pred.res.parA <- pred.parA + residuals(parA)
+
+pred.res.parA.l <- melt(pred.res.parA)
+names(dat_A)
+colnames(pred.res.parA)
+
+dat_A.l <- melt(dat_A[, c(15, 16, 5, 6, 2)])
+names(dat_A.l)[2] <- "observed"
+
+dat.scatter <- cbind(dat_A.l, pred.res.parA.l[,3])
+names(dat.scatter)[3] <- "partial.residual"
+
+str(dat.scatter)
+dat.scatter$variable <- factor(dat.scatter$variable)
+
+pdf("img/PartialResidual_ggplot_A.pdf", width = 12, height = 7)
+ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
+  theme_bw() +
+  xlab("") + 
+  ylab("") +
+  geom_point() +
+  geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE, col = "darkorange", lwd = 1.2) +
+  facet_wrap(~variable, nrow = 2, scale = "free_x") +
+  theme(axis.text = element_text(size = 14),
+        strip.text = element_text(size = 14),
+        plot.margin = unit(c(0,0.5,0,0), "cm"))
+dev.off()
+
+
+
 
 ###
 ### Fitted splines based on semipar ----
@@ -611,6 +715,8 @@ dat <- DATA[,c(2,5:7,11:20,26:30)]
 #rename some columns
 names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
 
+# dat <- dat_TI
+# dat <- dat_A
 
 form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NULL) +
   s(Alt, k=-1, bs="tp") +
@@ -665,9 +771,9 @@ if(FALSE){
 
 # Alternatively, with ggplot2:
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-colnames(newdata.tmp) <- colnames(dat.back)[-1]
+colnames(newdata.tmp) <- colnames(dat)[-1]
 for(j in 1:18){
-  newdata.tmp[,j] <- seq(min(dat.back[,j+1]), max(dat.back[,j+1]), length.out = 1000)
+  newdata.tmp[,j] <- seq(min(dat[,j+1]), max(dat[,j+1]), length.out = 1000)
 }  
 
 semipar <- gam2.3
@@ -713,7 +819,9 @@ colnames(newdata.tmp2.melt) <- c("pred", "x")
 
 dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
 
-pdf("img/FittedSplines_semipar_ggplot.pdf", width = 12, height = 12)
+pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
+#pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
+#pdf("img/FittedSplines_semipar_ggplot_A.pdf", width = 12, height = 12)
 ggplot(data = dt.tmp, aes(x = x, y = value)) +
   theme_bw() + 
   xlab("") +
@@ -1022,6 +1130,10 @@ pdf("img/SpEff_PredBack.pdf", width = 12, height = 9)
 plot_grid(p.sp.eff, p.back.pred, nrow = 1)
 dev.off()
 
+png("img/SpEff_PredBack2.png", width = 900, height = 675)
+pdf("img/SpEff_PredBack2.pdf", width = 12, height = 9)
+plot_grid(p.sp.eff, p.back.pred2, nrow = 1)
+dev.off()
 
 
 ###
