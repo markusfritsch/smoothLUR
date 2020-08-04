@@ -106,8 +106,7 @@ escape <- function(
           i.tmp <- order(adjR2.tmp, decreasing = TRUE)[k]
           # Check whether sign of corresponding predictor coefficient goes in line with pre-specified direction of effect
 
-#          if(dirEffAdj[i.tmp] %in% c(0,dirEstCoeff.tmp[i.tmp])){       # zero only happens when predictors are orthogonal to the response
-          if(dirEffAdj[i.tmp] %in% dirEstCoeff.tmp[i.tmp]){          
+          if(dirEffAdj[i.tmp] %in% if(dirEffAdj[i.tmp] == 0){ c( 0,  dirEstCoeff.tmp[i.tmp]) } else{dirEstCoeff.tmp[i.tmp]}){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred  <- colnames(X)[i.tmp]
             resModel <- lm(as.formula(paste("y ~",
