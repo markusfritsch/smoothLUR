@@ -106,7 +106,8 @@ escape <- function(
           i.tmp <- order(adjR2.tmp, decreasing = TRUE)[k]
           # Check whether sign of corresponding predictor coefficient goes in line with pre-specified direction of effect
 
-          if(dirEffAdj[i.tmp] %in% c(0,dirEstCoeff.tmp[i.tmp])){
+#          if(dirEffAdj[i.tmp] %in% c(0,dirEstCoeff.tmp[i.tmp])){       # zero only happens when predictors are orthogonal to the response
+          if(dirEffAdj[i.tmp] %in% dirEstCoeff.tmp[i.tmp]){          
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred  <- colnames(X)[i.tmp]
             resModel <- lm(as.formula(paste("y ~",
@@ -152,11 +153,12 @@ escape <- function(
           i.tmp <- order(adjR2.tmp, decreasing = TRUE)[k]
           # Check whether signs of corresponding predictor coefficient goes in line with pre-specified directions of effects.
 
-          if(all(apply(cbind(dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )],
-                             0,
-                             dirEstCoeff.tmp[[i.tmp]]),
+          if(all(apply(cbind(dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )], dirEstCoeff.tmp[[i.tmp]] ),
+#                            dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )],
+#                             0,                                                            # estimate of zero 
+#                             dirEstCoeff.tmp[[i.tmp]]),
                        1,
-                       FUN = function(x) {x[1] %in% x[-1]}))){
+                       FUN = function(x) { x[1] == 0 | (x[1] %in% x[-1]) }))){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred <- c(resPred, cols.tmp[i.tmp])
             resModel <- lm(as.formula(paste("y ~",
@@ -197,10 +199,11 @@ escape <- function(
 
 setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
 
-#dat  <- read.csv("DATA.csv", header=TRUE)							# background sites
+# dat  <- read.csv("DATA.csv", header=TRUE)							# background sites
 #	dat <- read.csv("DATA_DE_traffic_industrial.csv", header=TRUE)		# traffic sites
-	dat <- rbind(read.csv("DATA.csv", header=TRUE),					# background and traffic sites
-		read.csv("DATA_DE_traffic_industrial.csv", header=TRUE))
+#	dat <- rbind(read.csv("DATA.csv", header=TRUE),					# background and traffic sites
+#       read.csv("DATA_MonitoringSites_DE.csv", header=TRUE) )
+dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
 
 
 (res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
