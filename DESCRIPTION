@@ -11,7 +11,7 @@ Author: Markus Fritsch [aut, cre], Svenia Behm [aut]
 Maintainer: Markus Fritsch <Markus.Fritsch@uni-Passau.de>
   Depends: R (>= 4.0.2)
 Imports: mgcv (>= 1.8-31),
-stats (>= 3.6.2),
+stats (>= 4.0.2),
 Rdpack (>= 1.0-0)
 Suggests: 
 testthat (>= 2.3.2),
