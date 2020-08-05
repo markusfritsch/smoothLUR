@@ -154,7 +154,7 @@ escape <- function(
 
           if(all(apply(cbind(dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )], dirEstCoeff.tmp[[i.tmp]] ),
 #                            dirEffAdj[c(pred.ind, which(predAdj %in% cols.tmp[i.tmp]) )],
-#                             0,                                                            # estimate of zero 
+#                             0,                                                            # estimate of zero
 #                             dirEstCoeff.tmp[[i.tmp]]),
                        1,
                        FUN = function(x) { x[1] == 0 | (x[1] %in% x[-1]) }))){
@@ -196,51 +196,49 @@ escape <- function(
 
 
 
-#setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
-
-dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
-
-
-(res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                            ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                            ,"Constr", "UrbGreen", "Agri", "Forest"
-                                            , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                            , "LocRoute")
-                       ,depVar = "AQeYMean"
-                       ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                       ,thresh = 0.95) )
-
-
-
-set.seed(42)
-dat <- dat[sample(1:nrow(dat), 40),]
-
-(res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                            ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                            ,"Constr", "UrbGreen", "Agri", "Forest"
-                                            , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                            , "LocRoute")
-                       ,depVar = "AQeYMean"
-                       ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                       ,thresh = 0.95) )
-
-
-summary(res.model)
-summary(res.model)$adj.r.squared
-BIC(res.model)
-AIC(res.model)
-
-
-
-# Moran's I
-#	install.packages("ape")
-library(ape)
-
-res.dist		<- as.matrix(dist(cbind(dat$AQeLon, dat$AQeLat)))
-res.dist.inv	<- 1/(res.dist^2)
-diag(res.dist.inv)	<- 0
-
-Moran.I(resid(res.model), res.dist.inv)
-# null hypothesis: residuals do not exhibit spatial autocorrelation
-
-
+# #setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
+#
+# dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+#
+#
+# (res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                             ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                             , "LocRoute")
+#                        ,depVar = "AQeYMean"
+#                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                        ,thresh = 0.95) )
+#
+#
+#
+# set.seed(42)
+# dat <- dat[sample(1:nrow(dat), 40),]
+#
+# (res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                             ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                             , "LocRoute")
+#                        ,depVar = "AQeYMean"
+#                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                        ,thresh = 0.95) )
+#
+#
+# summary(res.model)
+# summary(res.model)$adj.r.squared
+# BIC(res.model)
+# AIC(res.model)
+#
+#
+#
+# # Moran's I
+# #	install.packages("ape")
+# library(ape)
+#
+# res.dist		<- as.matrix(dist(cbind(dat$AQeLon, dat$AQeLat)))
+# res.dist.inv	<- 1/(res.dist^2)
+# diag(res.dist.inv)	<- 0
+#
+# Moran.I(resid(res.model), res.dist.inv)
+# # null hypothesis: residuals do not exhibit spatial autocorrelation
