@@ -62,7 +62,7 @@
 #'
 #' \item{coefficients}{a vector containing the coefficient estimates}
 #'
-#' It has `...`, `...`, and `wmat` methods.
+#' It has `...`, `...`, and `...` methods.
 #'
 #' @author Svenia Behm and Markus Fritsch
 #' @export
@@ -258,6 +258,8 @@ escapeLUR <- function(
                     data=dat)
   }
 
+#  attr(resModel, "class")  <- "escapeLUR"
+  
   return(resModel) # Return final model derived by supervised forward stepwise predictor selection.
 
 }
@@ -266,13 +268,13 @@ escapeLUR <- function(
 
 
 
-# #setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
 #
 # dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
 # dat <- dat[, -1]
 # save(dat, file="data/monSitesDE.RData")
 #
-# (res.model <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+# (m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
 #                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
 #                                             ,"Constr", "UrbGreen", "Agri", "Forest"
 #                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
@@ -286,7 +288,7 @@ escapeLUR <- function(
 # set.seed(42)
 # dat <- dat[sample(1:nrow(dat), 40),]
 #
-# (res.model <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+# (m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
 #                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
 #                                             ,"Constr", "UrbGreen", "Agri", "Forest"
 #                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
@@ -296,10 +298,10 @@ escapeLUR <- function(
 #                        ,thresh = 0.95) )
 #
 #
-# summary(res.model)
-# summary(res.model)$adj.r.squared
-# BIC(res.model)
-# AIC(res.model)
+# summary(m1)
+# summary(m1)$adj.r.squared
+# BIC(m1)
+# AIC(m1)
 #
 #
 #
