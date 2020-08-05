@@ -1,5 +1,0 @@
-^pdynmc\.Rproj$
-^\.Rproj\.user$
-.Rhistory
-.gitignore
-^revdep$
