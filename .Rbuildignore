@@ -9,14 +9,14 @@ indRhineRuhr.rds
 DATA_MonitoringSites_DE.csv
 gitCommands.txt
 
-01-MonitoringSites_DE_DataPreparation.R
-01-TrafficIndustrial_NRW_DataPreparation.R
-02-2_GeographicalSubset.R
-02-GridGermany_DataPreparation.R
-02-GridRR_DataPreparation.R
-03-mlrs-and-gams_DE_TrInd.R
-03_mlrs-and-gams_DE_Back.R
-04_Evaluation-of-mlrs-and-gams_DE_Back.R
-05_ExploratoryDataAnalysis-and-Figs.R
+R/01-MonitoringSites_DE_DataPreparation.R
+R/01-TrafficIndustrial_NRW_DataPreparation.R
+R/02-2_GeographicalSubset.R
+R/02-GridGermany_DataPreparation.R
+R/02-GridRR_DataPreparation.R
+R/03-mlrs-and-gams_DE_TrInd.R
+R/03_mlrs-and-gams_DE_Back.R
+R/04_Evaluation-of-mlrs-and-gams_DE_Back.R
+R/05_ExploratoryDataAnalysis-and-Figs.R
 ^.*\.Rproj$
 ^\.Rproj\.user$
