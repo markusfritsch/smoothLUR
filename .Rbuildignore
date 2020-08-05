@@ -18,3 +18,5 @@ gitCommands.txt
 03_mlrs-and-gams_DE_Back.R
 04_Evaluation-of-mlrs-and-gams_DE_Back.R
 05_ExploratoryDataAnalysis-and-Figs.R
+^.*\.Rproj$
+^\.Rproj\.user$
