@@ -22,6 +22,10 @@
 #' @param pred A character vector stating the variable names of the
 #'    potential predictors (names have to match the column names of
 #'    `data`).
+#' @param spVar1 A character vector stating the variable name referring to longitude
+#'    (name has to match the column name of `data`)
+#' @param spVar2 A character vector stating the variable name referring to latitude
+#'    (name has to match the column name of `data`)
 #' @param depVar A character string indicating the name of the dependent
 #'    variable.
 #' @param thresh A numeric value that indicates the maximum share of
@@ -48,6 +52,8 @@ smooth <- function(
   names.dat <- names(dat)
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
+  dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(length(unique(x)) > 8))})]
+  # 9 parameters have to be estimated by default for each univariate thin plate regression spline
   names.dat[!(names.dat %in% names(dat))]
   predAdj <- pred[pred %in% names(dat)]
 
@@ -57,8 +63,13 @@ smooth <- function(
   names.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2)]
 
   form.tmp <- as.formula(paste("y ~ s(",spVar1, ",", spVar2,",k = -1, bs=\"tp\") + ", # bivariate spline for longitude and latitude always considered in the model
-                               paste0("s(", names.tmp, ",k=-1, bs=\"tp\")", collapse = "+"), # Here we can put any vector of predictor names.
+                               paste0("s(", names.tmp, ",k=8, bs=\"tp\")", collapse = "+"), # Here we can put any vector of predictor names.
                                sep = ""))
+  # to enable 10-fold CV for traffic/industrial sites the parameter k has to be reduced,
+  # otherwise the error message
+  # "Fehler in gam(formula = form.tmp, fit = TRUE, method = "P-ML", data = cbind(y,  :
+  # Model has more coefficients than data"
+  # is returned
   gam.tmp <- gam(formula=form.tmp, fit=TRUE, method="P-ML", data=cbind(y,X), family=gaussian(),
                  weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
                  select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
@@ -66,16 +77,15 @@ smooth <- function(
 }
 
 
-dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
-
-
-(res.model <- smooth(data = dat[dat$AQeType=="background", ], pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                          ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                          ,"Constr", "UrbGreen", "Agri", "Forest"
-                                          , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                          , "LocRoute")
-                     ,spVar1 = "AQeLon"
-                     ,spVar2 = "AQeLat"
-                     ,depVar = "AQeYMean"
-                     ,thresh = 0.95) )
+# dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
+# (res.model <- smooth(data = dat[dat$AQeType!="background", ]
+#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                , "LocRoute")
+#                      ,spVar1 = "AQeLon"
+#                      ,spVar2 = "AQeLat"
+#                      ,depVar = "AQeYMean"
+#                      ,thresh = 0.95) )
 
