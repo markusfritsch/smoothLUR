@@ -196,12 +196,8 @@ escape <- function(
 
 
 
-setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
+#setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
 
-# dat  <- read.csv("DATA.csv", header=TRUE)							# background sites
-#	dat <- read.csv("DATA_DE_traffic_industrial.csv", header=TRUE)		# traffic sites
-#	dat <- rbind(read.csv("DATA.csv", header=TRUE),					# background and traffic sites
-#       read.csv("DATA_MonitoringSites_DE.csv", header=TRUE) )
 dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
 
 
