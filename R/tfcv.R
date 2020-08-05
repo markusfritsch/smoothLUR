@@ -137,33 +137,33 @@ kFoldCV <- function(
 
 #source("03_FunESCAPE.R")
 #source("FunSmooth.R")
-
-tenFoldCV.seed1 <- kFoldCV(data = dat[dat$AQeType!="background",]
-                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                ,"Constr", "UrbGreen", "Agri", "Forest"
-                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                , "LocRoute")
-                      ,ID = "AQeCode"
-                      ,spVar1 = "AQeLon"
-                      ,spVar2 = "AQeLat"
-                      ,depVar = "AQeYMean"
-                      ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                      ,thresh = 0.95
-                      ,seed = 1
-                      ,k = 10
-                      ,strat = FALSE
-)
-
-
-lapply(TenFoldCV.seed1$ls.models, FUN = function(x) x$mod.par$coefficients)
-
-apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) sqrt(mean(x^2))) # rmse
-apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(abs(x)))    # mae
-apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(x))         # bias
-
-(adj.r2.par    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.par)$adj.r.squared)))
-(adj.r2.smooth <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.smooth)$r.sq)))
-
-(aic.par       <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.par))))
-(aic.smooth    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.smooth))))
+#
+#tenFoldCV.seed1 <- kFoldCV(data = dat[dat$AQeType!="background",]
+#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                , "LocRoute")
+#                      ,ID = "AQeCode"
+#                      ,spVar1 = "AQeLon"
+#                      ,spVar2 = "AQeLat"
+#                      ,depVar = "AQeYMean"
+#                      ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                      ,thresh = 0.95
+#                      ,seed = 1
+#                      ,k = 10
+#                      ,strat = FALSE
+#)
+#
+#
+#lapply(TenFoldCV.seed1$ls.models, FUN = function(x) x$mod.par$coefficients)
+#
+#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) sqrt(mean(x^2))) # rmse
+#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(abs(x)))    # mae
+#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(x))         # bias
+#
+#(adj.r2.par    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.par)$adj.r.squared)))
+#(adj.r2.smooth <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.smooth)$r.sq)))
+#
+#(aic.par       <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.par))))
+#(aic.smooth    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.smooth))))

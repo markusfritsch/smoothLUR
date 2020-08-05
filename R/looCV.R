@@ -105,59 +105,59 @@ looCV <- function(
 
 #source("03_FunESCAPE.R")
 #source("FunSmooth.R")
-
-dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
-
-
-(loocv.back <- looCV(data = dat[dat$AQeType=="background", ]
-                     ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                               ,"Constr", "UrbGreen", "Agri", "Forest"
-                               , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                               , "LocRoute")
-                     ,ID = "AQeCode"
-                     ,spVar1 = "AQeLon"
-                     ,spVar2 = "AQeLat"
-                     ,depVar = "AQeYMean"
-                     ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                     ,thresh = 0.95) )
-
-(loocv.TrInd <- loocv(data = dat[dat$AQeType!="background", ]
-                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                ,"Constr", "UrbGreen", "Agri", "Forest"
-                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                , "LocRoute")
-                      ,ID = "AQeCode"
-                      ,spVar1 = "AQeLon"
-                      ,spVar2 = "AQeLat"
-                      ,depVar = "AQeYMean"
-                      ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                      ,thresh = 0.95) )
-
-(loocv.All <- loocv(data = dat
-                    ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                              ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                              ,"Constr", "UrbGreen", "Agri", "Forest"
-                              , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                              , "LocRoute")
-                    ,ID = "AQeCode"
-                    ,spVar1 = "AQeLon"
-                    ,spVar2 = "AQeLat"
-                    ,depVar = "AQeYMean"
-                    ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                    ,thresh = 0.95) )
-
-rm(list = ls()[!ls()%in%c("loocv.back", "loocv.TrInd", "loocv.All")])
-save.image("loocv.RData")
-
-
-apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) sqrt(mean(x^2))) # rmse
-apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) mean(abs(x)))    # mae
-apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) mean(x))         # bias
-
-(adj.r2.par    <- mean(sapply(loocv.back$ls.models, FUN = function(x) summary(x$mod.par)$adj.r.squared)))
-(adj.r2.smooth <- mean(sapply(loocv.back$ls.models, FUN = function(x) summary(x$mod.smooth)$r.sq)))
-
-(aic.par       <- mean(sapply(loocv.back$ls.models, FUN = function(x) AIC(x$mod.par))))
-(aic.smooth    <- mean(sapply(loocv.back$ls.models, FUN = function(x) AIC(x$mod.smooth))))
+#
+#dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
+#
+#
+#(loocv.back <- looCV(data = dat[dat$AQeType=="background", ]
+#                     ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                               ,"Constr", "UrbGreen", "Agri", "Forest"
+#                               , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                               , "LocRoute")
+#                     ,ID = "AQeCode"
+#                     ,spVar1 = "AQeLon"
+#                     ,spVar2 = "AQeLat"
+#                     ,depVar = "AQeYMean"
+#                     ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                     ,thresh = 0.95) )
+#
+#(loocv.TrInd <- loocv(data = dat[dat$AQeType!="background", ]
+#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                , "LocRoute")
+#                      ,ID = "AQeCode"
+#                      ,spVar1 = "AQeLon"
+#                      ,spVar2 = "AQeLat"
+#                      ,depVar = "AQeYMean"
+#                      ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                      ,thresh = 0.95) )
+#
+#(loocv.All <- loocv(data = dat
+#                    ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                              ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                              ,"Constr", "UrbGreen", "Agri", "Forest"
+#                              , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                              , "LocRoute")
+#                    ,ID = "AQeCode"
+#                    ,spVar1 = "AQeLon"
+#                    ,spVar2 = "AQeLat"
+#                    ,depVar = "AQeYMean"
+#                    ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#                    ,thresh = 0.95) )
+#
+#rm(list = ls()[!ls()%in%c("loocv.back", "loocv.TrInd", "loocv.All")])
+#save.image("loocv.RData")
+#
+#
+#apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) sqrt(mean(x^2))) # rmse
+#apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) mean(abs(x)))    # mae
+#apply(loocv.back$df.err[,2:3], MARGIN = 2, function(x) mean(x))         # bias
+#
+#(adj.r2.par    <- mean(sapply(loocv.back$ls.models, FUN = function(x) summary(x$mod.par)$adj.r.squared)))
+#(adj.r2.smooth <- mean(sapply(loocv.back$ls.models, FUN = function(x) summary(x$mod.smooth)$r.sq)))
+#
+#(aic.par       <- mean(sapply(loocv.back$ls.models, FUN = function(x) AIC(x$mod.par))))
+#(aic.smooth    <- mean(sapply(loocv.back$ls.models, FUN = function(x) AIC(x$mod.smooth))))

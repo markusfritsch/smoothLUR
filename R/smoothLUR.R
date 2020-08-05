@@ -140,31 +140,31 @@ smoothLUR <- function(
 }
 
 
-dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
-
-pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-        ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-        ,"Constr", "UrbGreen", "Agri", "Forest"
-        , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-        , "LocRoute")
-depVar = "AQeYMean"
-spVar1 = "AQeLon"
-spVar2 = "AQeLat"
-thresh = 0.95
-
-
- (res.model <- smoothLUR(data = dat[dat$AQeType!="background", ]
-                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                ,"Constr", "UrbGreen", "Agri", "Forest"
-                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                , "LocRoute")
-                      ,spVar1 = "AQeLon"
-                      ,spVar2 = "AQeLat"
-                      ,depVar = "AQeYMean"
-                      ,thresh = 0.95) )
-
-
+#dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
+#
+#pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#        ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#        ,"Constr", "UrbGreen", "Agri", "Forest"
+#        , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#        , "LocRoute")
+#depVar = "AQeYMean"
+#spVar1 = "AQeLon"
+#spVar2 = "AQeLat"
+#thresh = 0.95
+#
+#
+# (res.model <- smoothLUR(data = dat[dat$AQeType!="background", ]
+#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#                                ,"Constr", "UrbGreen", "Agri", "Forest"
+#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#                                , "LocRoute")
+#                      ,spVar1 = "AQeLon"
+#                      ,spVar2 = "AQeLat"
+#                      ,depVar = "AQeYMean"
+#                      ,thresh = 0.95) )
+#
+#
 # dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
 # (res.model <- smooth(data = dat[dat$AQeType!="background", ]
 #                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
