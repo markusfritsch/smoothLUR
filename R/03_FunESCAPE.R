@@ -36,11 +36,14 @@
 #' Function for deriving parametric land use regression (LUR) model according
 #'    to the ESCAPE procedure.
 #'
-#' \code{escape} fits a parametric land use regression (LUR) model according
+#' \code{escapeLUR} fits a parametric land use regression (LUR) model according
 #'    to the ESCAPE procedure. The procedure automatically carries out the
-#'    procedure outlined in ...
+#'    procedure outlined in
+#'    \insertCite{Beelen.2013;textual}{escapeLUR},
+#'    \insertCite{Eeftens.2016;textual}{escapeLUR}, and
+#'    \insertCite{Wolf.2017;textual}{escapeLUR}.
 #'
-#' @aliases escape
+#' @aliases escapeLUR
 #' @param data A data set which contains the dependent variable and the
 #'    potential predictors.
 #' @param pred A character vector stating the variable names of the
@@ -55,8 +58,75 @@
 #' @param thresh A numeric value that indicates the maximum share of
 #'    zero values; if the share is exceeded, the corresponding potential
 #'    predictor is excluded.
+#' @return An object of class `escapeLUR` with the following elements:
 #'
-escape <- function(
+#' \item{coefficients}{a vector containing the coefficient estimates}
+#'
+#' It has `...`, `...`, and `wmat` methods.
+#'
+#' @author Svenia Behm and Markus Fritsch
+#' @export
+#' @importFrom stats lm
+#' @importFrom stats as.formula
+#'
+#' @seealso
+#'
+#' \code{\link{kFoldcvLUR}} for k-fold cross-validation for
+#'    escapeLUR and smoothLUR objects.
+#' \code{\link{loocvLUR}} for leave-one-out cross-validation for
+#'    escapeLUR and smoothLUR objects.
+#' \code{\link{smoothLUR}} for smooth land use regression (LUR)
+#'    models.
+#'
+#' @references
+#' \insertAllCited{}
+#'
+#'
+#' @examples
+#' ## Load data from package
+#' dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+#'
+#' set.seed(42)
+#' dat <- dat[sample(1:nrow(dat), 40),]
+#'
+#' ## Code example
+#'
+#' m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#'                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#'                                             ,"Constr", "UrbGreen", "Agri", "Forest"
+#'                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#'                                             , "LocRoute")
+#'                        ,depVar = "AQeYMean"
+#'                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#'                        ,thresh = 0.95)
+#'
+#' summary(res.model)
+#' summary(res.model)$adj.r.squared
+#' BIC(res.model)
+#' AIC(res.model)
+#'
+#' \donttest{
+#' ## Load data from package
+#' dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+#'
+#' ## 
+#' m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#'                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+#'                                             ,"Constr", "UrbGreen", "Agri", "Forest"
+#'                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
+#'                                             , "LocRoute")
+#'                        ,depVar = "AQeYMean"
+#'                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+#'                        ,thresh = 0.95)
+#'
+#' summary(res.model)
+#' summary(res.model)$adj.r.squared
+#' BIC(res.model)
+#' AIC(res.model) 
+#'
+#' }
+#'  
+escapeLUR <- function(
 			data
 			,pred
 			,depVar
@@ -93,7 +163,7 @@ escape <- function(
       adjR2.tmp <- rep(NA, ncol(X))         # Define empty vector for adjusted R^2's of univariate regressions.
 
       for(i in 1:ncol(X)){
-        lm.tmp <- lm(y ~ X[ , i], data = dat)           # Run univariate regressions
+        lm.tmp <- stats::lm(y ~ X[ , i], data = dat)           # Run univariate regressions
         dirEstCoeff.tmp[i] <- sign(lm.tmp$coefficients[2])  # Store sign of estimated coefficient.
         adjR2.tmp[i] <- summary(lm.tmp)$adj.r.squared       # Store adjusted R^2.
       }
@@ -109,7 +179,7 @@ escape <- function(
           if(dirEffAdj[i.tmp] %in% if(dirEffAdj[i.tmp] == 0){ c( 0,  dirEstCoeff.tmp[i.tmp]) } else{dirEstCoeff.tmp[i.tmp]}){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred  <- colnames(X)[i.tmp]
-            resModel <- lm(as.formula(paste("y ~",
+            resModel <- stats::lm(stats::as.formula(paste("y ~",
                                              paste(resPred, collapse = "+"), # Here we can put any vector of predictor names.
                                              sep = "")),
                             data=dat)
@@ -136,7 +206,7 @@ escape <- function(
         # Define vector containing names of current predictors.
         resPred.tmp <- c(resPred, cols.tmp[i])
         # Run multiple regression.
-        lm.tmp <- lm(as.formula(paste("y ~",
+        lm.tmp <- stats::lm(stats::as.formula(paste("y ~",
                                       paste(resPred.tmp, collapse = "+"), # Here we can put any vector of colnames.
                                       sep = "")),
                      data=dat)
@@ -160,7 +230,7 @@ escape <- function(
                        FUN = function(x) { x[1] == 0 | (x[1] %in% x[-1]) }))){
             # Overwrite 'res.pred', 'res.model', and 'AdjR2'.
             resPred <- c(resPred, cols.tmp[i.tmp])
-            resModel <- lm(as.formula(paste("y ~",
+            resModel <- stats::lm(stats::as.formula(paste("y ~",
                                              paste(resPred, collapse = "+"), # here we can put any vector of colnames
                                              sep = "")),
                             data=dat)
@@ -182,7 +252,7 @@ escape <- function(
   while(any(summary(resModel)$coefficients[-1,4] > 0.1)){ # Remove sequentially predictors attributed to p-value larger than 0.1.
     ind.tmp <- which.max(summary(resModel)$coefficients[-1,4])
     resPred <- resPred[-ind.tmp]
-    resModel <- lm(as.formula(paste("y ~",
+    resModel <- stats::lm(stats::as.formula(paste("y ~",
                                      paste(resPred, collapse = "+"), # here we can put any vector of colnames
                                      sep = "")),
                     data=dat)
@@ -199,9 +269,10 @@ escape <- function(
 # #setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
 #
 # dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+# dat <- dat[, -1]
+# save(dat, file="data/monSitesDE.RData")
 #
-#
-# (res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+# (res.model <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
 #                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
 #                                             ,"Constr", "UrbGreen", "Agri", "Forest"
 #                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
@@ -215,7 +286,7 @@ escape <- function(
 # set.seed(42)
 # dat <- dat[sample(1:nrow(dat), 40),]
 #
-# (res.model <- escape(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+# (res.model <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
 #                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
 #                                             ,"Constr", "UrbGreen", "Agri", "Forest"
 #                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
