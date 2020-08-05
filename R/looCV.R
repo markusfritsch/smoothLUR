@@ -65,7 +65,7 @@
 #'
 #' @examples
 #' ## Load data set
-#' dat <- monSitesDE
+#' dat <- data("monSitesDE", package=smoothLUR)
 #'
 looCV <- function(
     data

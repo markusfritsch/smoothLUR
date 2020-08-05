@@ -84,7 +84,7 @@
 #'
 #' @examples
 #' ## Load data from package
-#' dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+#' dat <- data("monSitesDE", package=smoothLUR)
 #'
 #' set.seed(42)
 #' dat <- dat[sample(1:nrow(dat), 40),]
@@ -107,7 +107,7 @@
 #'
 #' \donttest{
 #' ## Load data from package
-#' dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
+#' dat <- data("monSitesDE", package=smoothLUR)
 #'
 #' ## 
 #' m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
