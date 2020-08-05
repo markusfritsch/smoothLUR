@@ -7,11 +7,11 @@
 
 #' Function for conducting leave-one-out cross-validation
 #'
-#' \code{loocv} conducts a leave-one-out cross-validation for parametric
+#' \code{looCV} conducts a leave-one-out cross-validation for parametric
 #'    and smooth land use regression (LUR) models fitted with the functions
-#'    escape and smooth, respectively.
+#'    \code{escapeLUR} and \code{smoothLUR}, respectively.
 #'
-#' @aliases loocv
+#' @aliases looCV
 #' @param data A data set which contains the dependent variable and the
 #'    potential predictors.
 #' @param pred A character vector stating the variable names of the
@@ -33,23 +33,41 @@
 #' @param thresh A numeric value that indicates the maximum share of
 #'    zero values; if the share is exceeded, the corresponding potential
 #'    predictor is excluded.
+#' @return An object of class `loocvLUR` with the following elements:
 #'
-
-# Function returns a list of two elements:
-# 'df.err': data.frame with three columns:
-#                      'ID': Id of monitoring site
-#                      'Err.par':  Errors derived from parametric LUR model
-#                      'Err.smooth': Errors derived from smooth LUR model
-# 'ls.models': list with nrow(data) elements named according to the ID of omitted monitoring site
-#              each list element is a list containing two elements:
-#                   'mod.par': parametric model based on remaining sites
-#                   'mod.smooth': smooth model based on remaining sites
-
-source("03_FunESCAPE.R")
-source("FunSmooth.R")
-
-
-loocv <- function(
+#' \item{df.err}{data.frame with four columns: ID (ID of monitoring
+#'    site), Err.par (Errors derived from parametric LUR model),
+#'    Err.smooth (Errors derived from smooth LUR model)}
+#' \item{ls.models}{list with elements according to lines of data set;
+#'    each list element is named according to the ID of the omitted
+#'    monitoring site is itself a list containing two elements:
+#'    mod.par (parametric model based on remaining sites), mod.smooth
+#'    (smooth model based on remaining sites)}
+#'
+#' It has `...`, `...`, and `...` methods.
+#'
+#' @author Svenia Behm and Markus Fritsch
+#' @export
+#' @importFrom stats predict
+#'
+#' @seealso
+#'
+#' \code{\link{escapeLUR}} for parametric land use regression (LUR)
+#'    modeling.
+#' \code{\link{smoothLUR}} for smooth land use regression (LUR)
+#'    modeling.
+#' \code{\link{kFoldCV}} for k-fold cross-validation for
+#'    escapeLUR and smoothLUR objects.
+#'
+#' @references
+#' \insertAllCited{}
+#'
+#'
+#' @examples
+#' ## Load data set
+#' dat <- monSitesDE
+#'
+looCV <- function(
     data
     ,pred
     ,ID
@@ -68,21 +86,30 @@ loocv <- function(
   ls.models <- rep(list(vec.tmp), nrow(data))
   names(ls.models) <- data$ID
   for(n in 1:nrow(data)){
-    mod.par.tmp <- escape(data=data[-n,], pred, depVar, dirEff, thresh = 0.95) # re-estimate model including forward stepwise predictor selection
+    mod.par.tmp <- escapeLUR(data=data[-n,], pred, depVar, dirEff, thresh = 0.95) # re-estimate model including forward stepwise predictor selection
     ls.models[[n]][[1]] <- mod.par.tmp
-    df.err$Err.par[n] <- data[n, depVar] - predict(mod.par.tmp, newdata = data[n,])
-    mod.smooth.tmp <- smooth(data = data[-n,], pred, spVar1, spVar2, depVar, thresh = 0.95)
+    df.err$Err.par[n] <- data[n, depVar] - stats::predict(mod.par.tmp, newdata = data[n,])
+    mod.smooth.tmp <- smoothLUR(data = data[-n,], pred, spVar1, spVar2, depVar, thresh = 0.95)
     ls.models[[n]][[2]] <- mod.smooth.tmp
-    df.err$Err.smooth[n] <- data[n, depVar] - predict(mod.smooth.tmp, newdata = data[n,])
+    df.err$Err.smooth[n] <- data[n, depVar] - stats::predict(mod.smooth.tmp, newdata = data[n,])
   }
-  return(list(df.err = df.err, ls.models = ls.models))
+
+  resCV <- list(df.err = df.err, ls.models = ls.models)  
+  
+#  attr(resCV, "class")  <- "loocvLUR" 
+  
+  return(resCV)
+
 }
 
+
+#source("03_FunESCAPE.R")
+#source("FunSmooth.R")
 
 dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
 
 
-(loocv.back <- loocv(data = dat[dat$AQeType=="background", ]
+(loocv.back <- looCV(data = dat[dat$AQeType=="background", ]
                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
                                ,"Constr", "UrbGreen", "Agri", "Forest"

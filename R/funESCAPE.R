@@ -71,12 +71,12 @@
 #'
 #' @seealso
 #'
-#' \code{\link{kFoldcvLUR}} for k-fold cross-validation for
-#'    escapeLUR and smoothLUR objects.
-#' \code{\link{loocvLUR}} for leave-one-out cross-validation for
-#'    escapeLUR and smoothLUR objects.
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    models.
+#' \code{\link{kFoldCV}} for k-fold cross-validation for
+#'    escapeLUR and smoothLUR objects.
+#' \code{\link{looCV}} for leave-one-out cross-validation for
+#'    escapeLUR and smoothLUR objects.
 #'
 #' @references
 #' \insertAllCited{}
