@@ -40,7 +40,7 @@
 #' @author Svenia Behm and Markus Fritsch
 #' @export
 #' @importFrom stats as.formula
-#' @○importFrom mgcv gam
+#' @importFrom mgcv gam
 #'
 #' @seealso
 #'
@@ -57,7 +57,7 @@
 #'
 #' @examples
 #' ## Load data set
-#' dat <- data("monSitesDE", package=smoothLUR)
+#' dat <- data("monSitesDE", package="smoothLUR")
 #'
 #' set.seed(42)
 #' dat <- dat[sample(1:nrow(dat), 40),]
@@ -80,7 +80,7 @@
 #'
 #' \donttest{
 #' ## Load data set
-#' dat <- data("monSitesDE", package=smoothLUR)
+#' dat <- data("monSitesDE", package="smoothLUR")
 #'
 #' ## 
 #' m1 <- smoothLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"

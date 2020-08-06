@@ -39,9 +39,9 @@
 #' \code{escapeLUR} fits a parametric land use regression (LUR) model according
 #'    to the ESCAPE procedure. The procedure automatically carries out the
 #'    procedure outlined in
-#'    \insertCite{Beelen.2013;textual}{escapeLUR},
-#'    \insertCite{Eeftens.2016;textual}{escapeLUR}, and
-#'    \insertCite{Wolf.2017;textual}{escapeLUR}.
+#'    \insertCite{Beelen.2013;textual}{smoothLUR},
+#'    \insertCite{Eeftens.2016;textual}{smoothLUR}, and
+#'    \insertCite{Wolf.2017;textual}{smoothLUR}.
 #'
 #' @aliases escapeLUR
 #' @param data A data set which contains the dependent variable and the
@@ -84,7 +84,7 @@
 #'
 #' @examples
 #' ## Load data from package
-#' dat <- data("monSitesDE", package=smoothLUR)
+#' dat <- data("monSitesDE", package="smoothLUR")
 #'
 #' set.seed(42)
 #' dat <- dat[sample(1:nrow(dat), 40),]
@@ -107,7 +107,7 @@
 #'
 #' \donttest{
 #' ## Load data from package
-#' dat <- data("monSitesDE", package=smoothLUR)
+#' dat <- data("monSitesDE", package="smoothLUR")
 #'
 #' ## 
 #' m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"

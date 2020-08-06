@@ -61,7 +61,7 @@
 #' @author Svenia Behm and Markus Fritsch
 #' @export
 #' @importFrom stats predict
-#' @○importFrom mgcv gam
+#' @importFrom mgcv gam
 #'
 #' @seealso
 #'
@@ -70,7 +70,7 @@
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    modeling.
 #' \code{\link{looCV}} for leave-one-out cross-validation for
-#'    `escapeLUR' and `smoothLUR' objects.
+#'    `escapeLUR` and `smoothLUR` objects.
 #'
 #' @references
 #' \insertAllCited{}
@@ -78,7 +78,7 @@
 #'
 #' @examples
 #' ## Load data set
-#' dat <- data("monSitesDE", package=smoothLUR)
+#' dat <- data("monSitesDE", package="smoothLUR")
 #'
 kFoldCV <- function(
   data

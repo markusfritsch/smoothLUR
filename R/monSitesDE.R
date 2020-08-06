@@ -12,17 +12,19 @@
 #' how the predictors were generated, see the supplementary material
 #' of \insertCite{FriBeh2020}
 #'
+#' @name monSitesDE
+#'
 #' @docType data
 #'
 #' @usage data(monSitesDE)
 #'
-#' @format An object of class `data.frame' containing
+#' @format An object of class `data.frame` containing
 #' \describe{
-#' \item
-#' \item
-#' \item
-#' \item
-#' \item
+#' \item{a}{...}
+#' \item{b}{...}
+#' \item{c}{...}
+#' \item{d}{...}
+#' \item{e}{...}
 #' }
 #'
 #' @keywords datasets
@@ -36,8 +38,8 @@
 #' @source \href{https://www.bbr.bund.de/BBSR/DE/Raumbeobachtung/Downloads/downloads_node.html#doc443480bodyText2}{Federal institute for research on building, urban affairs and spatial development, raumtypen: Besiedelung und Lage.}
 #'
 #' @examples
-#' data(monSitesDE)
+#' data("monSitesDE", package = "smoothLUR")
 #' pol <- monSitesDE$AQeYMean
 #' typ <- as.factor(monSitesDE$type)
 #' \donttest{plot(y = pol, x = typ)}
-"monSitesDE"
+NULL
