@@ -8,9 +8,7 @@
 #' The meta-data on the location include longitude, latitude, and
 #' altitude. The surrounding area is characterized by computing
 #' the fractions of various land cover classes, population density,
-#' and the length of the road traffic network. For more details on
-#' how the predictors were generated, see the supplementary material
-#' of \insertCite{FriBeh2020}
+#' and the length of the road traffic network.
 #'
 #' @name monSitesDE
 #'
@@ -18,13 +16,38 @@
 #'
 #' @usage data(monSitesDE)
 #'
-#' @format An object of class `data.frame` containing
+#' @format A dataset with 403 rows and 30 variables containing:
 #' \describe{
-#' \item{a}{...}
-#' \item{b}{...}
-#' \item{c}{...}
-#' \item{d}{...}
-#' \item{e}{...}
+#'   \item{AQeCode}{...}
+#'   \item{AQeMean}{mean NO2 concentration level}
+#'   \item{Year}{year}
+#'   \item{Projection}{...}
+#'   \item{AQeLon}{...}
+#'   \item{AQeLat}{...}
+#'   \item{AQeAlt}{...}
+#'   \item{AQeType}{...}
+#'   \item{AQeArea}{...}
+#'   \item{AQeInletHeight}{...}
+#'   \item{HighDens}{...}
+#'   \item{LowDens}{...}
+#'   \item{Ind}{...}
+#'   \item{Transp}{...}
+#'   \item{Seap}{...}
+#'   \item{Airp}{...}
+#'   \item{Constr}{...}
+#'   \item{UrbGreen}{...}
+#'   \item{Agri}{...}
+#'   \item{Forest}{...}
+#'   \item{AGS}{...}
+#'   \item{GEN}{...}
+#'   \item{NUTS}{...}
+#'   \item{BBSRArea}{...}
+#'   \item{BBSRArea2}{...}
+#'   \item{BBSRpopDens}{...}
+#'   \item{PriRoad}{...}
+#'   \item{SecRoad}{...}
+#'   \item{NatMot}{...}
+#'   \item{LocRoute}{...}
 #' }
 #'
 #' @keywords datasets
@@ -38,8 +61,11 @@
 #' @source \href{https://www.bbr.bund.de/BBSR/DE/Raumbeobachtung/Downloads/downloads_node.html#doc443480bodyText2}{Federal institute for research on building, urban affairs and spatial development, raumtypen: Besiedelung und Lage.}
 #'
 #' @examples
-#' data("monSitesDE", package = "smoothLUR")
-#' pol <- monSitesDE$AQeYMean
-#' typ <- as.factor(monSitesDE$type)
-#' \donttest{plot(y = pol, x = typ)}
+#' \dontrun{
+#'   data(monSitesDE, package = "smoothLUR")
+#'   pol <- monSitesDE$AQeYMean
+#'   typ <- as.factor(monSitesDE$type)
+#'   \donttest{plot(y = pol, x = typ)}
+#' }
+#' 
 NULL

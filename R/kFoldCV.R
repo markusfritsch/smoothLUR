@@ -39,7 +39,7 @@
 #'    potential predictor is excluded.
 #' @param seed A numeric value that defines the seed for random
 #'    sampling
-#' @param folds An integer denoting the number of folds to use in
+#' @param k An integer denoting the number of folds to use in
 #'    cross-validation (defaults to 10)
 #' @param strat A boolean value that indicates whether stratified
 #'    sampling is desired (stratified spatially w.r.t. German federal
@@ -50,7 +50,7 @@
 #'    site), Fold (Number of fold the monitoring site is attributed to),
 #'    Err.par (Errors derived from parametric LUR model), Err.smooth
 #'    (Errors derived from smooth LUR model)}
-#' \item{ls.models}{list with elements according to `folds'; each list
+#' \item{ls.models}{list with elements according to `k`; each list
 #'    element is named according to the omitted fold and is itself a
 #'    list containing two elements: mod.par (parametric model based
 #'    on remaining sites), mod.smooth (smooth model based on remaining
@@ -78,7 +78,7 @@
 #'
 #' @examples
 #' ## Load data set
-#' dat <- data("monSitesDE", package="smoothLUR")
+#' data(monSitesDE, package="smoothLUR")
 #'
 kFoldCV <- function(
   data
@@ -109,7 +109,7 @@ kFoldCV <- function(
   # Define vector indicating K folds
   ind.folds <- cut(1:nrow(data), breaks = k, labels = FALSE)
 
-  pred.tmp <- rep(NA, nrow(dat))
+  pred.tmp <- rep(NA, nrow(data))
   for(i in 1:k){
     ind.test <- ind.reorder[which(ind.folds==i)]
     df.err$Fold[ind.test] <- i

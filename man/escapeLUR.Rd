@@ -44,45 +44,42 @@ It has `...`, `...`, and `...` methods.
 }
 \examples{
 ## Load data from package
-dat <- data("monSitesDE", package="smoothLUR")
-
+data(monSitesDE, package="smoothLUR")
 set.seed(42)
-dat <- dat[sample(1:nrow(dat), 40),]
 
 ## Code example
+dat <- monSitesDE[sample(1:nrow(monSitesDE), 40),]
+m1 <- escapeLUR(data = dat
+                 ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+                         ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                         ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
+                         ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                 ,depVar = "AQeYMean"
+                 ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                 ,thresh = 0.95)
 
-m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                            ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                            ,"Constr", "UrbGreen", "Agri", "Forest"
-                                            , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                            , "LocRoute")
-                       ,depVar = "AQeYMean"
-                       ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                       ,thresh = 0.95)
-
-summary(res.model)
-summary(res.model)$adj.r.squared
-BIC(res.model)
-AIC(res.model)
+summary(m1)
+summary(m1)$adj.r.squared
+BIC(m1)
+AIC(m1)
 
 \donttest{
 ## Load data from package
-dat <- data("monSitesDE", package="smoothLUR")
+data(monSitesDE, package="smoothLUR")
+dat <- monSitesDE
+m1 <- escapeLUR(data = dat
+                 ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+                         ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                         ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
+                         ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                 ,depVar = "AQeYMean"
+                 ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                 ,thresh = 0.95)
 
-## 
-m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-                                            ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-                                            ,"Constr", "UrbGreen", "Agri", "Forest"
-                                            , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-                                            , "LocRoute")
-                       ,depVar = "AQeYMean"
-                       ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-                       ,thresh = 0.95)
-
-summary(res.model)
-summary(res.model)$adj.r.squared
-BIC(res.model)
-AIC(res.model) 
+summary(m1)
+summary(m1)$adj.r.squared
+BIC(m1)
+AIC(m1) 
 
 }
  

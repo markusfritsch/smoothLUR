@@ -57,7 +57,7 @@ It has `...`, `...`, and `...` methods.
 }
 \examples{
 ## Load data set
-dat <- data("monSitesDE", package="smoothLUR")
+data(monSitesDE, package="smoothLUR")
 
 }
 \references{
