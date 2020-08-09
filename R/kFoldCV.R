@@ -44,7 +44,10 @@
 #' @param strat A boolean value that indicates whether stratified
 #'    sampling is desired (stratified spatially w.r.t. German federal
 #'    states)
-#' @return An object of class `tfcvLUR` with the following elements:
+#' @param loocv A boolean value that indicates whether a leave-one-out
+#'    cross-validation which is a k-fold CV with `k` equal to the
+#'    number of rows in `data` desired
+#' @return An object of class `kfcvLUR` with the following elements:
 #'
 #' \item{df.err}{data.frame with four columns: ID (Id of monitoring
 #'    site), Fold (Number of fold the monitoring site is attributed to),
@@ -92,7 +95,12 @@ kFoldCV <- function(
   ,seed
   ,k = 10
   ,strat = FALSE
+  ,loocv = FALSE
 ){
+
+  if(loocv){
+    k = nrow(data)
+  }
 
   df.err <- data.frame(ID = data[,ID],
                        Fold = rep(NA, nrow(data)),
@@ -101,17 +109,17 @@ kFoldCV <- function(
   vec.tmp <- vector("list", length = 2)
   names(vec.tmp) <- c("mod.par", "mod.smooth")
   ls.models <- rep(list(vec.tmp), k)
-  names(ls.models) <- paste("Fold", 1:k, sep = "")
+  names(ls.models) <- ifelse(loocv, data[,ID], paste("Fold", 1:k, sep = ""))
 
-  set.seed(seed)
-  ind.reorder <- sample(nrow(data))
+  if(!loocv){
+    set.seed(seed)
+    ind.reorder <- sample(nrow(data))
+    # Define vector indicating K folds
+    ind.folds <- cut(1:nrow(data), breaks = k, labels = FALSE)
+  }
 
-  # Define vector indicating K folds
-  ind.folds <- cut(1:nrow(data), breaks = k, labels = FALSE)
-
-  pred.tmp <- rep(NA, nrow(data))
   for(i in 1:k){
-    ind.test <- ind.reorder[which(ind.folds==i)]
+    ind.test <- ifelse(loocv, i, ind.reorder[which(ind.folds==i)])
     df.err$Fold[ind.test] <- i
 
     data.test <- data[ind.test, ]
@@ -121,15 +129,15 @@ kFoldCV <- function(
     ls.models[[i]][[1]] <- mod.par.tmp
     df.err$Err.par[ind.test]    <- data[ind.test, depVar] - predict(mod.par.tmp, newdata = data.test)
 
-    mod.smooth.tmp <- smoothLUR(data=data.train, pred, spVar1, spVar2, depVar, thresh = 0.95)
-    ls.models[[i]][[2]] <- mod.smooth.tmp
-    df.err$Err.smooth[ind.test] <- data[ind.test, depVar] - predict(mod.smooth.tmp, newdata = data.test)
+   # mod.smooth.tmp <- smoothLUR(data=data.train, pred, spVar1, spVar2, depVar, thresh = 0.95)
+#    ls.models[[i]][[2]] <- mod.smooth.tmp
+#    df.err$Err.smooth[ind.test] <- data[ind.test, depVar] - predict(mod.smooth.tmp, newdata = data.test)
   }
 
   resCV <- list(df.err = df.err, ls.models = ls.models)
-    
-#  attr(resCV, "class")  <- "tfcvLUR"  
-  
+
+#  attr(resCV, "class")  <- "kfcvLUR"
+
   return(resCV)
 }
 
@@ -153,6 +161,7 @@ kFoldCV <- function(
 #                      ,seed = 1
 #                      ,k = 10
 #                      ,strat = FALSE
+#                      ,loocv = FALSE
 #)
 #
 #
