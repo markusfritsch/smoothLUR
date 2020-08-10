@@ -109,9 +109,10 @@ kFoldCV <- function(
   vec.tmp <- vector("list", length = 2)
   names(vec.tmp) <- c("mod.par", "mod.smooth")
   ls.models <- rep(list(vec.tmp), k)
-  names(ls.models) <- ifelse(loocv, data[,ID], paste("Fold", 1:k, sep = ""))
-
-  if(!loocv){
+  if(loocv){
+    names(ls.models) <- data[,ID]
+   } else {
+    names(ls.models) <- paste("Fold", 1:k, sep = "")
     set.seed(seed)
     ind.reorder <- sample(nrow(data))
     # Define vector indicating K folds
@@ -119,7 +120,11 @@ kFoldCV <- function(
   }
 
   for(i in 1:k){
-    ind.test <- ifelse(loocv, i, ind.reorder[which(ind.folds==i)])
+    if(loocv){
+      ind.test <- i
+    } else {
+      ind.test <- ind.reorder[which(ind.folds==i)]
+    }
     df.err$Fold[ind.test] <- i
 
     data.test <- data[ind.test, ]
@@ -129,9 +134,9 @@ kFoldCV <- function(
     ls.models[[i]][[1]] <- mod.par.tmp
     df.err$Err.par[ind.test]    <- data[ind.test, depVar] - predict(mod.par.tmp, newdata = data.test)
 
-   # mod.smooth.tmp <- smoothLUR(data=data.train, pred, spVar1, spVar2, depVar, thresh = 0.95)
-#    ls.models[[i]][[2]] <- mod.smooth.tmp
-#    df.err$Err.smooth[ind.test] <- data[ind.test, depVar] - predict(mod.smooth.tmp, newdata = data.test)
+    mod.smooth.tmp <- smoothLUR(data=data.train, pred, spVar1, spVar2, depVar, thresh = 0.95)
+    ls.models[[i]][[2]] <- mod.smooth.tmp
+    df.err$Err.smooth[ind.test] <- data[ind.test, depVar] - predict(mod.smooth.tmp, newdata = data.test)
   }
 
   resCV <- list(df.err = df.err, ls.models = ls.models)
