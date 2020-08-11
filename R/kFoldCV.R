@@ -47,6 +47,9 @@
 #' @param loocv A boolean value that indicates whether a leave-one-out
 #'    cross-validation which is a k-fold CV with `k` equal to the
 #'    number of rows in `data` desired
+#' @param indRegions A character string that indicates the name of
+#'    the variable referring to the geographical regions; this
+#'    variable is required to perform spatial stratified sampling
 #' @return An object of class `kfcvLUR` with the following elements:
 #'
 #' \item{df.err}{data.frame with four columns: ID (Id of monitoring
@@ -64,7 +67,7 @@
 #' @author Svenia Behm and Markus Fritsch
 #' @export
 #' @importFrom stats predict
-#' @importFrom mgcv gam
+#' @importFrom mgcv gam splitTools
 #'
 #' @seealso
 #'
@@ -95,6 +98,7 @@ kFoldCV <- function(
   ,seed
   ,k = 10
   ,strat = FALSE
+  ,indRegions = "indRegions"
   ,loocv = FALSE
 ){
 
@@ -111,20 +115,32 @@ kFoldCV <- function(
   ls.models <- rep(list(vec.tmp), k)
   if(loocv){
     names(ls.models) <- data[,ID]
-   } else {
+  } else {
     names(ls.models) <- paste("Fold", 1:k, sep = "")
-    set.seed(seed)
-    ind.reorder <- sample(nrow(data))
-    # Define vector indicating K folds
-    ind.folds <- cut(1:nrow(data), breaks = k, labels = FALSE)
+    if(strat){
+      ls.folds <- create_folds(data[,indRegions], k = k, type = "stratified", seed = seed)
+      } else {
+        set.seed(seed)
+        ind.reorder <- sample(nrow(data))
+        # Define vector indicating K folds
+        ind.folds <- cut(1:nrow(data), breaks = k, labels = FALSE)
+    }
   }
 
   for(i in 1:k){
     if(loocv){
       ind.test <- i
-    } else {
-      ind.test <- ind.reorder[which(ind.folds==i)]
-    }
+      } else {
+        if(strat){
+          ind.test <- seq(1:nrow(data))[-ls.folds[[i]]]
+          # Checks:
+          # sort(unlist(sapply(ls.folds, FUN = function(x) seq(1:nrow(data))[-x])))
+          # length(unlist(sapply(ls.folds, FUN = function(x) seq(1:nrow(data))[-x])))
+          # length(unique(unlist(sapply(ls.folds, FUN = function(x) seq(1:nrow(data))[-x]))))
+        } else {
+          ind.test <- ind.reorder[which(ind.folds==i)]
+        }
+      }
     df.err$Fold[ind.test] <- i
 
     data.test <- data[ind.test, ]
@@ -141,7 +157,7 @@ kFoldCV <- function(
 
   resCV <- list(df.err = df.err, ls.models = ls.models)
 
-#  attr(resCV, "class")  <- "kfcvLUR"
+  #  attr(resCV, "class")  <- "kfcvLUR"
 
   return(resCV)
 }
