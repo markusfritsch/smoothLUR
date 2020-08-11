@@ -443,4 +443,10 @@ names(df.analysis)[c(1:3,5:20,26:29)] <- c("AQeCode", "AQeYMean", "Year", "AQeLo
                                            "Airp", "Constr", "UrbGreen", "Agri", "Forest",
                                            "PriRoad", "SecRoad", "NatMot", "LocRoute")
 
+
+# Add column of type factor indicating the municipality; this is required for stratified sampling in validation
+df.analysis$indRegions <- NA
+df.analysis$indRegions[nchar(df.analysis$AGS) == 7] <- substr(df.analysis$AGS[nchar(df.analysis$AGS) == 7], 1, 1)
+df.analysis$indRegions[nchar(df.analysis$AGS) != 7] <- substr(df.analysis$AGS[nchar(df.analysis$AGS) != 7], 1, 2)
+
 write.csv(df.analysis, file = "DATA_MonitoringSites_DE.csv")
