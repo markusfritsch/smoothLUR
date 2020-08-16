@@ -101,75 +101,67 @@ spdf.cellcentres.WGS84 <- spTransform(cellcentres.DE, WGS84)
 cellcentres.DE$lon.WGS84 <- coordinates(spdf.cellcentres.WGS84)[,1]
 cellcentres.DE$lat.WGS84 <- coordinates(spdf.cellcentres.WGS84)[,2]
 
-#gridded(cellcentres.DE) <- TRUE
-#spplot(cellcentres.DE) +
-#  latticeExtra::layer(sp.polygons(sPdf.boundaries.DE, fill = NA, col = "orange"))
-
 
 
 # Assign data from BBSR and BKG ----
 
-# Exploring and adjusting data - for details have a look in the data-preparation.R File
+
+# Exploring and adjusting data - for details have a look in '01-MonitoringSites_DE_DataPreparation.R'
 names(df.area2015)
 names(df.popDens2015)
 names(admin.regions.2015)
 
-admin.regions.2015.sub <- admin.regions.2015[,names(admin.regions.2015) %in% c("RS", "AGS", "GEN", "NUTS")]
+
+admin.regions.2015 <- admin.regions.2015[,c("RS", "AGS", "GEN", "NUTS", "EWZ")]
+
+# Calculate area of each polygon in 'admin.regions.2015' and add column to 'admin.regions.2015@data'
+proj4string(admin.regions.2015) # unit=m
+# gArea() returns area in m^2, divide by 1000*1000 to get area in km^2
+admin.regions.2015$Area_km2 <- gArea(admin.regions.2015, byid = TRUE) / 1000000
+
+admin.regions.2015$popDens <- as.numeric(admin.regions.2015$EWZ) / admin.regions.2015$Area_km2
+summary(admin.regions.2015$popDens)
+
+
+# Note that calculating area of municipalities based on the respective polygon is just an approximation as
+# a polygon is built upon connecting points and resembles the shape of the respective municipality not exactly.
+# More exact values for the population density can be retrieved using data from BBSR...
+
+
 
 dummy.tmp <- nchar(df.area2015$gem15) == 7
 df.area2015$gem15_full[dummy.tmp] <- paste(0,df.area2015$gem15[dummy.tmp],sep="")
 df.area2015$gem15_full[!dummy.tmp] <- df.area2015$gem15[!dummy.tmp]
-all(admin.regions.2015.sub$AGS %in% df.area2015$gem15_full)
-test2 <- admin.regions.2015.sub$AGS %in% df.area2015$gem15_full
-table(test2)
+all(admin.regions.2015$AGS %in% df.area2015$gem15_full)
+table(admin.regions.2015$AGS %in% df.area2015$gem15_full)
 # there are 185 municipalities for which no entry is available in `df.area`
-x1 <- admin.regions.2015.sub[!test2,]@data
-#View(x1)
-
+#View(admin.regions.2015[!(admin.regions.2015$AGS %in% df.area2015$gem15_full),]@data)
 
 # Data\Data_BKG\dokumentation\vg250.pdf
 # search for 'gemeindefrei' -> Regionalschlüssel (RS) 6.Stelle
-x1$check9 <- sapply(as.vector(x1[,1]), function(x) substring(x, 6,6))
-
-# sort for 'check9'
-# add to all municipalities except 'Berlin' and 'Hamburg' attribute 'rural'
-admin.regions.2015.sub$digit6 <- sapply(as.vector(admin.regions.2015.sub$RS), function(x) substring(x,6,6))
+admin.regions.2015$digit6 <- sapply(as.vector(admin.regions.2015$RS), function(x) substring(x,6,6))
 
 
-regions.2015.complete <- merge(admin.regions.2015.sub,df.area2015,
-                               by.y = "gem15_full", by.x = "AGS", all.x = TRUE)
+regions.2015 <- merge(admin.regions.2015, df.area2015[,c("vbgem15", "gem15_full")],
+                      by.y = "gem15_full", by.x = "AGS", all.x = TRUE)
 
+# Add manually the information for 'Berlin' and 'Hamburg' contained in in df.area.2015
+df.area2015[df.area2015$name15%in%c("Berlin, Stadt", "Hamburg, Freie und Hansestadt"),]
+#View(regions.2015@data[is.na(regions.2015$vbgem15),]) # filter for  digit == 0
+regions.2015@data[is.na(regions.2015$vbgem15) & regions.2015$digit6==0, "vbgem15"] <- df.area2015[c(1113,1113,8497),"vbgem15"]
 
+table(is.na(regions.2015$vbgem15))
+# now there are 182 entries in 'regions.2015' without a value for 'vbgem15'
+# these entries refer to regions as forests where in general no people live
 
-regions.2015.complete$raumt2010besiedlung[regions.2015.complete$digit6==9] <- "überwiegend ländlich"
-regions.2015.complete$raumt2010lage[regions.2015.complete$digit6==9] <-  "sehr peripher"
-
-
-# Add manually the information for 'Berlin' and 'Hamburg' contained in in dfarea.2015
-df.area2015[df.area2015$name15%in%c("Berlin, Stadt", "Hamburg, Freie und Hansestadt"),1:7]
-# View(regions.2015.complete@data[is.na(regions.2015.complete$raumt2010besiedlung),])
-
-regions.2015.complete@data[is.na(regions.2015.complete$raumt2010besiedlung),6:12] <- df.area2015[c(1113,1113,8497),1:7]
-
-# Are there any more NA's?
-check.na <- is.na(regions.2015.complete$raumt2010besiedlung)
-table(check.na)
-# No! -> to every polygon in 'admin.regions.2015.sub' the corresponding degree of urbanisation can be attributed
-
-levels(regions.2015.complete$raumt2010besiedlung)
-levels(regions.2015.complete$raumt2010besiedlung) <- c("suburban", "rural", "urban")
-
-
-proj4string(regions.2015.complete)
+proj4string(regions.2015)
 proj4string(cellcentres.DE)
 
-head(cellcentres.DE@data)
-
-cellcentres.DE@data <- cbind(cellcentres.DE@data, over(cellcentres.DE, regions.2015.complete))
+cellcentres.DE@data <- cbind(cellcentres.DE@data, over(cellcentres.DE, regions.2015))
 
 table(is.na(cellcentres.DE$AGS))
 # -> 757 NA's
-View(cellcentres.DE@data[is.na(cellcentres.DE$AGS),])
+#View(cellcentres.DE@data[is.na(cellcentres.DE$AGS),])
 
 plot(sPdf.boundaries.DE, col = "white", lty = 2)
 points(cellcentres.DE[is.na(cellcentres.DE$AGS),"layer"], pch = 4, col = "blue")
@@ -178,17 +170,17 @@ points(cellcentres.DE[is.na(cellcentres.DE$AGS),"layer"], pch = 4, col = "blue")
 
 # See further below
 # cellcentres.DE2 <- subset(cellcentres.DE, !is.na(cellcentres.DE$AGS))
-# 
+#
 # summary(duplicated(df.popDens2015$vbgem15)) # unambiguously identified
 # table(is.na(cellcentres.DE2$vbgem15))
 # # 2288 NA's
-# 
+#
 # cellcentres.DE2  <- merge(cellcentres.DE2, df.popDens2015[,c(1,3,4)],
 #                           by = "vbgem15",
 #                           all.x = TRUE)
-# 
+#
 # cellcentres.DE2$popDens15 <- cellcentres.DE2$z_bev15/cellcentres.DE2$fl15_sum
-# 
+#
 # summary(cellcentres.DE2$popDens15)
 # 2288 NA's
 # View(cellcentres.DE2@data[is.na(cellcentres.DE2$popDens15),])
@@ -234,11 +226,11 @@ for(i in 1:nrow(cellcentres.DE)){
 }
 
 
-write.csv(CLC.Grid, "R/DATA/Data_built/Attribute_CLC.csv")
+write.csv(CLC.Grid, "Data_built/Attribute_CLC.csv")
 }
 
 
-CLC.Grid <- read.csv("R/DATA/Data_built/Attribute_CLC.csv")[,-1]
+CLC.Grid <- read.csv("Data_built/Attribute_CLC.csv")[,-1]
 
 
 table(cellcentres.DE@data$layer == CLC.Grid$ID)
@@ -297,24 +289,24 @@ for(i in 1:10000){
 write.csv(spdf.cellcentres.DE2@data[280001:300000, ], file = "Attribute_Road_280001to300000.csv")
 }
 
-Roads1  <- read.csv("R/DATA/Data_built/Attribute_Road_1to20000.csv")[,-1]
-Roads2  <- read.csv("R/DATA/Data_built/Attribute_Road_20001to40000.csv")[,-1]
-Roads3  <- read.csv("R/DATA/Data_built/Attribute_Road_40001to60000.csv")[,-1]
-Roads4  <- read.csv("R/DATA/Data_built/Attribute_Road_60001to80000.csv")[,-1]
-Roads5  <- read.csv("R/DATA/Data_built/Attribute_Road_80001to100000.csv")[,-1]
-Roads6  <- read.csv("R/DATA/Data_built/Attribute_Road_100001to120000.csv")[,-1]
-Roads7  <- read.csv("R/DATA/Data_built/Attribute_Road_120001to140000.csv")[,-1]
-Roads8  <- read.csv("R/DATA/Data_built/Attribute_Road_140001to160000.csv")[,-1]
-Roads9  <- read.csv("R/DATA/Data_built/Attribute_Road_160001to180000.csv")[,-1]
-Roads10 <- read.csv("R/DATA/Data_built/Attribute_Road_180001to200000.csv")[,-1]
-Roads11 <- read.csv("R/DATA/Data_built/Attribute_Road_200001to220000.csv")[,-1]
-Roads12 <- read.csv("R/DATA/Data_built/Attribute_Road_220001to240000.csv")[,-1]
-Roads13 <- read.csv("R/DATA/Data_built/Attribute_Road_240001to260000.csv")[,-1]
-Roads14 <- read.csv("R/DATA/Data_built/Attribute_Road_260001to280000.csv")[,-1]
-Roads15 <- read.csv("R/DATA/Data_built/Attribute_Road_280001to300000.csv")[,-1]
-Roads16 <- read.csv("R/DATA/Data_built/Attribute_Road_300001to320000.csv")[,-1]
-Roads17 <- read.csv("R/DATA/Data_built/Attribute_Road_320001to340000.csv")[,-1]
-Roads18 <- read.csv("R/DATA/Data_built/Attribute_Road_340001to356793.csv")[,-1]
+Roads1  <- read.csv("Data_built/Attribute_Road_1to20000.csv")[,-1]
+Roads2  <- read.csv("Data_built/Attribute_Road_20001to40000.csv")[,-1]
+Roads3  <- read.csv("Data_built/Attribute_Road_40001to60000.csv")[,-1]
+Roads4  <- read.csv("Data_built/Attribute_Road_60001to80000.csv")[,-1]
+Roads5  <- read.csv("Data_built/Attribute_Road_80001to100000.csv")[,-1]
+Roads6  <- read.csv("Data_built/Attribute_Road_100001to120000.csv")[,-1]
+Roads7  <- read.csv("Data_built/Attribute_Road_120001to140000.csv")[,-1]
+Roads8  <- read.csv("Data_built/Attribute_Road_140001to160000.csv")[,-1]
+Roads9  <- read.csv("Data_built/Attribute_Road_160001to180000.csv")[,-1]
+Roads10 <- read.csv("Data_built/Attribute_Road_180001to200000.csv")[,-1]
+Roads11 <- read.csv("Data_built/Attribute_Road_200001to220000.csv")[,-1]
+Roads12 <- read.csv("Data_built/Attribute_Road_220001to240000.csv")[,-1]
+Roads13 <- read.csv("Data_built/Attribute_Road_240001to260000.csv")[,-1]
+Roads14 <- read.csv("Data_built/Attribute_Road_260001to280000.csv")[,-1]
+Roads15 <- read.csv("Data_built/Attribute_Road_280001to300000.csv")[,-1]
+Roads16 <- read.csv("Data_built/Attribute_Road_300001to320000.csv")[,-1]
+Roads17 <- read.csv("Data_built/Attribute_Road_320001to340000.csv")[,-1]
+Roads18 <- read.csv("Data_built/Attribute_Road_340001to356793.csv")[,-1]
 
 
 RoadsComplete <- rbind(Roads1, Roads2, Roads3, Roads4, Roads5, Roads6,
@@ -343,27 +335,19 @@ cellcentres.DE3$Altitude <- extract(raster.DGM, cellcentres.DE3)
 
 cellcentres.final <- cellcentres.DE3
 
-df.grid.final <- cellcentres.final@data[ , c(1, 3:6, 36, 19:28, 7, 9:10, 16:17, 31:35)]
+df.grid.final <- cellcentres.final@data[ , c(1, 3:6, 33, 16:25, 7, 9:10, 13, 28:32)]
 names(df.grid.final) <- c("Layer", "Lon.GK3", "Lat.GK3", "Lon.WGS84", "Lat.WGS84", "Alt",
                           "HighDens", "LowDens", "Ind", "Transp", "Seap",
                           "Airp", "Constr", "UrbGreen", "Agri", "Forest",
-                          "AGS", "GEN", "NUTS", "BBSRArea", "BBSRArea2", "BBSRpopDens",
+                          "AGS", "GEN", "NUTS", "popDens", "BBSRpopDens",
                           "PriRoad", "SecRoad", "NatMot", "LocRoute")
 
-View(df.grid.final[is.na(df.grid.final$BBSRpopDens), ])
-# Mainly forest -> Either set 0 or build arithmetic mean over BBSRpopDens of rows with same NUTS level...
+# Add column of type factor indicating the municipality
+df.grid.final$indRegions <- NA
+df.grid.final$indRegions[nchar(df.grid.final$AGS) == 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) == 7], 1, 1)
+df.grid.final$indRegions[nchar(df.grid.final$AGS) != 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) != 7], 1, 2)
 
-
-popDens.by.NUTS <- aggregate(BBSRpopDens ~ NUTS, df.grid.final, FUN = mean, rm.na = TRUE)
-
-
-
-Index <- apply(X = matrix(df.grid.final[is.na(df.grid.final$BBSRpopDens), "NUTS"]),
-               MARGIN = 1,
-               FUN = function(X) which(popDens.by.NUTS$NUTS == X))
-
-df.grid.final[is.na(df.grid.final$BBSRpopDens), "BBSRpopDens"] <- popDens.by.NUTS[Index, "BBSRpopDens"]
 
 # df.grid.DE <- df.grid.final
 # rm(list=(ls()[ls()!="df.grid.DE"]))
-# save.image("R/DATA/Data_built/grid.DE.NEW.RData")
+# save.image("Data_built/grid.DE.RData")
