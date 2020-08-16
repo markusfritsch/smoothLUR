@@ -1,0 +1,41 @@
+Overview over data used for project LUR with Splines:
+
+1) DE_AQeReporting_2013-2015 - permalink: a19f34d0217243a097f257a4a4979a15; url: https://www.eea.europa.eu/data-and-maps/data/aqereporting-2
+retrieved on 23rd April 2018
+File name syntax for aggregated timeseries is: <countrycode>_<pollutant_notation>_<year>_aggregated_timeseries.csv
+File name syntax for metadata is: <countrycode>_<year>_metadata.csv
+
+For information about Air Quality e-Reporting products on EEA data service see: AQeReporting_products_2017_vFinal.pdf
+
+
+2) Data_BBSR
+http://www.bbr.bund.de/BBSR/DE/Raumbeobachtung/Downloads/downloads_node.html#doc443480bodyText2
+- Raumtypen: Besiedelung und Lage -
+retrieved on 30th May 2017
+
+
+3) Data_BKG 
+
+-> Verwaltungsgebiete 
+http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=deu&gdz_akt_zeile=5&gdz_anz_zeile=1&gdz_unt_zeile=14&gdz_user_id=0
+- Download Geodaten -> GK3 Ebenen ArcInfo-Shape (Stand: 31.12.2015)
+retrieved on 19th July 2017
+
+-> DGM - Digitales GeländeModell
+http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=deu&gdz_akt_zeile=5&gdz_anz_zeile=1&gdz_unt_zeile=3&gdz_user_id=0-
+- Download Geodaten -> GK3 Grid-ASCII (Stand: 31.12.2015)
+retrieved on 29th April 2018
+
+4) Data_CLC12
+retrieved from
+http://land.copernicus.eu/pan-european/corine-land-cover/clc-2012
+on 23rd April 2018
+
+5) Data_GADM -> boundaries of Germany and its federal states
+data retrieved from 
+http://www.gadm.org/download
+on 23rd October 2016
+
+
+6) Data_EuroGeographics -> traffic network (!Regional map not open data, very costly, so we focus first on coarser resolution of 1:1000000 instead of the regional resolution 1:250000)
+data retrieved from http://www.eurogeographics.org/content/euroglobalmap-opendata on 25th April 2018

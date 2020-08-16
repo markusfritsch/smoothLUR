@@ -1,0 +1,9 @@
+No. structural variables;StepAIC;Form structural variables;Spatial component;adj. R^2;BIC;LOOCV RMSE;LOOCV MAE;LOOCV BIC;LOOCV AIC;LOOCV adj. R^2
+16;no;linear;-;0,688;1499,968;4,518;3,405;1494,119;1431,096;0,688
+10;yes;linear;-;0,693;1469,207;4,42;3,324;1463,395;1421,38;0,693
+-;-;-;linear;0,108;1695,613;7,352;5,853;1688,778;1674,773;0,108
+-;-;-;bivariate spline;0,267;1711,601;6,888;5,555;1704,926;1641,328;0,267
+16;no;linear;linear;0,785;1417,471;3,758;2,843;1411,983;1341,958;0,785
+11;yes;linear;linear;0,786;1393,305;3,712;2,805;1387,841;1335,322;0,786
+11;yes;linear;bivariate spline;0,841;1389,13;3,326;2,527;1383,803;1278,322;0,841
+11;yes;linear and univariate spline;bivariate spline;0,856;1384,811;3,207;2,429;1376,42;1257,757;0,856

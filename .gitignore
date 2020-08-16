@@ -16,6 +16,8 @@
 
 # data directories
 /DataFull/
+/Data_built
+/Data_sources
 
 
 # old material
