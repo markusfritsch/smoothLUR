@@ -67,7 +67,8 @@
 #' @author Svenia Behm and Markus Fritsch
 #' @export
 #' @importFrom stats predict
-#' @importFrom mgcv gam splitTools
+#' @importFrom mgcv gam
+#' @importFrom splitTools create_folds
 #'
 #' @seealso
 #'
@@ -118,7 +119,7 @@ kFoldCV <- function(
   } else {
     names(ls.models) <- paste("Fold", 1:k, sep = "")
     if(strat){
-      ls.folds <- create_folds(data[,indRegions], k = k, type = "stratified", seed = seed)
+      ls.folds <- splitTools::create_folds(data[,indRegions], k = k, type = "stratified", seed = seed)
       } else {
         set.seed(seed)
         ind.reorder <- sample(nrow(data))

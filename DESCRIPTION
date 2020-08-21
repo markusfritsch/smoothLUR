@@ -1,8 +1,8 @@
 Package: smoothLUR
 Type: Package
 Title: Smooth Land Use Regression Modeling
-Version: 0.1.0
-Date: 2020-08-06
+Version: 0.1.0.9000
+Date: 2020-08-21
 Authors@R: c(person("Markus", "Fritsch", role = c("aut", "cre"),
 		email = "Markus.Fritsch@uni-Passau.de"),
 	person("Svenia", "Bahm", role = c("aut"),
@@ -13,6 +13,7 @@ Depends: R (>= 4.0.0)
 Imports: mgcv (>= 1.8-31),
 	stats (>= 3.6.2),
 	Rdpack (>= 1.0-0),
+	splitTools (>= 0.2.1)
 Suggests: testthat (>= 2.3.2),
 	R.rsp (>= 0.44.0)
 RdMacros: Rdpack
