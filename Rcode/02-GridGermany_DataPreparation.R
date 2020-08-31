@@ -336,7 +336,7 @@ cellcentres.DE3$Altitude <- extract(raster.DGM, cellcentres.DE3)
 cellcentres.final <- cellcentres.DE3
 
 df.grid.final <- cellcentres.final@data[ , c(1, 3:6, 33, 16:25, 7, 9:10, 13, 28:32)]
-names(df.grid.final) <- c("Layer", "Lon.GK3", "Lat.GK3", "Lon.WGS84", "Lat.WGS84", "Alt",
+names(df.grid.final) <- c("layer", "lon.GK3", "lat.GK3", "lon.WGS84", "lat.WGS84", "Alt",
                           "HighDens", "LowDens", "Ind", "Transp", "Seap",
                           "Airp", "Constr", "UrbGreen", "Agri", "Forest",
                           "AGS", "GEN", "NUTS", "popDens", "BBSRpopDens",
