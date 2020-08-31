@@ -7,7 +7,7 @@
 rm(list = ls())
 
 ## Load packages ----
-
+library(smoothLUR)
 library(xlsx)
 library(rgdal)
 library(raster)
@@ -29,39 +29,25 @@ library(rgeos)
 ### Some descriptives ----
 ###
 
-# Data referring to background sites 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
+# Data referring to all sites
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
 
-table(DATA$BBSRArea)
-table(DATA$AQeArea)
-table(DATA$BBSRArea2)
-
-dat.back <- DATA[,c(2,5:7,11:20,26:30)]
-str(dat.back)
-summary(dat.back[, c(2:4, 15, 16:19)])
-
-#rename some columns
-names(dat.back)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
-
-
-# Data referring to traffic/industrial sites 
-DATA <- read.csv("R/DATA/Data_built/DATA_DE_traffic_industrial.csv", header=TRUE)[, -1]
-dat.tr.ind <- DATA[,c(2,5:7,11:20,26:30)]
-
-#rename some columns
-names(dat.tr.ind)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
-
+dat.B  <- dat[dat$AQeType == "background", ]
+dat.TI <- dat[dat$AQeType != "background", ]
 
 # Tukey's Five and Mean
-fivenum(dat.back$Y); mean(dat.back$Y); sd(dat.back$Y)
-fivenum(dat.tr.ind$Y); mean(dat.tr.ind$Y); sd(dat.tr.ind$Y)
+fivenum(dat$Y); mean(dat$Y); sd(dat$Y)
+fivenum(dat.B$Y); mean(dat.B$Y); sd(dat.B$Y)
+fivenum(dat.TI$Y); mean(dat.TI$Y); sd(dat.TI$Y)
 
-dat.all <- data.frame(Y = c(dat.back$Y, dat.tr.ind$Y), 
+
+
+dat.all <- data.frame(Y = c(dat.B$Y, dat.TI$Y),
                       type = c(rep("Backround", 246), rep("Traffic/Industrial", 157)))
 
-fivenum(dat.all$Y); mean(dat.all$Y); sd(dat.all$Y)
-
-dat.all2 <- data.frame(Y = rep(c(dat.back$Y, dat.tr.ind$Y),2), 
+dat.all2 <- data.frame(Y = rep(c(dat.B$Y, dat.TI$Y),2),
                        type = c(rep("Backround", 246), rep("Traffic/Industrial", 157), rep("All", 403)))
 
 
@@ -75,12 +61,12 @@ dat.all2 <- data.frame(Y = rep(c(dat.back$Y, dat.tr.ind$Y),2),
   xlab(expression(paste(NO[2], " concentration level in ", mu, "g/", m^3, sep = ""))) +
   ylab("density") +
   scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
-  theme(axis.text = element_text(size = 18), 
+  theme(axis.text = element_text(size = 18),
         axis.title = element_text(size = 18),
         legend.title = element_blank(),
         legend.text = element_text(size = 18),
         legend.position = c(0.75, 0.9)))
-  
+
 
 pdf("img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)
 p.hist
@@ -96,7 +82,7 @@ dev.off()
     xlab(expression(paste(NO[2], " concentration level in ", mu, "g/", m^3, sep = ""))) +
     ylab("density") +
     scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
-    theme(axis.text = element_text(size = 18), 
+    theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
           legend.title = element_blank(),
           legend.text = element_text(size = 18),
@@ -109,20 +95,11 @@ dev.off()
 
 
 
-# Adjust!
-dat.tmp <- dat.back
-
-t(apply(dat.tmp, MARGIN = 2, FUN = function(x){
-  return(c(nr.values = length(unique(x)),
-           max.extreme =  isTRUE(max(x) > quantile(x, 0.9) + 3* (quantile(x, 0.9) - quantile(x, 0.1))),
-           min.extreme =  isTRUE(min(x) < quantile(x, 0.1) - 3* (quantile(x, 0.9) - quantile(x, 0.1))))
-  )}))
-
-names(dat.back)
-corr.DE <- round(cor(dat.back[,-c(1, 9:11)]), 2)
+names(dat.B)
+corr.DE <- round(cor(dat.B[,c(5:7, 11:14, 18:20, 24, 26:29)]), 2)
 
 
-# for correlation matrix in ggplot2 see 
+# for correlation matrix in ggplot2 see
 # http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
 # accessed 2020-01-30
 
@@ -133,26 +110,24 @@ get_upper_tri <- function(cormat){
 }
 
 
-# Adjust!
-corr.tmp <- corr.DE
 
-upper_tri <- get_upper_tri(corr.tmp)
-corr.melt <- melt(upper_tri, na.rm = TRUE)
+upper_tri <- get_upper_tri(corr.DE)
+corr.melt <- reshape2::melt(upper_tri, na.rm = TRUE)
 
 
 p.corr <- ggplot(data = corr.melt, aes(Var2, Var1, fill = value))+
   geom_tile(color = "white")+
   xlab("") +
   ylab("") +
-  scale_fill_gradient2(low = "darkblue", high = "orange", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+  scale_fill_gradient2(low = "darkblue", high = "orange", mid = "white",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
                        name="") +
   theme_minimal() +
   coord_fixed() +
   # geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 14, hjust = 1),   
-        axis.text.y = element_text(size = 14), 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1,
+                                   size = 14, hjust = 1),
+        axis.text.y = element_text(size = 14),
         axis.ticks = element_blank(),
         legend.title = element_blank(),
         legend.justification = c(1, 0),
@@ -230,7 +205,7 @@ dev.off()
 WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
 
-# BKG (Bundesamt für Kartographie und Geodäsie) 
+# BKG (Bundesamt für Kartographie und Geodäsie)
 # German administrative regions
 admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
@@ -239,40 +214,30 @@ admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
 
 
 
-load("R/DATA/Data_built/grid.DE.NEW.RData")
-
-
-# Data referring to background sites
-
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat.back <- DATA[,c(2,5:7,11:20,26:30)]
-
-#rename some columns
-names(dat.back)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
-
-
-# Data referring to traffic/industrial sites 
-DATA <- read.csv("R/DATA/Data_built/DATA_DE_traffic_industrial.csv", header=TRUE)[, -1]
-dat.tr.ind <- DATA[,c(2,5:7,11:20,26:30)]
-
-#rename some columns
-names(dat.tr.ind)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+load("Data_built/grid.DE.RData")
 
 
 
-spdf.sites.back <- SpatialPointsDataFrame(coords = cbind(dat.back$Lon, dat.back$Lat),
-                                          data = dat.back,
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
+
+dat.B  <- dat[dat$AQeType == "background", ]
+dat.TI <- dat[dat$AQeType != "background", ]
+
+spdf.sites.back <- SpatialPointsDataFrame(coords = cbind(dat.B$Lon, dat.B$Lat),
+                                          data = dat.B,
                                           proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
 
-spdf.sites.tr.ind <- SpatialPointsDataFrame(coords = cbind(dat.tr.ind$Lon, dat.tr.ind$Lat),
-                                            data = dat.tr.ind,
+spdf.sites.tr.ind <- SpatialPointsDataFrame(coords = cbind(dat.TI$Lon, dat.TI$Lat),
+                                            data = dat.TI,
                                             proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
 
 
 # Derive SpatialPointsDataFrame from 'df.grid.DE'
-spdf.DE <- SpatialPointsDataFrame(coords = cbind(df.grid.DE$Lon.WGS84, df.grid.DE$Lat.WGS84),
+spdf.DE <- SpatialPointsDataFrame(coords = cbind(df.grid.DE$lon.WGS84, df.grid.DE$lat.WGS84),
                                   data = df.grid.DE,
                                   proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
@@ -280,7 +245,7 @@ spdf.DE <- SpatialPointsDataFrame(coords = cbind(df.grid.DE$Lon.WGS84, df.grid.D
 
 
 # Read indicator vector for filtering AGS referring to Rhine-Ruhr region
-ind.RR <- readRDS("R/DATA/Data_built/indRhineRuhr.rds")
+ind.RR <- readRDS("indRhineRuhr.rds")
 
 spdf.RR <- spdf.DE[spdf.DE$AGS %in% ind.RR, ]
 admin.regions.RR <- admin.regions.2015[admin.regions.2015$AGS %in% ind.RR, ]
@@ -298,7 +263,7 @@ admin.regions.RR$ID <- "RR"
 # dat.tmp.NRW$lat  <- coordinates(spdf.NRW2)[,2]
 
 
-col.range <- range(spdf.DE$BBSRpopDens)
+col.range <- range(spdf.DE$popDens)
 
 spdf.RR2 <- spTransform(spdf.RR, GK3)
 
@@ -327,7 +292,7 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
     xlab("") +
     ylab("") +
     coord_fixed(1) +
-    geom_tile(aes(fill = BBSRpopDens), width = 1000, height = 1000, na.rm = TRUE)+
+    geom_tile(aes(fill = popDens), width = 1000, height = 1000, na.rm = TRUE)+
     geom_point(data = spdf.tmp1@data,
                aes(x = coordinates(spdf.tmp1)[,1],
                    y = coordinates(spdf.tmp1)[,2],
@@ -342,7 +307,7 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
                         name = "Type of monitoring site",
                         labels = c("background", "traffic/industrial")) +
     scale_fill_gradientn(name = "popDens",
-                         colours = brewer.pal(9, "Blues")[-c(1,2)], 
+                         colours = brewer.pal(9, "Blues")[-c(1,2)],
                          breaks = seq(1000, 4000, 1000),
                          labels = seq(1000, 4000, 1000),
                          limits = col.range,
@@ -355,11 +320,11 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
           axis.ticks = element_blank()) +
     guides(fill = guide_colourbar(barwidth = 20),
            color = guide_legend(order = 1)))
-  
-  
+
+
 p.RR2 <- p.RR +
   # north(dat.tmp, location = "bottomright", symbol = 3) +
-  scalebar(dat.tmp, dist = 20, st.size = 3, transform = FALSE,
+  ggsn::scalebar(dat.tmp, dist = 20, st.size = 3, transform = FALSE,
            dist_unit = "km", model = "WGS84", st.color = "darkgrey",
            box.fill = c("darkgrey", "white"), box.color = "darkgrey",
            border.size = 0.5)
@@ -388,10 +353,10 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
   coord_fixed(1) +
   #  scale_x_continuous(breaks = x.GK3, labels = paste(x.WGS, "°E", sep = "")) +
   #  scale_y_continuous(breaks = y.GK3, labels = paste(y.WGS, "°N", sep = "")) +
-  geom_tile(aes(fill = BBSRpopDens), width = 1000, height = 1000, na.rm = TRUE)+
+  geom_tile(aes(fill = popDens), width = 1000, height = 1000, na.rm = TRUE)+
   geom_point(data = spdf.sites.back.2@data,
              aes(x = coordinates(spdf.sites.back.2)[,1],
-                 y = coordinates(spdf.sites.back.2)[,2], 
+                 y = coordinates(spdf.sites.back.2)[,2],
                  colour = "darkorange"),
              size = 1, shape = 15) +
   geom_point(data = spdf.sites.tr.ind.2@data,
@@ -401,7 +366,7 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
              size = 1, shape = 15) +
   geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA) +
   scale_fill_gradientn(name = "popDens",
-                       colours = brewer.pal(9, "Blues")[-c(1,2)], 
+                       colours = brewer.pal(9, "Blues")[-c(1,2)],
                        breaks = seq(1000, 4000, 1000),
                        labels = seq(1000, 4000, 1000),
                        limits = col.range,
@@ -420,7 +385,7 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
 
 p.DE2 <- p.DE +
   # north(dat.tmp, location = "bottomright", symbol = 3) +
-  scalebar(dat.tmp, dist = 100, st.size = 3, transform = FALSE,
+  ggsn::scalebar(dat.tmp, dist = 100, st.size = 3, transform = FALSE,
            dist_unit = "km", model = "WGS84", st.color = "darkgrey",
            box.fill = c("darkgrey", "white"), box.color = "darkgrey",
            border.size = 0.5)
@@ -430,14 +395,8 @@ p.DE2 <- p.DE +
 png("img/MonitoringSitesPopDens_RR.png", width = 900, height = 600)
 pdf("img/MonitoringSitesPopDens_RR.pdf", width = 12, height = 8)
 #plot_grid(p.DE2, p.RR2, rel_widths = c(0.55, 0.45))
-plot_grid(p.DE2, p.RR2, 
+plot_grid(p.DE2, p.RR2,
           rel_widths = c(0.5, 0.5))
-dev.off()
-
-
-library(ggpubr)
-png("img/MonitoringSitesPopDens_RR_2.png", width = 900, height = 600)
-ggarrange(p.DE2, p.RR2, widths = c(2,1), common.legend = TRUE, legend = "top")
 dev.off()
 
 
@@ -454,11 +413,11 @@ dev.off()
 ### for the discussing marginal effects and the assessment of individual exposure to air pollution
 ###
 
-load("R/DATA/Data_built/grid.DE.NEW.RData")
+load("Data_built/grid.DE.RData")
 WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
 
-names(df.grid.DE)[c(4,5,22)] <- c("Lon", "Lat", "popDens")
+names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
 dat.Positions <- data.frame(matrix(NA, nrow = 3, ncol = ncol(df.grid.DE)+1))
@@ -467,8 +426,8 @@ names(dat.Positions) <- c("Name", names(df.grid.DE))
 # 1) Cologne city centre, close to main station (urban)
 # Look on GoogleMaps for coordinates close to Cologne main station and filter respective cells from 'df.grid.DE'
 # View(df.grid.DE[6.95 < df.grid.DE$Lon & df.grid.DE$Lon < 6.96 & 50.93 < df.grid.DE$Lat & df.grid.DE$Lat < 50.94, ])
-df.tmp <- df.grid.DE[df.grid.DE$Layer == "295827", ]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3), 
+df.tmp <- df.grid.DE[df.grid.DE$layer == "295827", ]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$lon.GK3, df.tmp$lat.GK3),
                           proj4string = CRS(GK3))
 
 grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
@@ -489,14 +448,14 @@ GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapCologneCityCentre
 GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapCologneCityCentre2.png", type = "google")
 
 dat.Positions[1,1] <- "Cologne City Centre"
-dat.Positions[1,-1] <-  df.grid.DE[df.grid.DE$Layer == "295827", ]
+dat.Positions[1,-1] <-  df.grid.DE[df.grid.DE$layer == "295827", ]
 
 
 
 # 2) South-east of Mühlheim an der Ruhr (rural)
 #View(df.grid.DE[6.90 < df.grid.DE$Lon & df.grid.DE$Lon < 6.91 & 51.40 < df.grid.DE$Lat & df.grid.DE$Lat < 51.41, ])
-df.tmp <- df.grid.DE[df.grid.DE$Layer == "262025", ]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3), 
+df.tmp <- df.grid.DE[df.grid.DE$layer == "262025", ]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$lon.GK3, df.tmp$lat.GK3),
                           proj4string = CRS(GK3))
 
 grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
@@ -516,14 +475,14 @@ GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim.png", t
 GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim2.png", type = "google")
 
 dat.Positions[2,1] <- "MuehlheimRuhr"
-dat.Positions[2,-1] <-  df.grid.DE[df.grid.DE$Layer == "262025", ]
+dat.Positions[2,-1] <-  df.grid.DE[df.grid.DE$layer == "262025", ]
 
 
 
 # 3) Suburb of Dortmund
 # View(df.grid.DE[7.47 < df.grid.DE$Lon & df.grid.DE$Lon < 7.48 & 51.49 < df.grid.DE$Lat & df.grid.DE$Lat < 51.50, ])
-df.tmp <- df.grid.DE[df.grid.DE$Layer == "256215", ]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3), 
+df.tmp <- df.grid.DE[df.grid.DE$layer == "256215", ]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$lon.GK3, df.tmp$lat.GK3),
                           proj4string = CRS(GK3))
 
 grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
@@ -543,43 +502,61 @@ GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund.png", ty
 GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund2.png", type = "google")
 
 dat.Positions[3,1] <- "Dortmund"
-dat.Positions[3,-1] <-  df.grid.DE[df.grid.DE$Layer == "256215", ]
+dat.Positions[3,-1] <-  df.grid.DE[df.grid.DE$layer == "256215", ]
 
-#saveRDS(object = dat.Positions, file = "R/DATA/Data_built/dat.Positions.rds")
+#saveRDS(object = dat.Positions, file = "Data_built/dat.Positions.rds")
 
 
 
 ###
-### Partial residual plot based on model par1 ----
+### Partial residual plot based on parametric model ----
 ###
 
 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat <- DATA[,c(2,5:7,11:20,26:30)]
-#rename some columns
-names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
 
-par1 <- lm(Y ~ popDens + Forest + Lat + Alt + Agri + NatMot, data = dat)
-
-
-DATA_TI <- read.csv("R/DATA/Data_built/DATA_DE_traffic_industrial.csv", header=TRUE)[, -1]
-dat_TI <- DATA_TI[ , c(2,5:7,11:20,26:30)] 
-#rename some columns
-names(dat_TI)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
-
-parTI <- lm(Y ~ popDens + PriRoad + Alt + LowDens + HighDens, data = dat_TI)
+dat.B  <- dat[dat$AQeType == "background", ]
+dat.TI <- dat[dat$AQeType != "background", ]
 
 
-dat_A <- rbind(dat, dat_TI)  
-parA <- lm(Y ~ popDens + PriRoad + HighDens + LowDens + Lon, data = dat_A)  
-  
+parA <- escapeLUR(data = dat
+                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                            ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+
+parB <- escapeLUR(data = dat.B
+                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                            ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+
+
+parTI <- escapeLUR(data = dat.TI
+                   ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                             ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                             ,"UrbGreen", "Agri", "Forest", "popDens"
+                             ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                   ,depVar = "Y"
+                   ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                   ,thresh = 0.95)
+
+
 
 if(FALSE){
 # Difference between loessLine smoother and gamLine smoother
 par(mfrow = c(1,2))
-crp(par1, term = "popDens", pch = ".", smooth = list(smoother = loessLine),
+crp(parB, term = "popDens", pch = ".", smooth = list(smoother = loessLine),
     grid = FALSE, ylab = "res.partial.popDens") # default smoother is loessLine
-crp(par1, term = "popDens", pch = ".", smooth = list(smoother = gamLine),
+crp(parB, term = "popDens", pch = ".", smooth = list(smoother = gamLine),
     grid = FALSE, ylab = "res.partial.popDens")
 par(mfrow = c(1,1))
 
@@ -606,18 +583,17 @@ dev.off()
 
 
 # Alternatively, with ggplot
-dat.back <- dat 
-pred.par1 <- predict(object = par1, newdata = dat.back, type = "terms")
-pred.res.par1 <- pred.par1 + residuals(par1)
+pred.parB <- predict(object = parB, newdata = dat.B, type = "terms")
+pred.res.parB <- pred.parB + residuals(parB)
 
-pred.res.par1.l <- melt(pred.res.par1)
-names(dat.back)
-colnames(pred.res.par1)
+pred.res.parB.l <- reshape2::melt(pred.res.parB)
+names(dat.B)
+colnames(pred.res.parB)
 
-dat.back.l <- melt(dat.back[, c(15, 14, 3, 4, 13, 18)])
-names(dat.back.l)[2] <- "observed"
+dat.B.l <- reshape2::melt(dat.B[, c(24, 20, 6, 7, 19, 28)])
+names(dat.B.l)[2] <- "observed"
 
-dat.scatter <- cbind(dat.back.l, pred.res.par1.l[,3])
+dat.scatter <- cbind(dat.B.l, pred.res.parB.l[,3])
 names(dat.scatter)[3] <- "partial.residual"
 
 str(dat.scatter)
@@ -627,7 +603,7 @@ dat.scatter$variable <- factor(dat.scatter$variable, levels(dat.scatter$variable
 pdf("img/PartialResidual_ggplot.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
-  xlab("") + 
+  xlab("") +
   ylab("") +
   geom_point() +
   geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
@@ -640,17 +616,17 @@ dev.off()
 
 
 
-pred.parTI <- predict(object = parTI, newdata = dat_TI, type = "terms")
+pred.parTI <- predict(object = parTI, newdata = dat.TI, type = "terms")
 pred.res.parTI <- pred.parTI + residuals(parTI)
 
 pred.res.parTI.l <- melt(pred.res.parTI)
-names(dat_TI)
+names(dat.TI)
 colnames(pred.res.parTI)
 
-dat_TI.l <- melt(dat_TI[, c(15, 16, 4, 6, 5)])
-names(dat_TI.l)[2] <- "observed"
+dat.TI.l <- reshape2::melt(dat.TI[, c(24, 26, 6, 12, 11)])
+names(dat.TI.l)[2] <- "observed"
 
-dat.scatter <- cbind(dat_TI.l, pred.res.parTI.l[,3])
+dat.scatter <- cbind(dat.TI.l, pred.res.parTI.l[,3])
 names(dat.scatter)[3] <- "partial.residual"
 
 str(dat.scatter)
@@ -659,7 +635,7 @@ dat.scatter$variable <- factor(dat.scatter$variable)
 pdf("img/PartialResidual_ggplot_TI.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
-  xlab("") + 
+  xlab("") +
   ylab("") +
   geom_point() +
   geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
@@ -673,14 +649,14 @@ dev.off()
 
 
 
-pred.parA <- predict(object = parA, newdata = dat_A, type = "terms")
+pred.parA <- predict(object = parA, newdata = dat, type = "terms")
 pred.res.parA <- pred.parA + residuals(parA)
 
-pred.res.parA.l <- melt(pred.res.parA)
-names(dat_A)
+pred.res.parA.l <- reshape2::melt(pred.res.parA)
+names(dat)
 colnames(pred.res.parA)
 
-dat_A.l <- melt(dat_A[, c(15, 16, 5, 6, 2)])
+dat_A.l <- reshape2::melt(dat[, c(24, 26, 11, 12, 5, 27)])
 names(dat_A.l)[2] <- "observed"
 
 dat.scatter <- cbind(dat_A.l, pred.res.parA.l[,3])
@@ -692,7 +668,7 @@ dat.scatter$variable <- factor(dat.scatter$variable)
 pdf("img/PartialResidual_ggplot_A.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
-  xlab("") + 
+  xlab("") +
   ylab("") +
   geom_point() +
   geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
@@ -707,43 +683,63 @@ dev.off()
 
 
 ###
-### Fitted splines based on semipar ----
+### Fitted splines based on smooth model ----
 ###
 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat <- DATA[,c(2,5:7,11:20,26:30)]
-#rename some columns
-names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
 
-# dat <- dat_TI
-# dat <- dat_A
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
 
-form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NULL) +
-  s(Alt, k=-1, bs="tp") +
-  s(HighDens, k=-1, bs="tp") +
-  s(LowDens, k=-1, bs="tp") +
-  s(Ind, k=-1, bs="tp") +
-  s(Transp, k=-1, bs="tp") +
-  s(UrbGreen, k=-1, bs="tp") +
-  s(Agri, k=-1, bs="tp") +
-  s(Forest, k=-1, bs="tp") +
-  s(popDens, k=-1, bs="tp") +
-  s(PriRoad, k=-1, bs="tp") +
-  s(SecRoad, k=-1, bs="tp") +
-  s(NatMot, k=-1, bs="tp") +
-  s(LocRoute, k=-1, bs="tp")
+dat.B  <- dat[dat$AQeType == "background", ]
+dat.TI <- dat[dat$AQeType != "background", ]
 
-gam2.3 <- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=dat, family=gaussian(),
-              weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
-              select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
+smoothA <- smoothLUR(data = dat
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
 
-dat.Positions$semipar <- predict(object = gam2.3, newdata = dat.Positions)
-#saveRDS(object = dat.Positions, file = "R/DATA/Data_built/dat.Positions.rds")
+smoothB <- smoothLUR(data = dat.B
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
+
+smoothTI <- smoothLUR(data = dat.TI
+                      ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                                ,"Constr", "UrbGreen", "Agri", "Forest"
+                                , "popDens", "PriRoad", "SecRoad", "NatMot"
+                                , "LocRoute")
+                      ,spVar1 = "Lon"
+                      ,spVar2 = "Lat"
+                      ,depVar = "Y"
+                      ,thresh = 0.95)
+
+
+dat.Positions <- readRDS("C:/Users/Svenia/Desktop/Skycloud/smoothLUR/Data_built/dat.Positions.rds")
+
+dat.Positions$smoothB  <- predict(object = smoothB, newdata = dat.Positions)
+dat.Positions$smoothTI <- predict(object = smoothTI, newdata = dat.Positions)
+dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
+
+#saveRDS(object = dat.Positions, file = "Data_built/dat.Positions.rds")
 
 
 if(FALSE){
   semipar <- gam2.3
-  
+
   pdf("img/FittedSplines_semipar.pdf", width = 15, height = 16)
   par(mfrow = c(4, 3), mai = c(1.2, 1.2, 0.3, 0.3), cex = 1.3)
   for(i in c(3:14)){
@@ -754,8 +750,8 @@ if(FALSE){
     #        pch = 16, cex = 0.3)
   }
   dev.off()
-  
-  
+
+
   pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
   par(mfrow = c(1,1), mai = c(1, 0.8, 0.1, 0.5))
   plot(semipar, se = FALSE, select = 10)
@@ -771,12 +767,13 @@ if(FALSE){
 
 # Alternatively, with ggplot2:
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-colnames(newdata.tmp) <- colnames(dat)[-1]
+dat.pred <- dat[, c(5:7,11:20,24,26:29)]
+colnames(newdata.tmp) <- colnames(dat.pred)
 for(j in 1:18){
-  newdata.tmp[,j] <- seq(min(dat[,j+1]), max(dat[,j+1]), length.out = 1000)
-}  
+  newdata.tmp[,j] <- seq(min(dat.pred[,j]), max(dat.pred[,j]), length.out = 1000)
+}
 
-semipar <- gam2.3
+semipar <- smoothB
 
 pred.tmp <- predict(object = semipar, newdata = newdata.tmp, se.fit = TRUE, type = "terms")
 
@@ -789,7 +786,7 @@ sp.tmp <- rownames(summary(semipar)$s.table)[vec.tmp]
 
 edf.tmp <- round(summary(semipar)$s.table[vec.tmp, "edf"], 2)
 
-stripe.tmp <- paste(substr(sp.tmp, start = 1, stop = nchar(sp.tmp)-1), 
+stripe.tmp <- paste(substr(sp.tmp, start = 1, stop = nchar(sp.tmp)-1),
                     ", ", edf.tmp, ")", sep = "")
 
 
@@ -804,9 +801,9 @@ newdata.tmp2 <- newdata.tmp[,substr(sp.tmp, start = 3, stop = nchar(sp.tmp)-1)]
 
 
 # transform in long format
-pred.tmp2.melt <- melt(pred.tmp2)
-conf.lower.melt <- melt(conf.lower)
-conf.upper.melt <- melt(conf.upper)
+pred.tmp2.melt <- reshape2::melt(pred.tmp2)
+conf.lower.melt <- reshape2::melt(conf.lower)
+conf.upper.melt <- reshape2::melt(conf.upper)
 
 pred.conf <- cbind(pred.tmp2.melt[,-1], conf.lower.melt[,3], conf.upper.melt[,3])
 names(pred.conf) <- c("variable", "value", "lwr", "upr")
@@ -814,16 +811,17 @@ names(pred.conf) <- c("variable", "value", "lwr", "upr")
 levels(pred.conf$variable)
 levels(pred.conf$variable) <- stripe.tmp
 
-newdata.tmp2.melt <- melt(newdata.tmp2)
+newdata.tmp2.melt <- reshape2::melt(newdata.tmp2)
 colnames(newdata.tmp2.melt) <- c("pred", "x")
 
 dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
 
-pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
+pdf("img/FittedSplines_semipar_ggplot.pdf", width = 12, height = 12)
+#pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
 #pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
 #pdf("img/FittedSplines_semipar_ggplot_A.pdf", width = 12, height = 12)
 ggplot(data = dt.tmp, aes(x = x, y = value)) +
-  theme_bw() + 
+  theme_bw() +
   xlab("") +
   ylab("") +
   geom_line(col = "royalblue", lwd = 0.7) +
@@ -834,13 +832,13 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
 dev.off()
 
 
-dat.Positions <- readRDS("R/DATA/Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 dt.points <- data.frame(x = dat.Positions[1:2, "popDens"],
                         value = c(predict(object = semipar,
                                           newdata = dat.Positions[1:2, ], type="terms")[,"s(popDens)"]))
 
 p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "popDens", ], aes(x = x, y = value)) +
-  theme_bw() + 
+  theme_bw() +
   ylim(-5,10) +
   xlab("") +
   ylab("") +
@@ -861,13 +859,9 @@ dev.off()
 
 
 ###
-### Marginal spatial effect in semipar (bivariate smoothing spline plus parametric term for altitude) ----
+### Marginal spatial effect in smooth model (bivariate smoothing spline plus parametric term for altitude) ----
 ###
 
-# sPdf.bndry.NRW <- readOGR(dsn = "../DATA/Data_GADM",
-#                           layer = "DEU_adm1", encoding = "UTF-8", use_iconv = TRUE)
-# sPdf.bndry.NRW <- sPdf.bndry.NRW[sPdf.bndry.NRW$ID_1==10,]
-# 
 
 WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
@@ -880,33 +874,25 @@ admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
 
 
 # Read indicator vector for filtering AGS referring to Rhine-Ruhr region
-ind.RR <- readRDS("R/DATA/Data_built/indRhineRuhr.rds")
+ind.RR <- readRDS("indRhineRuhr.rds")
 
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat.back <- DATA[,c(2,5:7,11:20,26:30)]
-names(dat.back)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+dat.B  <- dat[dat$AQeType == "background", ]
+dat.TI <- dat[dat$AQeType != "background", ]
 
-# GAM with bivariate spline for lon and lat and univariate spline for remaining predictors 
-form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NULL) +
-  s(Alt, k=-1, bs="tp") +
-  s(HighDens, k=-1, bs="tp") +
-  s(LowDens, k=-1, bs="tp") +
-  s(Ind, k=-1, bs="tp") +
-  s(Transp, k=-1, bs="tp") +
-  s(UrbGreen, k=-1, bs="tp") +
-  s(Agri, k=-1, bs="tp") +
-  s(Forest, k=-1, bs="tp") +
-  s(popDens, k=-1, bs="tp") +
-  s(PriRoad, k=-1, bs="tp") +
-  s(SecRoad, k=-1, bs="tp") +
-  s(NatMot, k=-1, bs="tp") +
-  s(LocRoute, k=-1, bs="tp")
-
-semipar <- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=dat.back, family=gaussian(),
-               weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
-               select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
-
+smoothB <- smoothLUR(data = dat.B
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
 
 
 # Filter administrative regions referring to Rhine-Ruhr area
@@ -915,8 +901,8 @@ admin.regions.RR$ID <- "RR"
 
 
 # Load grid over Germany
-load("R/DATA/Data_built/grid.DE.NEW.RData")
-names(df.grid.DE)[22] <- "popDens"
+load("Data_built/grid.DE.RData")
+names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$GEN != "Helgoland", ]
 
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
@@ -924,13 +910,13 @@ names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 # Filter grid cells referring to Rhine-Ruhr area
 df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
 
-sp.eff	<- predict(object = semipar, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
-  predict(object = semipar, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
+sp.eff	<- predict(object = smoothB, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
+  predict(object = smoothB, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
 
 df.grid.DE$sp.eff	<- as.vector(sp.eff)
 
 
-p.sp.eff <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
+p.sp.eff <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
   ylab("") +
@@ -956,13 +942,13 @@ p.sp.eff <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
 
 
 
-dat.Positions <- readRDS("R/DATA/Data_built/dat.Positions.rds")
-df.grid2points	<- dat.Positions[1:2, c("Lon.GK3", "Lat.GK3")]
+dat.Positions <- readRDS("Data_built/dat.Positions.rds")
+df.grid2points	<- dat.Positions[1:2, c("lon.GK3", "lat.GK3")]
 
 p.sp.eff2 <- p.sp.eff +
-  geom_point(data = df.grid2points, aes(x = Lon.GK3, y = Lat.GK3), 
+  geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
              pch = 19, colour = "orangered", size = 2) +
-  geom_text(data = df.grid2points, aes(x = Lon.GK3, y = Lat.GK3, label = c("1", "2")),
+  geom_text(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2")),
             colour = "orangered", nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
 
 
@@ -991,101 +977,46 @@ dev.off()
 
 
 ###
-### Conditional background mean NO2 surface over Germany fitted by semipar ----
+### Conditional background mean NO2 surface over Germany fitted by smooth model ----
 ###
 
-gam.pred	<- predict(object = semipar, newdata = df.grid.DE)
-
-df.grid.DE$gam.pred	<- as.vector(gam.pred)
+df.grid.DE$smoothB	<- as.vector(predict(object = smoothB, newdata = df.grid.DE))
 
 
 #NO2 concentrations not supported by the underlying data
-min(dat.back$Y)
-df.grid.DE$gam.pred[df.grid.DE$gam.pred < 0]
-df.grid.DE$gam.pred[df.grid.DE$gam.pred < min(dat.back$Y)]
-length(df.grid.DE$gam.pred[df.grid.DE$gam.pred < min(dat.back$Y)]) # 107
-length(df.grid.DE$gam.pred[df.grid.DE$gam.pred < min(dat.back$Y)])/length(df.grid.DE$gam.pred)*100		# share in % of predicted values
-df.grid.DE$gam.pred[df.grid.DE$gam.pred < min(dat.back$Y)]		<- min(dat.back$Y)				# replace by min contained in data set
+min(dat.B$Y)
+df.grid.DE$smoothB[df.grid.DE$smoothB < 0]
+df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]
+length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]) # 383
+length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
+df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]		<- min(dat.B$Y)				# replace by min contained in data set
 
 
-max(dat.back$Y)
-df.grid.DE$gam.pred[df.grid.DE$gam.pred > max(dat.back$Y)]
-length(df.grid.DE$gam.pred[df.grid.DE$gam.pred > max(dat.back$Y)]) # 17
-length(df.grid.DE$gam.pred[df.grid.DE$gam.pred > max(dat.back$Y)])/length(df.grid.DE$gam.pred)*100		# share in % of predicted values
-df.grid.DE$gam.pred[df.grid.DE$gam.pred > max(dat.back$Y)]		<- max(dat.back$Y)				# replace by max contained in data set
+max(dat.B$Y)
+df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]
+length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]) # 2
+length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
+df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]		<- max(dat.B$Y)				# replace by max contained in data set
 
-
-# Data referring to traffic/industrial sites 
-DATA <- read.csv("R/DATA/Data_built/DATA_DE_traffic_industrial.csv", header=TRUE)[, -1]
-dat.tr.ind <- DATA[,c(2,5:7,11:20,26:30)]
-
-#rename some columns
-names(dat.tr.ind)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
-
-form.gam1 <- Y ~  s(HighDens, k=-1, bs="tp") +
-  s(LowDens, k=-1, bs="tp") +
-  s(Ind, k=-1, bs="tp") +
-  s(Transp, k=-1, bs="tp") +
-  s(UrbGreen, k=-1, bs="tp") +
-  s(Agri, k=-1, bs="tp") +
-  s(Forest, k=-1, bs="tp") +
-  s(popDens, k=-1, bs="tp") +
-  s(PriRoad, k=-1, bs="tp") +
-  s(SecRoad, k=-1, bs="tp") +
-  s(NatMot, k=-1, bs="tp") +
-  s(LocRoute, k=-1, bs="tp")
-
-gam2 <- gam(formula=form.gam1, fit=TRUE, method="P-ML", data=dat.tr.ind, family=gaussian(),
-            weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
-            select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
-
-
-form.gam.sp <- Y ~  s(Lon, Lat, k=-1, bs="tp") +
-  s(Alt, k=-1, bs="tp") +
-  s(HighDens, k=-1, bs="tp") +
-  s(LowDens, k=-1, bs="tp") +
-  s(Ind, k=-1, bs="tp") +
-  s(Transp, k=-1, bs="tp") +
-  s(UrbGreen, k=-1, bs="tp") +
-  s(Agri, k=-1, bs="tp") +
-  s(Forest, k=-1, bs="tp") +
-  s(popDens, k=-1, bs="tp") +
-  s(PriRoad, k=-1, bs="tp") +
-  s(SecRoad, k=-1, bs="tp") +
-  s(NatMot, k=-1, bs="tp") +
-  s(LocRoute, k=-1, bs="tp")
-
-gam.sp <- gam(formula=form.gam.sp, fit=TRUE, method="P-ML", data=dat.tr.ind, family=gaussian(),
-              weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
-              select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
-
-dat.Positions$semiparTI <- as.vector(predict(object = gam.sp, newdata = dat.Positions))
-#saveRDS(object = dat.Positions, file = "R/DATA/Data_built/dat.Positions.rds")
 
 
 # Filter grid cells referring to Rhine-Ruhr area
 df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
 
-#gam.tmp <- gam2
-gam.tmp <- gam.sp
-gam.tr.ind.pred.RR <- predict(object = gam.sp, newdata = df.grid.RR)
-
-df.grid.RR$gam.pred.tr.ind <- as.vector(gam.tr.ind.pred.RR)
+df.grid.RR$smoothTI <- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
 
 #NO2 concentrations not supported by the underlying data
-min(dat.tr.ind$Y)
-length(df.grid.RR$gam.pred.tr.ind[df.grid.RR$gam.pred.tr.ind < min(dat.tr.ind$Y)])
-max(dat.tr.ind$Y)
-length(df.grid.RR$gam.pred.tr.ind[df.grid.RR$gam.pred.tr.ind > max(dat.tr.ind$Y)])
+min(dat.TI$Y)
+length(df.grid.RR$smoothTI[df.grid.RR$smoothTI < min(dat.TI$Y)])
+max(dat.TI$Y)
+length(df.grid.RR$smoothTI[df.grid.RR$smoothTI > max(dat.TI$Y)])
 
-dat.tr.ind.RR <- dat.tr.ind[ind.tmp, ]
-(brks <- seq(from = min(gam.tr.ind.pred.RR, dat.tr.ind.RR$Y, dat.back$Y),# min(df.grid.DE$gam.pred), 
-             to = max(gam.tr.ind.pred.RR, dat.tr.ind.RR$Y, dat.back$Y), #max(df.grid.NRW$gam.pred.tr.ind), 
+(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.RR$smoothTI),
+             to = max(df.grid.DE$smoothB, df.grid.RR$smoothTI),
              length.out = 11))
-# [1]  2.525396  8.900901 15.276407 21.651912 28.027417 34.402922 40.778428 47.153933 53.529438 59.904944 66.280449
 brks2 <- seq(10, 60, 10)
 
-p.back.pred <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
+p.back.pred <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
   ylab("") +
@@ -1114,10 +1045,10 @@ admin.bndry.RR <- spTransform(admin.regions.RR, GK3)
 admin.bndry.RR.f <- fortify(admin.bndry.RR, region = "ID")
 bndry.tmp <- admin.bndry.RR.f
 
-names(bndry.tmp)[1:2] <- c("Lon.GK3", "Lat.GK3")
+names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.back.pred2 <- p.back.pred +
-  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA) 
-  
+  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA)
+
 
 png("img/PredBack_RR.png", width = 450, height = 675)
 pdf("img/PredBack_RR.pdf", width = 6, height = 9)
@@ -1141,15 +1072,12 @@ dev.off()
 ###
 
 
-# Adjust!
-df.grid.tmp <- df.grid.RR
-
-p.back.pred.sub <- ggplot(df.grid.tmp, aes(x = Lon.GK3, y = Lat.GK3)) +
+p.back.pred.sub <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
   ylab("") +
   coord_fixed(1) +
-  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothB), width = 1000, height = 1000, na.rm = TRUE) +
   scale_fill_gradientn(name = "",
                        colours = brewer.pal(9, "YlOrRd")[-1],
                        breaks = brks2,
@@ -1168,12 +1096,12 @@ p.back.pred.sub <- ggplot(df.grid.tmp, aes(x = Lon.GK3, y = Lat.GK3)) +
 #   guides(fill = guide_colourbar(barheight = 15))
 
 
-p.back.pred.sub2 <- ggplot(df.grid.tmp, aes(x = Lon.GK3, y = Lat.GK3)) +
+p.back.pred.sub2 <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing() +  #theme_bw() +
   xlab("") +
   ylab("") +
   coord_fixed(1) +
-  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothB), width = 1000, height = 1000, na.rm = TRUE) +
   scale_fill_gradientn(name = "",
                        colours = brewer.pal(9, "YlOrRd")[-1],
                        breaks = brks2,
@@ -1190,12 +1118,12 @@ p.back.pred.sub2 <- ggplot(df.grid.tmp, aes(x = Lon.GK3, y = Lat.GK3)) +
 
 
 
-(p.tr.ind.pred.sub <- ggplot(df.grid.tmp, aes(Lon.GK3, y = Lat.GK3)) +
+(p.tr.ind.pred.sub <- ggplot(df.grid.RR, aes(lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing() +  #theme_bw() +
   xlab("") +
   ylab("") +
   coord_fixed(1) +
-  geom_tile(aes(fill = gam.pred.tr.ind), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothTI), width = 1000, height = 1000, na.rm = TRUE) +
   scale_fill_gradientn(name = "",
                        colours = brewer.pal(9, "YlOrRd")[-1],
                        breaks = brks2,
@@ -1229,20 +1157,20 @@ ggarrange(p.back.pred2, p.back.pred.sub, widths = c(1,1), common.legend = TRUE, 
   ggexport(filename = "img/PredBackDERR.pdf", width = 12, height = 10)
 
 
-dat.Positions <- readRDS("R/DATA/Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 
 
 ## Plot points 1 to 3 (of `dat.Positions`) on map
 (p.back.pred.sub2 <- p.back.pred.sub +
-    geom_point(data = dat.Positions, aes(x = Lon.GK3, y = Lat.GK3), 
+    geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
                pch = 19, colour = "blue", size = 2) +
-    geom_text(data = dat.Positions, aes(x = Lon.GK3, y = Lat.GK3, label = c("1", "2", "3")),
+    geom_text(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2", "3")),
               colour = "blue", nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
 (p.tr.ind.pred.sub2 <- p.tr.ind.pred.sub +
-    geom_point(data = dat.Positions, aes(x = Lon.GK3, y = Lat.GK3), 
+    geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
                pch = 19, colour = "blue", size = 2) +
-    geom_text(data = dat.Positions, aes(x = Lon.GK3, y = Lat.GK3, label = c("1", "2", "3")),
+    geom_text(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2", "3")),
               colour = "blue", nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
 
@@ -1257,3 +1185,54 @@ ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend =
 
 #ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
 #  ggexport(filename = "img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
+
+
+
+###
+### Correlation between predictions of par0, parB, and smoothB ----
+###
+
+dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)[,-1]
+names(dat)
+names(dat)[c(2,5:7)] <- c("Y", "Lon", "Lat", "Alt")
+
+dat.B  <- dat[dat$AQeType == "background", ]
+
+par0 <- escapeLUR(data = dat.B
+                  ,pred = c("HighDens", "LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+parB <- escapeLUR(data = dat[dat$AQeType=="background", ]
+                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                            ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+smoothB <- smoothLUR(data = dat.B
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
+
+load("Data_built/grid.DE.RData")
+names(df.grid.DE)
+df.grid.DE <- df.grid.DE[df.grid.DE$GEN != "Helgoland", ]
+names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
+
+
+df.grid.DE$smoothB	<- as.vector(predict(object = smoothB, newdata = df.grid.DE))
+df.grid.DE$par0	<- as.vector(predict(object = par0, newdata = df.grid.DE))
+df.grid.DE$parB	<- as.vector(predict(object = parB, newdata = df.grid.DE))
+
+
+cor(df.grid.DE[,c("smoothB", "par0", "parB")])
