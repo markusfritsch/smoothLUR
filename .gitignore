@@ -14,6 +14,9 @@
 .Ruserdata
 
 
+# image directories
+/img
+
 # data directories
 /DataFull/
 /Data_built
