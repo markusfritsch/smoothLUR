@@ -58,6 +58,15 @@ Moran.I(resid(smoothA), res.dist.inv)
 
 # Background monitoring sites
 
+par0 <- escapeLUR(data = dat[dat$AQeType=="background", ]
+                  ,pred = c("HighDens", "LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                           ,"UrbGreen", "Agri", "Forest", "popDens"
+                           ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                 ,depVar = "AQeYMean"
+                 ,dirEff = c(1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                 ,thresh = 0.95)
+summary(par0)
+
 parB <- escapeLUR(data = dat[dat$AQeType=="background", ]
                   ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
                             ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
@@ -82,6 +91,7 @@ smoothB <- smoothLUR(data = dat[dat$AQeType=="background", ]
 summary(parB)$adj.r.squared
 summary(smoothB)$r.sq
 
+AIC(par0)
 BIC(parB); AIC(parB)
 BIC(smoothB); AIC(smoothB)
 
@@ -89,6 +99,7 @@ datB <- dat[dat$AQeType == "background", ]
 res.dist		<- as.matrix(dist(cbind(datB$AQeLon, datB$AQeLat)))
 res.dist.inv	<- 1/(res.dist^2)
 diag(res.dist.inv)	<- 0
+Moran.I(resid(par0), res.dist.inv)
 Moran.I(resid(parB), res.dist.inv)
 Moran.I(resid(smoothB), res.dist.inv)
 
