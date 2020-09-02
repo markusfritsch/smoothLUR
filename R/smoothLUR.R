@@ -49,8 +49,6 @@
 #'    models.
 #' \code{\link{kFoldCV}} for k-fold cross-validation for
 #'    escapeLUR and smoothLUR objects.
-#' \code{\link{looCV}} for leave-one-out cross-validation for
-#'    escapeLUR and smoothLUR objects.
 #'
 #' @references
 #' \insertAllCited{}
@@ -96,7 +94,7 @@
 #' summary(m1)
 #' summary(m1)$adj.r.squared
 #' BIC(m1)
-#' AIC(m1) 
+#' AIC(m1)
 #'
 #' }
 #' }
@@ -136,9 +134,9 @@ smoothLUR <- function(
                  select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
 
 #  attr(gam.tmp, "class")  <- "smoothLUR"
-  
+
   return(gam.tmp)
-  
+
 }
 
 
