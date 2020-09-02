@@ -75,8 +75,6 @@
 #'    models.
 #' \code{\link{kFoldCV}} for k-fold cross-validation for
 #'    escapeLUR and smoothLUR objects.
-#' \code{\link{looCV}} for leave-one-out cross-validation for
-#'    escapeLUR and smoothLUR objects.
 #'
 #' @references
 #' \insertAllCited{}
@@ -119,10 +117,10 @@
 #' summary(m1)
 #' summary(m1)$adj.r.squared
 #' BIC(m1)
-#' AIC(m1) 
+#' AIC(m1)
 #'
 #' }
-#'  
+#'
 escapeLUR <- function(
 			data
 			,pred
@@ -254,7 +252,7 @@ escapeLUR <- function(
   }
 
 #  attr(resModel, "class")  <- "escapeLUR"
-  
+
   return(resModel) # Return final model derived by supervised forward stepwise predictor selection.
 
 }
