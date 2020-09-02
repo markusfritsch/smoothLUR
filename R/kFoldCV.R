@@ -76,8 +76,6 @@
 #'    modeling.
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    modeling.
-#' \code{\link{looCV}} for leave-one-out cross-validation for
-#'    `escapeLUR` and `smoothLUR` objects.
 #'
 #' @references
 #' \insertAllCited{}
