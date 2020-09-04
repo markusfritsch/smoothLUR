@@ -1224,6 +1224,44 @@ smoothB <- smoothLUR(data = dat.B
                      ,depVar = "Y"
                      ,thresh = 0.95)
 
+parA <- escapeLUR(data = dat
+                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                            ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+smoothA <- smoothLUR(data = dat
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
+
+parTI <- escapeLUR(data = dat[dat$AQeType!="background", ]
+                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                            ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "popDens"
+                            ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
+                  ,depVar = "Y"
+                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
+                  ,thresh = 0.95)
+smoothTI <- smoothLUR(data = dat[dat$AQeType!="background", ]
+                     ,pred = c("Lon", "Lat", "Alt", "HighDens"
+                               ,"LowDens", "Ind", "Transp", "Seap", "Airp"
+                               ,"Constr", "UrbGreen", "Agri", "Forest"
+                               , "popDens", "PriRoad", "SecRoad", "NatMot"
+                               , "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,depVar = "Y"
+                     ,thresh = 0.95)
+
 load("Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$GEN != "Helgoland", ]
@@ -1234,5 +1272,13 @@ df.grid.DE$smoothB	<- as.vector(predict(object = smoothB, newdata = df.grid.DE))
 df.grid.DE$par0	<- as.vector(predict(object = par0, newdata = df.grid.DE))
 df.grid.DE$parB	<- as.vector(predict(object = parB, newdata = df.grid.DE))
 
+df.grid.DE$smoothTI	<- as.vector(predict(object = smoothTI, newdata = df.grid.DE))
+df.grid.DE$parTI	<- as.vector(predict(object = parTI, newdata = df.grid.DE))
+
+df.grid.DE$smoothA	<- as.vector(predict(object = smoothA, newdata = df.grid.DE))
+df.grid.DE$parA	<- as.vector(predict(object = parA, newdata = df.grid.DE))
+
 
 cor(df.grid.DE[,c("smoothB", "par0", "parB")])
+cor(df.grid.DE[,c("smoothTI", "parTI")])
+cor(df.grid.DE[,c("smoothA", "parA")])
