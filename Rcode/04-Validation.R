@@ -7,7 +7,7 @@
 # loocv, (stratified) 10-fold cv, and (stratified) hold-out validation
 
 
-setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 rm(list = ls())
 

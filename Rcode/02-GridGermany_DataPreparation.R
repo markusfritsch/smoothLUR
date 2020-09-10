@@ -10,6 +10,9 @@
 rm(list = ls())
 
 
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+
+
 library(rgdal)
 library(xlsx)
 library(raster)

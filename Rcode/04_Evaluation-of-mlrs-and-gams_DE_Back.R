@@ -4,9 +4,14 @@
 
 
 
-library(mgcv)
+
+
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 rm(list = ls())
+
+#	install.packages(mgcv)
+library(mgcv)
 
 
 DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]

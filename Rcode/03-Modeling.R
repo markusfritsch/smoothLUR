@@ -5,6 +5,9 @@
 
 ## we use approximated population density based on data from BKG and function gArea()
 
+
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
+
 rm(list = ls())
 
 # install.packages("smoothLUR")
