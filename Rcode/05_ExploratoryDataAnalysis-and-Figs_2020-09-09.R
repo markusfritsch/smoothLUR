@@ -4,6 +4,10 @@
 
 # To obtain the same ratio when using pdf instead of png, divide height and width (used to produce png) by 75
 
+
+setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
+
+
 rm(list = ls())
 
 ## Load packages ----
@@ -67,7 +71,8 @@ dat.all2 <- data.frame(Y = rep(c(dat.B$Y, dat.TI$Y),2),
         legend.position = c(0.75, 0.9)))
 
 
-pdf("img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)
+pdf("../img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)		# M: otherwise, a conflict with GIT results
+#pdf("img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)
 p.hist
 dev.off()
 
@@ -88,7 +93,8 @@ dev.off()
           legend.position = c(0.75, 0.9)))
 
 
-pdf("img/HistogramDensitiesBackTrInd2.pdf", height = 6, width = 9)
+pdf("../img/HistogramDensitiesBackTrInd2.pdf", height = 6, width = 9)		# M: otherwise, a conflict with GIT results
+#pdf("img/HistogramDensitiesBackTrInd2.pdf", height = 6, width = 9)
 p.hist2
 dev.off()
 
@@ -136,7 +142,8 @@ p.corr <- ggplot(data = corr.melt, aes(Var2, Var1, fill = value))+
                                title.position = "top", title.hjust = 0.5))
 
 
-pdf("img/CorrMatrix_Back.pdf", width = 8, height = 8)
+pdf("../img/CorrMatrix_Back.pdf", width = 8, height = 8)		# M: otherwise, a conflict with GIT results
+#pdf("img/CorrMatrix_Back.pdf", width = 8, height = 8)
 p.corr
 dev.off()
 
@@ -180,7 +187,8 @@ pairs(cbind(a1, a2),
 )
 
 
-pdf("img/ScatterplotMatrixGamLine2.pdf", width = 9, height = 6)
+pdf("../img/ScatterplotMatrixGamLine2.pdf", width = 9, height = 6)		# M: otherwise, a conflict with GIT results
+#pdf("img/ScatterplotMatrixGamLine2.pdf", width = 9, height = 6)
 pairs(cbind(Y, dat[,c(2, 3, 14, 15)]),
       diag.panel = panel.density,
       panel = function(x, y, ...){
@@ -206,14 +214,16 @@ GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +u
 
 # BKG (Bundesamt für Kartographie und Geodäsie)
 # German administrative regions
-admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
+admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",		# M: otherwise, a conflict with GIT results
+#admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
 
 
 
-load("Data_built/grid.DE.RData")
+load("DataFull/Data_built/grid.DE.RData")							# M: otherwise, a conflict with GIT results
+#load("Data_built/grid.DE.RData")
 
 
 
@@ -391,16 +401,20 @@ p.DE2 <- p.DE +
 
 
 
-png("img/MonitoringSitesPopDens_RR.png", width = 900, height = 600)
-pdf("img/MonitoringSitesPopDens_RR.pdf", width = 12, height = 8)
+png("../img/MonitoringSitesPopDens_RR.png", width = 900, height = 600)		# M: otherwise, a conflict with GIT results
+pdf("../img/MonitoringSitesPopDens_RR.pdf", width = 12, height = 8)		# M: otherwise, a conflict with GIT results
+#png("img/MonitoringSitesPopDens_RR.png", width = 900, height = 600)
+#pdf("img/MonitoringSitesPopDens_RR.pdf", width = 12, height = 8)
 #plot_grid(p.DE2, p.RR2, rel_widths = c(0.55, 0.45))
 plot_grid(p.DE2, p.RR2,
           rel_widths = c(0.5, 0.5))
 dev.off()
 
 
-png("img/MonitoringSitesPopDens_RR_3.png", width = 900, height = 675)
-pdf("img/MonitoringSitesPopDens_RR_3.pdf", width = 13, height = 8)
+png("../img/MonitoringSitesPopDens_RR_3.png", width = 900, height = 675)	# M: otherwise, a conflict with GIT results
+pdf("../img/MonitoringSitesPopDens_RR_3.pdf", width = 13, height = 8)		# M: otherwise, a conflict with GIT results
+#png("img/MonitoringSitesPopDens_RR_3.png", width = 900, height = 675)
+#pdf("img/MonitoringSitesPopDens_RR_3.pdf", width = 13, height = 8)
 ggdraw() +
   draw_plot(p.DE2, 0, 0, 0.5, 1) +
   draw_plot(p.RR2, 0.5, 0.05, 0.5, 0.9)
@@ -412,7 +426,8 @@ dev.off()
 ### for the discussing marginal effects and the assessment of individual exposure to air pollution
 ###
 
-load("Data_built/grid.DE.RData")
+load("DataFull/Data_built/grid.DE.RData")						# M: otherwise, a conflict with GIT results
+#load("Data_built/grid.DE.RData")	
 WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
 
@@ -443,8 +458,10 @@ b2 <- qbbox(lat = coordinates(sp.b2)[,2],
             lon = coordinates(sp.b2)[,1])
 
 Sys.setenv(LANG = "en")
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapCologneCityCentre.png", type = "google-s")
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapCologneCityCentre2.png", type = "google")
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre.png", type = "google-s")	# M: otherwise, a conflict with GIT results
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre2.png", type = "google")		# M: otherwise, a conflict with GIT results
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre.png", type = "google-s")
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre2.png", type = "google")
 
 dat.Positions[1,1] <- "Cologne City Centre"
 dat.Positions[1,-1] <-  df.grid.DE[df.grid.DE$layer == "295827", ]
@@ -470,8 +487,10 @@ bbox(sp.b)
 b2 <- qbbox(lat = coordinates(sp.b2)[,2],
             lon = coordinates(sp.b2)[,1])
 
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim.png", type = "google-s")
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim2.png", type = "google")
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim.png", type = "google-s")
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim2.png", type = "google")
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim.png", type = "google-s")
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapMuehlheim2.png", type = "google")
 
 dat.Positions[2,1] <- "MuehlheimRuhr"
 dat.Positions[2,-1] <-  df.grid.DE[df.grid.DE$layer == "262025", ]
@@ -497,8 +516,10 @@ bbox(sp.b)
 b2 <- qbbox(lat = coordinates(sp.b2)[,2],
             lon = coordinates(sp.b2)[,1])
 
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund.png", type = "google-s")
-GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund2.png", type = "google")
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund.png", type = "google-s")
+GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund2.png", type = "google")
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund.png", type = "google-s")
+#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "img/MapDortmund2.png", type = "google")
 
 dat.Positions[3,1] <- "Dortmund"
 dat.Positions[3,-1] <-  df.grid.DE[df.grid.DE$layer == "256215", ]
@@ -561,7 +582,8 @@ par(mfrow = c(1,1))
 
 
 
-pdf("img/ResidualPlotLurParGamLine.pdf", width = 15, height = 8)
+pdf("../img/ResidualPlotLurParGamLine.pdf", width = 15, height = 8)
+#pdf("img/ResidualPlotLurParGamLine.pdf", width = 15, height = 8)
 
 par(mfrow = c(2, 3), mai = c(1.2, 1.2, 0.3, 0.3), cex = 1.3)
 crp(par1, term = "popDens", pch = ".", smooth = list(smoother = gamLine),
@@ -599,7 +621,8 @@ str(dat.scatter)
 dat.scatter$variable <- factor(dat.scatter$variable, levels(dat.scatter$variable)[c(1,2,6,5,3,4)])
 
 
-pdf("img/PartialResidual_ggplot.pdf", width = 12, height = 7)
+pdf("../img/PartialResidual_ggplot.pdf", width = 12, height = 7)
+#pdf("img/PartialResidual_ggplot.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
   xlab("") +
@@ -631,7 +654,8 @@ names(dat.scatter)[3] <- "partial.residual"
 str(dat.scatter)
 dat.scatter$variable <- factor(dat.scatter$variable)
 
-pdf("img/PartialResidual_ggplot_TI.pdf", width = 12, height = 7)
+pdf("../img/PartialResidual_ggplot_TI.pdf", width = 12, height = 7)
+#pdf("img/PartialResidual_ggplot_TI.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
   xlab("") +
@@ -664,7 +688,8 @@ names(dat.scatter)[3] <- "partial.residual"
 str(dat.scatter)
 dat.scatter$variable <- factor(dat.scatter$variable)
 
-pdf("img/PartialResidual_ggplot_A.pdf", width = 12, height = 7)
+pdf("../img/PartialResidual_ggplot_A.pdf", width = 12, height = 7)
+#pdf("img/PartialResidual_ggplot_A.pdf", width = 12, height = 7)
 ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = variable)) +
   theme_bw() +
   xlab("") +
@@ -727,7 +752,8 @@ smoothTI <- smoothLUR(data = dat.TI
                       ,thresh = 0.95)
 
 
-dat.Positions <- readRDS("C:/Users/Svenia/Desktop/Skycloud/smoothLUR/Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("dat.Positions.rds")
+#dat.Positions <- readRDS("C:/Users/Svenia/Desktop/Skycloud/smoothLUR/Data_built/dat.Positions.rds")
 
 dat.Positions$smoothB  <- predict(object = smoothB, newdata = dat.Positions)
 dat.Positions$smoothTI <- predict(object = smoothTI, newdata = dat.Positions)
@@ -739,7 +765,8 @@ dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
 if(FALSE){
   semipar <- gam2.3
 
-  pdf("img/FittedSplines_semipar.pdf", width = 15, height = 16)
+  pdf("../img/FittedSplines_semipar.pdf", width = 15, height = 16)
+#  pdf("img/FittedSplines_semipar.pdf", width = 15, height = 16)
   par(mfrow = c(4, 3), mai = c(1.2, 1.2, 0.3, 0.3), cex = 1.3)
   for(i in c(3:14)){
     plot(semipar, se = TRUE, select = i, shade = TRUE, rug = FALSE,
@@ -751,7 +778,8 @@ if(FALSE){
   dev.off()
 
 
-  pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
+  pdf("../img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
+#  pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
   par(mfrow = c(1,1), mai = c(1, 0.8, 0.1, 0.5))
   plot(semipar, se = FALSE, select = 10)
   points(x = c(df.grid.DE[332323,"popDens"], df.grid.DE[355210,"popDens"]),
@@ -815,7 +843,8 @@ colnames(newdata.tmp2.melt) <- c("pred", "x")
 
 dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
 
-pdf("img/FittedSplines_semipar_ggplot.pdf", width = 12, height = 12)
+pdf("../img/FittedSplines_semipar_ggplot.pdf", width = 12, height = 12)
+#pdf("img/FittedSplines_semipar_ggplot.pdf", width = 12, height = 12)
 #pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
 #pdf("img/FittedSplines_semipar_ggplot_TI.pdf", width = 12, height = 12)
 #pdf("img/FittedSplines_semipar_ggplot_A.pdf", width = 12, height = 12)
@@ -831,7 +860,8 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
 dev.off()
 
 
-dat.Positions <- readRDS("Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("dat.Positions.rds")
+#dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 dt.points <- data.frame(x = dat.Positions[1:2, "popDens"],
                         value = c(predict(object = semipar,
                                           newdata = dat.Positions[1:2, ], type="terms")[,"s(popDens)"]))
@@ -851,7 +881,8 @@ p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "popDens", ], aes(x = x,
 
 
 
-pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
+pdf("../img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
+#pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
 p.spline.popDens
 dev.off()
 
@@ -866,7 +897,8 @@ WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
 
 # BKG (Bundesamt für Kartographie und Geodäsie) - German administrative regions
-admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
+admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
+#admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
@@ -900,7 +932,8 @@ admin.regions.RR$ID <- "RR"
 
 
 # Load grid over Germany
-load("Data_built/grid.DE.RData")
+load("DataFull/Data_built/grid.DE.RData")
+#load("Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$GEN != "Helgoland", ]
 
@@ -941,7 +974,8 @@ p.sp.eff <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 
 
-dat.Positions <- readRDS("Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("dat.Positions.rds")
+#dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 df.grid2points	<- dat.Positions[1:2, c("lon.GK3", "lat.GK3")]
 
 p.sp.eff2 <- p.sp.eff +
@@ -952,21 +986,27 @@ p.sp.eff2 <- p.sp.eff +
 
 
 
-png("img/SpatialEffect1.png", width = 450, height = 675)
-pdf("img/SpatialEffect1.pdf", width = 6, height = 9)
+png("../img/SpatialEffect1.png", width = 450, height = 675)
+pdf("../img/SpatialEffect1.pdf", width = 6, height = 9)
+#png("img/SpatialEffect1.png", width = 450, height = 675)
+#pdf("img/SpatialEffect1.pdf", width = 6, height = 9)
 p.sp.eff
 dev.off()
 
 
 
-png("img/SpatialEffect2.png", width = 450, height = 675)
-pdf("img/SpatialEffect2.pdf", width = 6, height = 9)
+png("../img/SpatialEffect2.png", width = 450, height = 675)
+pdf("../img/SpatialEffect2.pdf", width = 6, height = 9)
+#png("img/SpatialEffect2.png", width = 450, height = 675)
+#pdf("img/SpatialEffect2.pdf", width = 6, height = 9)
 p.sp.eff2
 dev.off()
 
 
-png("img/SpatialEffect_popDens.png", width = 900, height = 600)
-pdf("img/SpatialEffect_popDens.pdf", width = 12, height = 8)
+png("../img/SpatialEffect_popDens.png", width = 900, height = 600)
+pdf("../img/SpatialEffect_popDens.pdf", width = 12, height = 8)
+#png("img/SpatialEffect_popDens.png", width = 900, height = 600)
+#pdf("img/SpatialEffect_popDens.pdf", width = 12, height = 8)
 ggdraw() +
   draw_plot(p.sp.eff2, 0, 0, 0.57, 1) +
   draw_plot(p.spline.popDens, 0.57, 0.25, 0.43, 0.5)
@@ -1049,19 +1089,25 @@ p.back.pred2 <- p.back.pred +
   geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA)
 
 
-png("img/PredBack_RR.png", width = 450, height = 675)
-pdf("img/PredBack_RR.pdf", width = 6, height = 9)
+png("../img/PredBack_RR.png", width = 450, height = 675)
+pdf("../img/PredBack_RR.pdf", width = 6, height = 9)
+#png("img/PredBack_RR.png", width = 450, height = 675)
+#pdf("img/PredBack_RR.pdf", width = 6, height = 9)
 p.back.pred2
 dev.off()
 
 
-png("img/SpEff_PredBack.png", width = 900, height = 675)
-pdf("img/SpEff_PredBack.pdf", width = 12, height = 9)
+png("../img/SpEff_PredBack.png", width = 900, height = 675)
+pdf("../img/SpEff_PredBack.pdf", width = 12, height = 9)
+#png("img/SpEff_PredBack.png", width = 900, height = 675)
+#pdf("img/SpEff_PredBack.pdf", width = 12, height = 9)
 plot_grid(p.sp.eff, p.back.pred, nrow = 1)
 dev.off()
 
-png("img/SpEff_PredBack2.png", width = 900, height = 675)
-pdf("img/SpEff_PredBack2.pdf", width = 12, height = 9)
+png("../img/SpEff_PredBack2.png", width = 900, height = 675)
+pdf("../img/SpEff_PredBack2.pdf", width = 12, height = 9)
+#png("img/SpEff_PredBack2.png", width = 900, height = 675)
+#pdf("img/SpEff_PredBack2.pdf", width = 12, height = 9)
 plot_grid(p.sp.eff, p.back.pred2, nrow = 1)
 dev.off()
 
@@ -1139,8 +1185,10 @@ p.back.pred.sub2 <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
 
 
 library(ggpubr)
-png("img/PredBackTrIndRR.png", width = 900, height = 600)
-pdf("img/PredBackTrIndRR.pdf", width = 12, height = 8)
+png("../img/PredBackTrIndRR.png", width = 900, height = 600)
+pdf("../img/PredBackTrIndRR.pdf", width = 12, height = 8)
+#png("img/PredBackTrIndRR.png", width = 900, height = 600)
+#pdf("img/PredBackTrIndRR.pdf", width = 12, height = 8)
 #plot_grid(p.back.pred.sub, p.tr.ind.pred.sub, rel_widths = c(0.51, 0.45))
 ggarrange(p.back.pred.sub, p.tr.ind.pred.sub, widths = c(1,1), common.legend = TRUE, legend = "bottom")
 dev.off()
@@ -1153,10 +1201,12 @@ ggarrange(p.back.pred2, p.back.pred.sub, widths = c(1,1), common.legend = TRUE, 
 dev.off()
 
 ggarrange(p.back.pred2, p.back.pred.sub, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
-  ggexport(filename = "img/PredBackDERR.pdf", width = 12, height = 10)
+  ggexport(filename = "../img/PredBackDERR.pdf", width = 12, height = 10)
+#  ggexport(filename = "img/PredBackDERR.pdf", width = 12, height = 10)
 
 
-dat.Positions <- readRDS("Data_built/dat.Positions.rds")
+dat.Positions <- readRDS("dat.Positions.rds")
+#dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 
 
 ## Plot points 1 to 3 (of `dat.Positions`) on map
@@ -1173,14 +1223,16 @@ dat.Positions <- readRDS("Data_built/dat.Positions.rds")
               colour = "blue", nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
 
-png("img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
+png("../img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
+#png("img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
 #pdf("img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
 ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom")
 #plot_grid(p.back.pred.sub2, p.tr.ind.pred.sub2, rel_widths = c(0.51, 0.45))
 dev.off()
 
 ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
-  ggexport(filename = "img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
+  ggexport(filename = "../img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
+#  ggexport(filename = "img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
 
 #ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
 #  ggexport(filename = "img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
@@ -1261,7 +1313,8 @@ smoothTI <- smoothLUR(data = dat[dat$AQeType!="background", ]
                      ,depVar = "Y"
                      ,thresh = 0.95)
 
-load("Data_built/grid.DE.RData")
+load("grid.DE.RData")
+#load("Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$GEN != "Helgoland", ]
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
@@ -1281,3 +1334,5 @@ df.grid.DE$parA	<- as.vector(predict(object = parA, newdata = df.grid.DE))
 cor(df.grid.DE[,c("smoothB", "par0", "parB")])
 cor(df.grid.DE[,c("smoothTI", "parTI")])
 cor(df.grid.DE[,c("smoothA", "parA")])
+
+
