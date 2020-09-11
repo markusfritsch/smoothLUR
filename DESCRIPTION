@@ -5,7 +5,7 @@ Version: 0.1.0.9000
 Date: 2020-08-21
 Authors@R: c(person("Markus", "Fritsch", role = c("aut", "cre"),
 		email = "Markus.Fritsch@uni-Passau.de"),
-	person("Svenia", "Bahm", role = c("aut"),
+	person("Svenia", "Behm", role = c("aut"),
     email = "Svenia.Behm@uni-Passau.de"))
 Author: Markus Fritsch [aut, cre], Svenia Behm [aut]
 Maintainer: Markus Fritsch <Markus.Fritsch@uni-Passau.de>
