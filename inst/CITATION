@@ -1,10 +1,20 @@
 bibentry(bibtype = "techreport",
+	title = "Smooth land use regression modeling of long-term exposure to nitrogen dioxide",
+	author = c(person("Markus", "Fritsch"),
+		person("Svenia", "Behm")),
+	note = "Working Paper",
+	year = "2020",
+	url = "https://github.com/markusfritsch/smoothLUR",
+	header = "For citing the article corresponding to smoothLUR in publication use:"
+	)
+
+bibentry(bibtype = "techreport",
 	title = "{smoothLUR} -- A package for smooth land use regression modeling",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
 	note = "Working Paper",
 	year = "2020",
 	url = "https://github.com/markusfritsch/smoothLUR",
-	header = "To cite smoothLUR in publication use:"
+	header = "For citing smoothLUR in publication use:"
 	)
 
