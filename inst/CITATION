@@ -1,0 +1,10 @@
+bibentry(bibtype = "techreport",
+	title = "{smoothLUR} -- A package for smooth land use regression modeling",
+	author = c(person("Markus", "Fritsch"),
+		person("Svenia", "Behm")),
+	note = "Working Paper",
+	year = "2020",
+	url = "https://github.com/markusfritsch/smoothLUR",
+	header = "To cite smoothLUR in publication use:"
+	)
+
