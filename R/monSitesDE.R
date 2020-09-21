@@ -37,12 +37,12 @@
 #'   \item{UrbGreen}{proportion of area attributed to urban green spaces within a buffer of radius 1km around the monitoring site}
 #'   \item{Agri}{proportion of agricultural area within a buffer of radius 1km around the monitoring site}
 #'   \item{Forest}{proportion of forestry area within a buffer of radius 1km around the monitoring site}
-#'   \item{popDens}{population density (inhabitants per km^2) at municipality key level}
+#'   \item{PopDens}{population density (inhabitants per km^2) at municipality key level}
 #'   \item{PriRoad}{primary roads (length in meter) within buffer of radius 1km around the monitoring site}
 #'   \item{SecRoad}{secondary roads (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{NatMot}{national motorways (length in meter) within buffer of radius 1km around the monitoring site}
+#'   \item{FedAuto}{federal autobahn (length in meter) within buffer of radius 1km around the monitoring site}
 #'   \item{LocRoute}{local routes (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{indRegions}{indicator for the German federal state the monitoring site is located in}
+#'   \item{IndRegions}{indicator for the German federal state the monitoring site is located in}
 #' }
 #'
 #' @keywords datasets
