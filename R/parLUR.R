@@ -18,8 +18,9 @@
 #'    parametric polynomials in a forward stepwise approach. The function
 #'    allows to carry out the ESCAPE procedure outlined in
 #'    \insertCite{Beelen.2013;textual}{smoothLUR},
-#'    \insertCite{Eeftens.2016;textual}{smoothLUR}, and
-#'    \insertCite{Wolf.2017;textual}{smoothLUR}.
+#'    \insertCite{Eeftens.2016;textual}{smoothLUR},
+#'    \insertCite{Wolf.2017;textual}{smoothLUR}, and
+#'    \insertCite{Fritsch2020smooth;textual}{smoothLUR}.
 #'
 #' @aliases parLUR
 #' @param data A data set which contains the dependent variable and the
