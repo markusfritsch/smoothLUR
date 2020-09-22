@@ -4,18 +4,29 @@
 
 
 
-#install.packages(mgcv)
-library(mgcv)
+
+
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 rm(list = ls())
 
+#	install.packages("mgcv")
+library(mgcv)
+#	install.packages("xtable")
+library(xtable)
+library(smoothLUR)
 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat <- DATA[,c(2,5:7,11:20,26:30)]
+
+
+
+#	DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
+#	dat <- DATA[,c(2,5:7,11:20,26:30)]
+load("data/monSitesDE.rda")
+dat	<- monSitesDE[, c(2,5:8,10:24)]
 
 
 #rename some columns
-names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+names(dat)[c(1:4)] <- c("Y", "Lon", "Lat", "Alt")
 
 
 # Deriving a linear parametric land use regression model with predictor pre-selection ----
@@ -35,36 +46,75 @@ names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
 
 # Eliminate predictors that exhibit mainly zeros or extreme values ----
 # (see Wolf et al., 2016, p.1535, and Eeftens et al., 2016, p.5)
-t(apply(dat, MARGIN = 2, FUN = function(x){
+t(apply(dat[,-5], MARGIN = 2, FUN = function(x){
   return(c(nr.values = length(unique(x)),
            max.extreme =  isTRUE(max(x) > quantile(x, 0.9) + 3* (quantile(x, 0.9) - quantile(x, 0.1))),
-           min.extreme =  isTRUE(min(x) < quantile(x, 0.1) - 3* (quantile(x, 0.9) - quantile(x, 0.1))))
+           min.extreme =  isTRUE(min(x) < quantile(x, 0.1) - 3* (quantile(x, 0.9) - quantile(x, 0.1))),
+           no.zero = sum(x == 0))
   )
 }
 )
 )
+nrow(dat)
 # -> eliminate Seap, Airp, Constr
-names(dat)
+
+
+
 
 
 ## Estimate parametric model with structural predictors only (par0) ----
 
-dat2 <- dat[,-c(2:4,9:11)]
+dat0.B	<- dat[dat$AQeType == "background", -c(2:4, 10:12)]
+dat0.TI	<- dat[(dat$AQeType == "traffic" | dat$AQeType == "industrial"), -c(2:4, 10:12)]
+dat0.A	<- dat[, -c(2:4, 10:12)]
 
 
-# Pre-specify direction of effect -> + 1, - -1, +/- 0
-df_start <-  data.frame(matrix(data = NA, nrow = ncol(dat2)-1, ncol = 4))
-names(df_start) <- c("Predictor", "DirEff", "EstCoeff", "AdjR2")
-df_start$Predictor <- names(dat2)[-1]
-df_start$DirEff <- c(rep(1,4),-1,0,-1,rep(1,5))
 
+#input parameters for escapeLUR function when including only structural effects
+dirEff0	<- c(rep(1,4),-1,0,-1,rep(1,5))
+
+m0.B		<- escapeLUR(data = dat0.B, depVar = "Y", pred = paste(names(dat0.B)[-c(1:2)]), dirEff = dirEff0)
+m0.TI		<- escapeLUR(data = dat0.TI, depVar = "Y", pred = paste(names(dat0.TI)[-c(1:2)]), dirEff = dirEff0)
+m0.A		<- escapeLUR(data = dat0.A, depVar = "Y", pred = paste(names(dat0.A)[-c(1:2)]), dirEff = dirEff0)
+
+
+
+xtable(summary(m0.B)$coefficients[,1:2], digits = 4)
+xtable(summary(m0.TI)$coefficients[,1:2], digits = 4)
+xtable(summary(m0.A)$coefficients[,1:2], digits = 4)
+
+
+
+
+
+## Estimate parametric model with structural and spatial predictors (par) ----
+
+dat.B		<- dat[dat$AQeType == "background", -c(10:12)]
+dat.TI	<- dat[(dat$AQeType == "traffic" | dat$AQeType == "industrial"), -c(10:12)]
+dat.A		<- dat[, -c(10:12)]
+
+
+#input parameters for escapeLUR function when including only structural effects
+dirEff	<- c(rep(0, times = 3), rep(1,4),-1,0,-1,rep(1,5))
+
+m.B		<- escapeLUR(data = dat.B, depVar = "Y", pred = paste(names(dat.B)[-c(1,5)]), dirEff = dirEff)
+m.TI		<- escapeLUR(data = dat.TI, depVar = "Y", pred = paste(names(dat.TI)[-c(1,5)]), dirEff = dirEff)
+m.A		<- escapeLUR(data = dat.A, depVar = "Y", pred = paste(names(dat.A)[-c(1,5)]), dirEff = dirEff)
+
+
+
+
+
+
+
+### background sites: parB
 
 
 # 1. Identify start model ----
 # Run univariate regressions and choose predictor with hightest adjusted R^2
 for(i in 1:nrow(df_start)){
-  dat.tmp <- dat2[ , -1]
-  lm.tmp <- lm(Y ~ dat.tmp[ , i], data = dat)
+  dat.tmp <- datB[ , -c(1:2)]
+  lm.tmp <- lm(Y ~ dat.tmp[ , i], data = datB)
   df_start$EstCoeff[i] <- lm.tmp$coefficients[2]
   df_start$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
@@ -80,68 +130,69 @@ adjR2_start <- df_start[which.max(df_start$AdjR2), "AdjR2"]
 
 # Adding a second variable ----
 
-df_select2 <- df_start[-which.max(df_start$AdjR2), ]
-col.2 <- which(names(dat2) == df_start[which.max(df_start$AdjR2), "Predictor"])
+df_select2	<- df_start[-which.max(df_start$AdjR2), ]
+col.2		<- which(names(datB) == df_start[which.max(df_start$AdjR2), "Predictor"])
 for(i in 1:nrow(df_select2)){
-  dat.tmp <- dat2[ , -c(1, col.2)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] + dat.tmp[ , i])
-  df_select2$EstCoeff[i] <- lm.tmp$coefficients[3]
-  df_select2$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
+  dat.tmp	<- datB[ , -c(1:2, col.2)]
+  lm.tmp	<- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"], df_select2[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
+
+  df_select2$EstCoeff[i]	<- lm.tmp$coefficients[3]
+  df_select2$AdjR2[i]		<- summary(lm.tmp)$`adj.r.squared`
 }
 df_select2[which.max(df_select2$AdjR2),]
 adjR2_select2 <- df_select2[which.max(df_select2$AdjR2), "AdjR2"]
 adjR2_select2 - adjR2_start > 0.01
-coefficients(lm(Y ~ popDens, data = dat))
-coefficients(lm(Y ~ popDens + Forest, data = dat))
+coefficients(lm(Y ~ PopDens, data = datB))
+coefficients(lm(Y ~ PopDens + Forest, data = datB))
 # a) adj R^2 increase by more than 1 %
 # b) estimated coefficient for Forest has the expected sign
-# c) estimated coefficient for popDens still positive
+# c) estimated coefficient for PopDens still positive
 
 
 
 # Adding a third variable ----
 
 df_select3 <- df_select2[-which.max(df_select2$AdjR2), ]
-col.3 <- which(names(dat2) == df_select2[which.max(df_select2$AdjR2), "Predictor"])
+col.3 <- which(names(datB) == df_select2[which.max(df_select2$AdjR2), "Predictor"])
 for(i in 1:nrow(df_select3)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select3$EstCoeff[i] <- lm.tmp$coefficients[4]
   df_select3$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select3[which.max(df_select3$AdjR2), ]
 adjR2_select3 <- df_select3[which.max(df_select3$AdjR2), "AdjR2"]
 adjR2_select3 - adjR2_select2 > 0.01
-coefficients(lm(Y ~ popDens + Forest, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri, data = dat))
+coefficients(lm(Y ~ PopDens + Forest, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri, data = datB))
 # a) adj R^2 increase by more than 1 %
 # b) estimated coefficient for Agri has the expected sign
-# c) sign of estimated coefficients for popDens and Forest still positive and negative
+# c) sign of estimated coefficients for PopDens and Forest still positive
 
 
 
 # Adding a fourth variable ----
 
 df_select4 <- df_select3[-which.max(df_select3$AdjR2), ]
-col.4 <- which(names(dat2) == df_select3[which.max(df_select3$AdjR2), "Predictor"])
+col.4 <- which(names(datB) == df_select3[which.max(df_select3$AdjR2), "Predictor"])
 
 for(i in 1:nrow(df_select4)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3, col.4)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + 
-                 dat[ , df_select3[which.max(df_select3$AdjR2), "Predictor"]] +dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3, col.4)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[which.max(df_select3$AdjR2), "Predictor"],
+		df_select4[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select4$EstCoeff[i] <- lm.tmp$coefficients[5]
   df_select4$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select4[which.max(df_select4$AdjR2), ]
 adjR2_select4 <- df_select4[which.max(df_select4$AdjR2), "AdjR2"]
 adjR2_select4 - adjR2_select3 > 0.01
-coefficients(lm(Y ~ popDens + Forest + Agri, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot, data = dat))
+coefficients(lm(Y ~ PopDens + Forest + Agri, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto, data = datB))
 # a) adj R^2 increase by more than 1 %
-# b) estimated coefficient for NatMot has the expected sign
-# c) sign of estimated coefficients for popDens, Forest and Agri still the same
+# b) estimated coefficient for FedAuto has the expected sign
+# c) sign of estimated coefficients for PopDens, Forest, and Agri still the same
 
 
 
@@ -149,25 +200,24 @@ coefficients(lm(Y ~ popDens + Forest + Agri + NatMot, data = dat))
 # Adding a fifth variable ----
 
 df_select5 <- df_select4[-which.max(df_select4$AdjR2), ]
-col.5 <- which(names(dat2) == df_select4[which.max(df_select4$AdjR2), "Predictor"])
+col.5 <- which(names(datB) == df_select4[which.max(df_select4$AdjR2), "Predictor"])
 
 for(i in 1:nrow(df_select5)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3, col.4, col.5)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + 
-                 dat[ , df_select3[which.max(df_select3$AdjR2), "Predictor"]] + 
-                 dat[ , df_select4[which.max(df_select4$AdjR2), "Predictor"]] + dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3, col.4, col.5)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[which.max(df_select3$AdjR2), "Predictor"],
+		df_select4[which.max(df_select4$AdjR2), "Predictor"], df_select5[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select5$EstCoeff[i] <- lm.tmp$coefficients[6]
   df_select5$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select5[which.max(df_select5$AdjR2), ]
 adjR2_select5 <- df_select5[which.max(df_select5$AdjR2), "AdjR2"]
 adjR2_select5 - adjR2_select4 > 0.01
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens, data = dat))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens, data = datB))
 # a) adj R^2 increase by more than 1 %
 # b) estimated coefficient for HighDens has the expected sign
-# c) sign of estimated coefficients for popDens, Forest, Agri and NatMot still the same
+# c) sign of estimated coefficients for PopDens, Forest, Agri, and FedAuto still the same
 
 
 
@@ -175,87 +225,97 @@ coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens, data = dat))
 # Adding a sixth variable ----
 
 df_select6 <- df_select5[-which.max(df_select5$AdjR2), ]
-col.6 <- which(names(dat2) == df_select5[which.max(df_select5$AdjR2), "Predictor"])
+col.6 <- which(names(datB) == df_select5[which.max(df_select5$AdjR2), "Predictor"])
 
 for(i in 1:nrow(df_select6)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3, col.4, col.5, col.6)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + 
-                 dat[ , df_select3[which.max(df_select3$AdjR2), "Predictor"]] + 
-                 dat[ , df_select4[which.max(df_select4$AdjR2), "Predictor"]] +
-                 dat[ , df_select5[which.max(df_select5$AdjR2), "Predictor"]] + dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3, col.4, col.5, col.6)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[which.max(df_select3$AdjR2), "Predictor"],
+		df_select4[which.max(df_select4$AdjR2), "Predictor"], df_select5[which.max(df_select5$AdjR2), "Predictor"],
+		df_select6[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select6$EstCoeff[i] <- lm.tmp$coefficients[7]
   df_select6$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select6[which.max(df_select6$AdjR2), ]
 adjR2_select6 <- df_select6[which.max(df_select6$AdjR2), "AdjR2"]
 adjR2_select6 - adjR2_select5 > 0.01
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind, data = dat))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind, data = datB))
 # a) adj R^2 increase by more than 1 %
 # b) estimated coefficient for Alt has the expected sign
-# c) sign of estimated coefficients for popDens, Forest, Lat, Lon and Alt still the same
+# c) sign of estimated coefficients for popDens, Forest, Agri, FedAuto and HighDens still the same
+
+
 
 
 
 # Adding a seventh variable ----
 
 df_select7 <- df_select6[-which.max(df_select6$AdjR2), ]
-col.7 <- which(names(dat2) == df_select6[which.max(df_select6$AdjR2), "Predictor"])
+col.7 <- which(names(datB) == df_select6[which.max(df_select6$AdjR2), "Predictor"])
 
 for(i in 1:nrow(df_select7)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3, col.4, col.5, col.6, col.7)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + 
-                 dat[ , df_select3[which.max(df_select3$AdjR2), "Predictor"]] + 
-                 dat[ , df_select4[which.max(df_select4$AdjR2), "Predictor"]] +
-                 dat[ , df_select5[which.max(df_select5$AdjR2), "Predictor"]] + 
-                 dat[ , df_select6[which.max(df_select6$AdjR2), "Predictor"]] + dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3, col.4, col.5, col.6, col.7)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[which.max(df_select3$AdjR2), "Predictor"],
+		df_select4[which.max(df_select4$AdjR2), "Predictor"], df_select5[which.max(df_select5$AdjR2), "Predictor"],
+		df_select6[which.max(df_select6$AdjR2), "Predictor"], df_select7[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select7$EstCoeff[i] <- lm.tmp$coefficients[8]
   df_select7$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select7[which.max(df_select7$AdjR2), ]
 adjR2_select7 <- df_select7[which.max(df_select7$AdjR2), "AdjR2"]
 adjR2_select7 - adjR2_select6 > 0.01
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind + LowDens, data = dat))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens, data = datB))
+# a) adj R^2 increase by more than 1 %
+# b) estimated coefficient for Alt has the expected sign
+# c) sign of estimated coefficients for popDens, Forest, Agri, FedAuto, HighDens, and Ind still the same
 
 
 
 
-# Adding a eighth variable ----
+# Adding an eighth variable ----
 
 df_select8 <- df_select7[-which.max(df_select7$AdjR2), ]
-col.8 <- which(names(dat2) == df_select7[which.max(df_select7$AdjR2), "Predictor"])
+col.8 <- which(names(datB) == df_select7[which.max(df_select7$AdjR2), "Predictor"])
 
 for(i in 1:nrow(df_select8)){
-  dat.tmp <- dat2[ , -c(1, col.2, col.3, col.4, col.5, col.6, col.7, col.8)]
-  lm.tmp <- lm(dat$Y ~ dat[ , df_start[which.max(df_start$AdjR2), "Predictor"]] +
-                 dat[ , df_select2[which.max(df_select2$AdjR2), "Predictor"]] + 
-                 dat[ , df_select3[which.max(df_select3$AdjR2), "Predictor"]] + 
-                 dat[ , df_select4[which.max(df_select4$AdjR2), "Predictor"]] +
-                 dat[ , df_select5[which.max(df_select5$AdjR2), "Predictor"]] + 
-                 dat[ , df_select6[which.max(df_select6$AdjR2), "Predictor"]] + 
-                 dat[ , df_select7[which.max(df_select6$AdjR2), "Predictor"]] + dat.tmp[ , i])
+  dat.tmp <- datB[ , -c(1, col.2, col.3, col.4, col.5, col.6, col.7, col.8)]
+  lm.tmp <- lm(as.formula(paste("Y", paste(c(df_start[which.max(df_start$AdjR2), "Predictor"],
+		df_select2[which.max(df_select2$AdjR2), "Predictor"], df_select3[which.max(df_select3$AdjR2), "Predictor"],
+		df_select4[which.max(df_select4$AdjR2), "Predictor"], df_select5[which.max(df_select5$AdjR2), "Predictor"],
+		df_select6[which.max(df_select6$AdjR2), "Predictor"], df_select7[which.max(df_select7$AdjR2), "Predictor"],
+		df_select8[i,1]), collapse = "+"), sep = "~" ) ), data = datB)
   df_select8$EstCoeff[i] <- lm.tmp$coefficients[9]
   df_select8$AdjR2[i] <- summary(lm.tmp)$`adj.r.squared`
 }
 df_select8[which.max(df_select8$AdjR2), ]
-# Coefficient for PriRoad shows expected sign
 adjR2_select8 <- df_select8[which.max(df_select8$AdjR2), "AdjR2"]
 adjR2_select8 - adjR2_select7 > 0.01
-# But PriRoad does not lead to an increase in adjR^2 larger than 1 %.
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind + LowDens, data = dat))
-coefficients(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind + LowDens + PriRoad, data = dat))
-# At this point, one would stop and return to step 4 of the forward stepwise predictor selection
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens, data = datB))
+coefficients(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens + PriRoad, data = datB))
+# a) adj R^2 increase by more than 1 %: not fulfilled
+# b) estimated coefficient for Alt has the expected sign
+# c) sign of estimated coefficients for popDens, Forest, Agri, FedAuto, HighDens, Ind, and LowDens still the same
 
 
-summary(lm(Y ~ popDens + Forest + Agri + NatMot + HighDens + Ind + LowDens, data = dat))
-# Remove Agri
-summary(lm(Y ~ popDens + Forest + NatMot + HighDens + Ind + LowDens, data = dat))
 
 
-par0 <- lm(Y ~ popDens + Forest + NatMot + HighDens + Ind + LowDens, data = dat)
+
+### --> aborting procedure after step 7 yields model par0
+
+
+
+
+
+
+summary(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens + PriRoad, data = datB))
+# Remove FedAuto
+summary(lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens, data = datB))
+
+
+par0 <- lm(Y ~ PopDens + Forest + Agri + FedAuto + HighDens + Ind + LowDens, data = dat)
 AIC(par0); BIC(par0)
 
 
@@ -267,6 +327,8 @@ diag(res.dist.inv) <- 0
 Moran.I(resid(par0), res.dist.inv)
 # the null that the residuals do not reveal spatial autocorrelation
 # can be rejected at every reasonable significance level
+
+
 
 
 

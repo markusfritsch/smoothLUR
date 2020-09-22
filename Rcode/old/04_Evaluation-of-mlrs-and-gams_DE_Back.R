@@ -4,20 +4,35 @@
 
 
 
-library(mgcv)
+
+
+#	setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 rm(list = ls())
 
+#	install.packages(mgcv)
+library(mgcv)
 
-DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-dat <- DATA[,c(2,5:7,11:20,26:30)]
+
+
+#	DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
+#	dat <- DATA[,c(2,5:7,11:20,26:30)]
+load("data/monSitesDE.rda")
+dat	<- monSitesDE[, c(2,5:8,10:24)]
+
+
+dat	<- dat[dat$AQeType == "background", ]
+#	dat	<- dat[dat$AQeType == "traffic" | dat$AQeType == "industrial", ]
+#	dat	<- dat
 
 
 #rename some columns
-names(dat)[c(1:4, 15)] <- c("Y", "Lon", "Lat", "Alt", "popDens")
+names(dat)[c(1:4)] <- c("Y", "Lon", "Lat", "Alt")
 
 
-par1 <- lm(Y ~ popDens + Forest + Lat + Alt + Agri + NatMot, data = dat)
+
+par1 <- lm(Y ~ PopDens + Forest + Lat + Alt + Agri + FedAuto, data = dat)
+
 
 
 form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NULL) +
@@ -29,10 +44,10 @@ form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NUL
   s(UrbGreen, k=-1, bs="tp") +
   s(Agri, k=-1, bs="tp") +
   s(Forest, k=-1, bs="tp") +
-  s(popDens, k=-1, bs="tp") +
+  s(PopDens, k=-1, bs="tp") +
   s(PriRoad, k=-1, bs="tp") +
   s(SecRoad, k=-1, bs="tp") +
-  s(NatMot, k=-1, bs="tp") +
+  s(FedAuto, k=-1, bs="tp") +
   s(LocRoute, k=-1, bs="tp")
 
 gam2.3 <- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=dat, family=gaussian(),
@@ -45,13 +60,15 @@ semipar <- gam2.3
 
  
 # Overview over the performance of the models
-df.overview <- data.frame(matrix(data = NA, nrow = 2, ncol = 9))
-names(df.overview) <- c("Name", "adj. R^2", "BIC", "AIC", "LOOCV RMSE",
+df.overview			<- data.frame(matrix(data = NA, nrow = 2, ncol = 9))
+names(df.overview)	<- c("Name", "adj. R^2", "BIC", "AIC", "LOOCV RMSE",
                         "LOOCV MAE", "LOOCV BIC", "LOOCV AIC", "LOOCV adj. R^2")
 df.overview[ , 1] <- c("par1", "semipar")
 df.overview[ , 2] <- round(c(summary(par1)$adj.r.squared, summary(semipar)$r.sq), digits = 4)
 df.overview[ , 3] <- round(BIC(par1, semipar)[ , 2], digits = 4)
 df.overview[ , 4] <- round(AIC(par1, semipar)[ , 2], digits = 4)
+
+
 
 
 

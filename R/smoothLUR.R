@@ -14,7 +14,7 @@
 #'
 #' \code{smoothLUR} fits a smooth land use regression (LUR) model
 #'     using the gam() function from the mgcv package. The procedure
-#'     automatically carries out the procedure outlined in ...
+#'     is outlined in \insertCite{Fritsch2020smooth;textual}{smoothLUR}
 #'
 #' @aliases smoothLUR
 #' @param data A data set which contains the dependent variable and
@@ -45,14 +45,13 @@
 #'
 #' @seealso
 #'
-#' \code{\link{escapeLUR}} for smooth land use regression (LUR)
+#' \code{\link{parLUR}} for parametric land use regression (LUR)
 #'    models.
 #' \code{\link{kFoldCV}} for k-fold cross-validation for
-#'    escapeLUR and smoothLUR objects.
+#'    parLUR and smoothLUR objects.
 #'
 #' @references
 #' \insertAllCited{}
-#'
 #'
 #' @examples
 #' \dontrun{
@@ -63,13 +62,13 @@
 #' ## Code example
 #' dat <- monSitesDE[sample(1:nrow(monSitesDE), 40),]
 #' m1 <- smoothLUR(data = dat
-#'                  ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#'                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
-#'                          ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
-#'                          ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
-#'                  ,spVar1 = "AQeLon"
-#'                  ,spVar2 = "AQeLat"
-#'                  ,depVar = "AQeYMean"
+#'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
+#'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+#'                  ,spVar1 = "Lon"
+#'                  ,spVar2 = "Lat"
+#'                  ,depVar = "Y"
 #'                  ,thresh = 0.95)
 #'
 #' summary(m1)
@@ -82,13 +81,13 @@
 #' data(monSitesDE, package="smoothLUR")
 #' dat <- monSitesDE
 #' m1 <- smoothLUR(data = dat,
-#'                  ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#'                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
-#'                          ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
-#'                          ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
-#'                  ,spVar1 = "AQeLon"
-#'                  ,spVar2 = "AQeLat"
-#'                  ,depVar = "AQeYMean"
+#'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
+#'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+#'                  ,spVar1 = "Lon"
+#'                  ,spVar2 = "Lat"
+#'                  ,depVar = "Y"
 #'                  ,thresh = 0.95)
 #'
 #' summary(m1)
@@ -140,40 +139,4 @@ smoothLUR <- function(
 }
 
 
-#dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
-#
-#pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#        ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#        ,"Constr", "UrbGreen", "Agri", "Forest"
-#        , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#        , "LocRoute")
-#depVar = "AQeYMean"
-#spVar1 = "AQeLon"
-#spVar2 = "AQeLat"
-#thresh = 0.95
-#
-#
-# (res.model <- smoothLUR(data = dat[dat$AQeType!="background", ]
-#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#                                ,"Constr", "UrbGreen", "Agri", "Forest"
-#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#                                , "LocRoute")
-#                      ,spVar1 = "AQeLon"
-#                      ,spVar2 = "AQeLat"
-#                      ,depVar = "AQeYMean"
-#                      ,thresh = 0.95) )
-#
-#
-# dat <- read.csv("DATA_monitoringSites_DE.csv", header = TRUE)
-# (res.model <- smooth(data = dat[dat$AQeType!="background", ]
-#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#                                ,"Constr", "UrbGreen", "Agri", "Forest"
-#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#                                , "LocRoute")
-#                      ,spVar1 = "AQeLon"
-#                      ,spVar2 = "AQeLat"
-#                      ,depVar = "AQeYMean"
-#                      ,thresh = 0.95) )
 

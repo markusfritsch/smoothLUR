@@ -9,7 +9,7 @@
 #'
 #' \code{kFoldCV} conducts a k-fold cross-validation for parametric
 #'    and smooth land use regression (LUR) models fitted with the
-#'    functions \code{escapeLUR} and \code{smoothLUR}, respectively.
+#'    functions \code{parLUR} and \code{smoothLUR}, respectively.
 #'
 #' @aliases kFoldCV
 #' @param data A data set which contains the dependent variable and
@@ -33,7 +33,7 @@
 #'    of the potential predictor (1 for positive, -1 for negative
 #'    and 0 if the expected effect sign is unclear). Argument
 #'    defaults to NULL and is only required for parametric model
-#'    fitting according to ESCAPE procedure.
+#'    fitting.
 #' @param thresh A numeric value that indicates the maximum share of
 #'    zero values; if the share is exceeded, the corresponding
 #'    potential predictor is excluded.
@@ -72,7 +72,7 @@
 #'
 #' @seealso
 #'
-#' \code{\link{escapeLUR}} for parametric land use regression (LUR)
+#' \code{\link{parLUR}} for parametric land use regression (LUR)
 #'    modeling.
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    modeling.
@@ -145,7 +145,7 @@ kFoldCV <- function(
     data.test <- data[ind.test, ]
     data.train <- data[-ind.test, ]
 
-    mod.par.tmp <- escapeLUR(data=data.train, pred, depVar, dirEff, thresh = 0.95)
+    mod.par.tmp <- parLUR(data=data.train, pred, depVar, dirEff, thresh = 0.95)
     ls.models[[i]][[1]] <- mod.par.tmp
     df.err$Err.par[ind.test]    <- data[ind.test, depVar] - predict(mod.par.tmp, newdata = data.test)
 
@@ -163,36 +163,3 @@ kFoldCV <- function(
 
 
 
-#source("03_FunESCAPE.R")
-#source("FunSmooth.R")
-#
-#tenFoldCV.seed1 <- kFoldCV(data = dat[dat$AQeType!="background",]
-#                      ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#                                ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#                                ,"Constr", "UrbGreen", "Agri", "Forest"
-#                                , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#                                , "LocRoute")
-#                      ,ID = "AQeCode"
-#                      ,spVar1 = "AQeLon"
-#                      ,spVar2 = "AQeLat"
-#                      ,depVar = "AQeYMean"
-#                      ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-#                      ,thresh = 0.95
-#                      ,seed = 1
-#                      ,k = 10
-#                      ,strat = FALSE
-#                      ,loocv = FALSE
-#)
-#
-#
-#lapply(TenFoldCV.seed1$ls.models, FUN = function(x) x$mod.par$coefficients)
-#
-#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) sqrt(mean(x^2))) # rmse
-#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(abs(x)))    # mae
-#apply(TenFoldCV.seed1$df.err[,3:4], MARGIN = 2, function(x) mean(x))         # bias
-#
-#(adj.r2.par    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.par)$adj.r.squared)))
-#(adj.r2.smooth <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) summary(x$mod.smooth)$r.sq)))
-#
-#(aic.par       <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.par))))
-#(aic.smooth    <- mean(sapply(TenFoldCV.seed1$ls.models, FUN = function(x) AIC(x$mod.smooth))))

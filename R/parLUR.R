@@ -1,13 +1,7 @@
 
-#####################################################
-###	Version information
-#####################################################
-
-###
-###	Starting point
-###
-
-#	code version 03_FunESCAPE as of 2020-07-25
+##############################################
+### Function to derive parametric LUR model
+##############################################
 
 
 
@@ -18,47 +12,34 @@
 
 
 
-
-
-#####################################################################
-### Function to derive parametric LUR model using ESCAPE procedure
-#####################################################################
-
-
-
-
-
-
-
-
-
-
-#' Function for deriving parametric land use regression (LUR) model according
-#'    to the ESCAPE procedure.
+#' Function for deriving parametric land use regression (LUR) model.
 #'
-#' \code{escapeLUR} fits a parametric land use regression (LUR) model according
-#'    to the ESCAPE procedure. The procedure automatically carries out the
-#'    procedure outlined in
+#' \code{parLUR} fits a parametric land use regression (LUR) model employing
+#'    parametric polynomials in a forward stepwise approach. The function
+#'    allows to carry out the ESCAPE procedure outlined in
 #'    \insertCite{Beelen.2013;textual}{smoothLUR},
 #'    \insertCite{Eeftens.2016;textual}{smoothLUR}, and
 #'    \insertCite{Wolf.2017;textual}{smoothLUR}.
 #'
-#' @aliases escapeLUR
+#' @aliases parLUR
 #' @param data A data set which contains the dependent variable and the
 #'    potential predictors.
-#' @param pred A character vector stating the variable names of the
+#' @param x A character vector stating the variable names of the
 #'    potential predictors (names have to match the column names of
 #'    `data`).
-#' @param depVar A character string indicating the name of the dependent
-#'    variable.
+#' @param y A character string indicating the name of the dependent
+#'    variable (name needs to match the column names of `data`).
 #' @param dirEff A vector that contains one entry for each potential
 #'    predictor and indicates the expected direction of the effect of the
 #'    potential predictor (1 for positive, -1 for negative and 0 if the
 #'    expected effect sign is unclear).
 #' @param thresh A numeric value that indicates the maximum share of
 #'    zero values; if the share is exceeded, the corresponding potential
-#'    predictor is excluded.
-#' @return An object of class `escapeLUR` with the following elements:
+#'    predictor is excluded (defaults to 0.95).
+#' @param thresh_pval A numeric value that indicates a threshold for
+#'    removing predictors after the forward stepwise modeling procedure;
+#'    the threshold is the p-value of a standard t-Test (defaults to 0.1).
+#' @return An object of class `parLUR` with the following elements:
 #'
 #' \item{coefficients}{a vector containing the coefficient estimates}
 #'
@@ -74,7 +55,7 @@
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    models.
 #' \code{\link{kFoldCV}} for k-fold cross-validation for
-#'    escapeLUR and smoothLUR objects.
+#'    parLUR and smoothLUR objects.
 #'
 #' @references
 #' \insertAllCited{}
@@ -87,14 +68,15 @@
 #'
 #' ## Code example
 #' dat <- monSitesDE[sample(1:nrow(monSitesDE), 40),]
-#' m1 <- escapeLUR(data = dat
-#'                  ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#' m1 <- parLUR(data = dat
+#'                  ,x = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
-#'                          ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
-#'                          ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
-#'                  ,depVar = "AQeYMean"
+#'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
+#'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+#'                  ,y = "Y"
 #'                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-#'                  ,thresh = 0.95)
+#'                  ,thresh = 0.95
+#'                  ,thresh_pval = 0.1)
 #'
 #' summary(m1)
 #' summary(m1)$adj.r.squared
@@ -105,14 +87,15 @@
 #' ## Load data from package
 #' data(monSitesDE, package="smoothLUR")
 #' dat <- monSitesDE
-#' m1 <- escapeLUR(data = dat
-#'                  ,pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
+#' m1 <- parLUR(data = dat
+#'                  ,x = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
-#'                          ,"UrbGreen", "Agri", "Forest", "BBSRpopDens"
-#'                          ,"PriRoad", "SecRoad", "NatMot", "LocRoute")
-#'                  ,depVar = "AQeYMean"
+#'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
+#'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+#'                  ,y = "Y"
 #'                  ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-#'                  ,thresh = 0.95)
+#'                  ,thresh = 0.95
+#'                  ,thresh_pval = 0.1)
 #'
 #' summary(m1)
 #' summary(m1)$adj.r.squared
@@ -121,24 +104,25 @@
 #'
 #' }
 #'
-escapeLUR <- function(
+parLUR <- function(
 			data
-			,pred
-			,depVar
+			,x
+			,y
 			,dirEff
 			,thresh = 0.95
+			,thresh_pval = 0.1
 ){
 
-  dat <- data.frame(subset(x = data, select = c(depVar, pred)))
+  dat <- data.frame(subset(x = data, select = c(y, x)))
   names.dat <- names(dat)
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
   names.dat[!(names.dat %in% names(dat))]
-  predAdj <- pred[pred %in% names(dat)]
+  predAdj <- x[x %in% names(dat)]
   dirEffAdj <- dirEff[pred %in% names(dat)]
 
-  y <- dat[, depVar]
-  X <- subset(x = dat, select = pred[pred %in% names(dat)])
+  y <- dat[, y]
+  X <- subset(x = dat, select = x[x %in% names(dat)])
 
   adjR2 <- 0        # First, set adjusted R^2 to zero
   resPred <- NA     # Vector to be filled with predictors included in the model
@@ -242,7 +226,7 @@ escapeLUR <- function(
     }
   }
 
-  while(any(summary(resModel)$coefficients[-1,4] > 0.1)){ # Remove sequentially predictors attributed to p-value larger than 0.1.
+  while(any(summary(resModel)$coefficients[-1,4] > thresh_pval)){ # Remove sequentially predictors attributed to p-value larger than 0.1.
     ind.tmp <- which.max(summary(resModel)$coefficients[-1,4])
     resPred <- resPred[-ind.tmp]
     resModel <- stats::lm(stats::as.formula(paste("y ~",
@@ -251,7 +235,7 @@ escapeLUR <- function(
                     data=dat)
   }
 
-#  attr(resModel, "class")  <- "escapeLUR"
+#  attr(resModel, "class")  <- "parLUR"
 
   return(resModel) # Return final model derived by supervised forward stepwise predictor selection.
 
@@ -261,50 +245,3 @@ escapeLUR <- function(
 
 
 
-# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/R")
-#
-# dat <- read.csv("DATA_MonitoringSites_DE.csv", header=TRUE)
-# dat <- dat[, -1]
-# save(dat, file="data/monSitesDE.RData")
-#
-# (m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#                                             ,"Constr", "UrbGreen", "Agri", "Forest"
-#                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#                                             , "LocRoute")
-#                        ,depVar = "AQeYMean"
-#                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-#                        ,thresh = 0.95) )
-#
-#
-#
-# set.seed(42)
-# dat <- dat[sample(1:nrow(dat), 40),]
-#
-# (m1 <- escapeLUR(data = dat, pred = c("AQeLon", "AQeLat", "AQeAlt", "HighDens"
-#                                             ,"LowDens", "Ind", "Transp", "Seap", "Airp"
-#                                             ,"Constr", "UrbGreen", "Agri", "Forest"
-#                                             , "BBSRpopDens", "PriRoad", "SecRoad", "NatMot"
-#                                             , "LocRoute")
-#                        ,depVar = "AQeYMean"
-#                        ,dirEff = c(0,0,-1,1,1,1,1,1,1,1,-1,0,-1,1,1,1,1,1)
-#                        ,thresh = 0.95) )
-#
-#
-# summary(m1)
-# summary(m1)$adj.r.squared
-# BIC(m1)
-# AIC(m1)
-#
-#
-#
-# # Moran's I
-# #	install.packages("ape")
-# library(ape)
-#
-# res.dist		<- as.matrix(dist(cbind(dat$AQeLon, dat$AQeLat)))
-# res.dist.inv	<- 1/(res.dist^2)
-# diag(res.dist.inv)	<- 0
-#
-# Moran.I(resid(res.model), res.dist.inv)
-# # null hypothesis: residuals do not exhibit spatial autocorrelation
