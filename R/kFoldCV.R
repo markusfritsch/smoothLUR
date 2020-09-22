@@ -1,3 +1,4 @@
+
 #################################################
 ### Function to conduct k-fold cross-validation
 #################################################
@@ -14,20 +15,21 @@
 #' @aliases kFoldCV
 #' @param data A data set which contains the dependent variable and
 #'    the potential predictors.
-#' @param pred A character vector stating the variable names of the
+#' @param x A character vector stating the variable names of the
 #'    potential predictors (names have to match the column names of
 #'    `data`).
 #' @param ID A character string stating the variable name referring
 #'    to the monitoring sites' ID (name has to mach the column name
-#'    of `data`)
+#'    of `data`).
 #' @param spVar1 A character string stating the variable name
 #'    referring to longitude (name has to match the column name of
-#'    `data`)
+#'    `data`).
 #' @param spVar2 A character string stating the variable name
 #'    referring to latitude (name has to match the column name of
-#'    `data`)
-#' @param depVar A character string that indicates the name of the
-#'    dependent variable.
+#'    `data`).
+#' @param y A character string that indicates the name of the
+#'    dependent variable (name has to match the column name of
+#'    `data`).
 #' @param dirEff A vector that contains one entry for each potential
 #'    predictor and indicates the expected direction of the effect
 #'    of the potential predictor (1 for positive, -1 for negative
@@ -38,18 +40,18 @@
 #'    zero values; if the share is exceeded, the corresponding
 #'    potential predictor is excluded.
 #' @param seed A numeric value that defines the seed for random
-#'    sampling
+#'    sampling.
 #' @param k An integer denoting the number of folds to use in
-#'    cross-validation (defaults to 10)
+#'    cross-validation (defaults to 10).
 #' @param strat A boolean value that indicates whether stratified
 #'    sampling is desired (stratified spatially w.r.t. German federal
-#'    states)
+#'    states).
 #' @param loocv A boolean value that indicates whether a leave-one-out
 #'    cross-validation which is a k-fold CV with `k` equal to the
-#'    number of rows in `data` desired
+#'    number of rows in `data` desired.
 #' @param indRegions A character string that indicates the name of
 #'    the variable referring to the geographical regions; this
-#'    variable is required to perform spatial stratified sampling
+#'    variable is required to perform spatial stratified sampling.
 #' @return An object of class `kfcvLUR` with the following elements:
 #'
 #' \item{df.err}{data.frame with four columns: ID (Id of monitoring
@@ -77,21 +79,17 @@
 #' \code{\link{smoothLUR}} for smooth land use regression (LUR)
 #'    modeling.
 #'
-#' @references
-#' \insertAllCited{}
-#'
-#'
 #' @examples
 #' ## Load data set
 #' data(monSitesDE, package="smoothLUR")
 #'
 kFoldCV <- function(
   data
-  ,pred
+  ,x
   ,ID
   ,spVar1
   ,spVar2
-  ,depVar
+  ,y
   ,dirEff
   ,thresh = 0.95
   ,seed
@@ -145,13 +143,13 @@ kFoldCV <- function(
     data.test <- data[ind.test, ]
     data.train <- data[-ind.test, ]
 
-    mod.par.tmp <- parLUR(data=data.train, pred, depVar, dirEff, thresh = 0.95)
+    mod.par.tmp <- parLUR(data=data.train, x, y, dirEff, thresh = 0.95)
     ls.models[[i]][[1]] <- mod.par.tmp
-    df.err$Err.par[ind.test]    <- data[ind.test, depVar] - predict(mod.par.tmp, newdata = data.test)
+    df.err$Err.par[ind.test]    <- data[ind.test, y] - predict(mod.par.tmp, newdata = data.test)
 
-    mod.smooth.tmp <- smoothLUR(data=data.train, pred, spVar1, spVar2, depVar, thresh = 0.95)
+    mod.smooth.tmp <- smoothLUR(data=data.train, x, spVar1, spVar2, y, thresh = 0.95)
     ls.models[[i]][[2]] <- mod.smooth.tmp
-    df.err$Err.smooth[ind.test] <- data[ind.test, depVar] - predict(mod.smooth.tmp, newdata = data.test)
+    df.err$Err.smooth[ind.test] <- data[ind.test, y] - predict(mod.smooth.tmp, newdata = data.test)
   }
 
   resCV <- list(df.err = df.err, ls.models = ls.models)

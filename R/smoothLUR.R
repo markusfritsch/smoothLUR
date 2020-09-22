@@ -1,6 +1,7 @@
-###########################################################
-### Function to derive smooth LUR model using mgcv package
-###########################################################
+
+##########################################
+### Function to derive smooth LUR model
+##########################################
 
 
 
@@ -19,15 +20,15 @@
 #' @aliases smoothLUR
 #' @param data A data set which contains the dependent variable and
 #'    the potential predictors.
-#' @param pred A character vector stating the variable names of the
+#' @param x A character vector stating the variable names of the
 #'    potential predictors (names have to match the column names of
 #'    `data`).
 #' @param spVar1 A character vector stating the variable name referring
-#'    to longitude (name has to match the column name of `data`)
+#'    to longitude (name has to match the column name of `data`).
 #' @param spVar2 A character vector stating the variable name referring
-#'    to latitude (name has to match the column name of `data`)
-#' @param depVar A character string indicating the name of the dependent
-#'    variable.
+#'    to latitude (name has to match the column name of `data`).
+#' @param y A character string indicating the name of the dependent
+#'    variable (name has to match the column name of `data`).
 #' @param thresh A numeric value that indicates the maximum share of
 #'    zero values; if the share is exceeded, the corresponding potential
 #'    predictor is excluded.
@@ -62,13 +63,13 @@
 #' ## Code example
 #' dat <- monSitesDE[sample(1:nrow(monSitesDE), 40),]
 #' m1 <- smoothLUR(data = dat
-#'                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+#'                  ,x = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
 #'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
 #'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
 #'                  ,spVar1 = "Lon"
 #'                  ,spVar2 = "Lat"
-#'                  ,depVar = "Y"
+#'                  ,y = "Y"
 #'                  ,thresh = 0.95)
 #'
 #' summary(m1)
@@ -81,13 +82,13 @@
 #' data(monSitesDE, package="smoothLUR")
 #' dat <- monSitesDE
 #' m1 <- smoothLUR(data = dat,
-#'                  ,pred = c("Lon", "Lat", "Alt", "HighDens"
+#'                  ,x = c("Lon", "Lat", "Alt", "HighDens"
 #'                          ,"LowDens", "Ind", "Transp", "Seap", "Airp", "Constr"
 #'                          ,"UrbGreen", "Agri", "Forest", "PopDens"
 #'                          ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
 #'                  ,spVar1 = "Lon"
 #'                  ,spVar2 = "Lat"
-#'                  ,depVar = "Y"
+#'                  ,y = "Y"
 #'                  ,thresh = 0.95)
 #'
 #' summary(m1)
@@ -99,24 +100,24 @@
 #' }
 smoothLUR <- function(
     data
-    ,pred
+    ,x
     ,spVar1
     ,spVar2
-    ,depVar
+    ,y
     ,thresh = 0.95
   ){
 
-  dat <- data.frame(subset(x = data, select = c(depVar, pred)))
+  dat <- data.frame(subset(x = data, select = c(y, x)))
   names.dat <- names(dat)
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(length(unique(x)) > 8))})]
   # 9 parameters have to be estimated by default for each univariate thin plate regression spline
   names.dat[!(names.dat %in% names(dat))]
-  predAdj <- pred[pred %in% names(dat)]
+  predAdj <- x[x %in% names(dat)]
 
-  y <- dat[, depVar]
-  X <- subset(x = dat, select = pred[pred %in% names(dat)])
+  y <- dat[, y]
+  X <- subset(x = dat, select = x[x %in% names(dat)])
 
   names.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2)]
 

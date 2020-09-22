@@ -14,7 +14,7 @@ rm(list = ls())
 library(smoothLUR)
 #	install.packages("ape")
 library(ape)
-# null hypothesis: no spatial autocorrelation in error terms
+
 
 
 #	dat <- read.csv("DATA_MonitoringSites_DE.csv", header = TRUE)[,-1]

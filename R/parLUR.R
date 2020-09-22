@@ -120,7 +120,7 @@ parLUR <- function(
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
   names.dat[!(names.dat %in% names(dat))]
   predAdj <- x[x %in% names(dat)]
-  dirEffAdj <- dirEff[pred %in% names(dat)]
+  dirEffAdj <- dirEff[x %in% names(dat)]
 
   y <- dat[, y]
   X <- subset(x = dat, select = x[x %in% names(dat)])

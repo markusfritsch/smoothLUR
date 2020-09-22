@@ -5,11 +5,19 @@
 00_old
 DataFull
 Rcode
+data/Data_built
+data/Data_sources
 
 indRhineRuhr.rds
 dat.Positions.rds
 DATA_MonitoringSites_DE.csv
 gitCommands.txt
+
+ValidationResultsTI.RData
+cvResultsA.RData
+cvResultsB.RData
+cvResultsTI.RData
+grid.DE.RData
 
 ^.*\.Rproj$
 ^\.Rproj\.user$

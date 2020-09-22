@@ -19,31 +19,56 @@
 #'
 #' @format A dataset with 403 rows and 25 variables containing:
 #' \describe{
-#'   \item{AQeCode}{code of monitoring site as in AirBase}
-#'   \item{Y}{mean NO2 concentration level}
-#'   \item{Year}{year}
-#'   \item{Projection}{coordinate reference system of the geocoordinates longitude (AQeLon) and latitude (AQeLat)}
-#'   \item{Lon}{geocoordinate longitude (decimal degrees) at which the monitoring site is located}
-#'   \item{Lat}{geocoordinate latitude (decimal degrees) at which the monitoring site is located}
-#'   \item{Alt}{altitude (meter above sea level) at which the monitoring site is located}
-#'   \item{AQeType}{type of monitoring site - information whether it is measuring background, industrial, or traffic related air pollution}
-#'   \item{AQeArea}{area of monitoring site - information whether it is measuring air pollution in urban, suburban, rural, etc. environment}
-#'   \item{HighDens}{proportion of high density residential area within a buffer of radius 1km around the monitoring site}
-#'   \item{LowDens}{proportion of low density residential area within a buffer of radius 1km around the monitoring site}
-#'   \item{Ind}{proportion of industrial area within a buffer of radius 1km around the monitoring site}
-#'   \item{Transp}{proportion of area attributed to transport within a buffer of radius 1km around the monitoring site}
-#'   \item{Seap}{proportion of area attributed to seaport within a buffer of radius 1km around the monitoring site}
-#'   \item{Airp}{proportion of area attributed to airport within a buffer of radius 1km around the monitoring site}
-#'   \item{Constr}{proportion of area attributed to construction within a buffer of radius 1km around the monitoring site}
-#'   \item{UrbGreen}{proportion of area attributed to urban green spaces within a buffer of radius 1km around the monitoring site}
-#'   \item{Agri}{proportion of agricultural area within a buffer of radius 1km around the monitoring site}
-#'   \item{Forest}{proportion of forestry area within a buffer of radius 1km around the monitoring site}
-#'   \item{PopDens}{population density (inhabitants per km^2) at municipality key level}
-#'   \item{PriRoad}{primary roads (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{SecRoad}{secondary roads (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{FedAuto}{federal autobahn (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{LocRoute}{local routes (length in meter) within buffer of radius 1km around the monitoring site}
-#'   \item{IndRegions}{indicator for the German federal state the monitoring site is located in}
+#' \item{AQeCode}{code of monitoring site as in AirBase}
+#' \item{Y}{mean NO2 concentration level}
+#' \item{Year}{year}
+#' \item{Projection}{coordinate reference system of the
+#'    geocoordinates longitude (AQeLon) and latitude (AQeLat)}
+#' \item{Lon}{geocoordinate longitude (decimal degrees) at which
+#'    the monitoring site is located}
+#' \item{Lat}{geocoordinate latitude (decimal degrees) at which
+#'    the monitoring site is located}
+#' \item{Alt}{altitude (meter above sea level) at which the
+#'    monitoring site is located}
+#' \item{AQeType}{type of monitoring site - information whether
+#'    it is measuring background, industrial, or traffic related
+#'    air pollution}
+#' \item{AQeArea}{area of monitoring site - information whether
+#'    it is measuring air pollution in urban, suburban, rural, etc.
+#'    environment}
+#' \item{HighDens}{proportion of high density residential area
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{LowDens}{proportion of low density residential area
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{Ind}{proportion of industrial area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{Transp}{proportion of area attributed to transport within
+#'    a buffer of radius 1km around the monitoring site}
+#' \item{Seap}{proportion of area attributed to seaport within a
+#'    buffer of radius 1km around the monitoring site}
+#' \item{Airp}{proportion of area attributed to airport within a
+#'    buffer of radius 1km around the monitoring site}
+#' \item{Constr}{proportion of area attributed to construction
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{UrbGreen}{proportion of area attributed to urban green
+#'    spaces within a buffer of radius 1km around the monitoring
+#'    site}
+#' \item{Agri}{proportion of agricultural area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{Forest}{proportion of forestry area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{PopDens}{population density (inhabitants per km^2) at
+#'    municipality key level}
+#' \item{PriRoad}{primary roads (length in meter) within buffer of
+#'    radius 1km around the monitoring site}
+#' \item{SecRoad}{secondary roads (length in meter) within buffer
+#'    of radius 1km around the monitoring site}
+#' \item{FedAuto}{federal autobahn (length in meter) within buffer
+#'    of radius 1km around the monitoring site}
+#' \item{LocRoute}{local routes (length in meter) within buffer of
+#'    radius 1km around the monitoring site}
+#' \item{IndRegions}{indicator for the German federal state the
+#'    monitoring site is located in}
 #' }
 #'
 #' @keywords datasets

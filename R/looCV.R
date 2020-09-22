@@ -1,3 +1,4 @@
+
 ###############################################################
 ### Function to conduct leave-one-out cross-validation (LOOCV)
 ###############################################################
@@ -14,17 +15,17 @@
 #' @aliases looCV
 #' @param data A data set which contains the dependent variable and the
 #'    potential predictors.
-#' @param pred A character vector stating the variable names of the
+#' @param x A character vector stating the variable names of the
 #'    potential predictors (names have to match the column names of
 #'    `data`).
 #' @param ID A character vector stating the variable name referring to the
-#'    monitoring sites' ID (name has to mach the column name of `data`)
+#'    monitoring sites' ID (name has to mach the column name of `data`).
 #' @param spVar1 A character vector stating the variable name referring to
-#'    longitude (name has to match the column name of `data`)
+#'    longitude (name has to match the column name of `data`).
 #' @param spVar2 A character vector stating the variable name referring to
-#'    latitude (name has to match the column name of `data`)
-#' @param depVar A character string indicating the name of the dependent
-#'    variable.
+#'    latitude (name has to match the column name of `data`).
+#' @param y A character string indicating the name of the dependent
+#'    variable (name has to match the column name of `data`).
 #' @param dirEff A vector that contains one entry for each potential
 #'    predictor and indicates the expected direction of the effect of the
 #'    potential predictor (1 for positive, -1 for negative and 0 if the
@@ -59,21 +60,17 @@
 #' \code{\link{kFoldCV}} for k-fold cross-validation for
 #'    parLUR and smoothLUR objects.
 #'
-#' @references
-#' \insertAllCited{}
-#'
-#'
 #' @examples
 #' ## Load data set
 #' data(monSitesDE, package="smoothLUR")
 #'
 looCV <- function(
     data
-    ,pred
+    ,x
     ,ID
     ,spVar1
     ,spVar2
-    ,depVar
+    ,y
     ,dirEff
     ,thresh = 0.95
   ){
@@ -86,12 +83,12 @@ looCV <- function(
   ls.models <- rep(list(vec.tmp), nrow(data))
   names(ls.models) <- data$ID
   for(n in 1:nrow(data)){
-    mod.par.tmp <- parLUR(data=data[-n,], pred, depVar, dirEff, thresh = 0.95) # re-estimate model including forward stepwise predictor selection
+    mod.par.tmp <- parLUR(data=data[-n,], x, y, dirEff, thresh = 0.95) # re-estimate model including forward stepwise predictor selection
     ls.models[[n]][[1]] <- mod.par.tmp
-    df.err$Err.par[n] <- data[n, depVar] - stats::predict(mod.par.tmp, newdata = data[n,])
-    mod.smooth.tmp <- smoothLUR(data = data[-n,], pred, spVar1, spVar2, depVar, thresh = 0.95)
+    df.err$Err.par[n] <- data[n, y] - stats::predict(mod.par.tmp, newdata = data[n,])
+    mod.smooth.tmp <- smoothLUR(data = data[-n,], x, spVar1, spVar2, y, thresh = 0.95)
     ls.models[[n]][[2]] <- mod.smooth.tmp
-    df.err$Err.smooth[n] <- data[n, depVar] - stats::predict(mod.smooth.tmp, newdata = data[n,])
+    df.err$Err.smooth[n] <- data[n, y] - stats::predict(mod.smooth.tmp, newdata = data[n,])
   }
 
   resCV <- list(df.err = df.err, ls.models = ls.models)  
