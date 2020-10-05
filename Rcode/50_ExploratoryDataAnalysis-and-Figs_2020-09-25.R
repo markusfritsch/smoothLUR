@@ -109,8 +109,10 @@ dev.off()
 
 
 
-names(dat.B)
-corr.DE <- round(cor(dat.B[,c(2:4, 6:9, 13:20)]), digits = 2)
+#names(dat.B)
+names(dat)
+#corr.DE <- round(cor(dat.B[,c(2:4, 6:9, 13:20)]), digits = 2)
+corr.DE <- round(cor(dat[,c(2:4, 6:9, 13:20)]), digits = 2)
 
 
 # for correlation matrix in ggplot2 see
