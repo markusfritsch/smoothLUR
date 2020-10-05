@@ -6,7 +6,7 @@
 
 
 
-# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
+#	setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 rm(list = ls())
 
@@ -25,14 +25,20 @@ library(smoothLUR)
 
 
 
-#	DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-#	dat <- DATA[,c(2,5:7,11:20,26:30)]
+
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(2,5:8,10:24)]
+dat	<- monSitesDE[, c(2,4:7,9:24)]
 
 
-#rename some columns
-names(dat)[c(1:4)] <- c("Y", "Lon", "Lat", "Alt")
+
+
+
+
+
+
+###
+### Parametric analysis
+###
 
 
 # Deriving a linear parametric land use regression model with predictor pre-selection ----
@@ -52,7 +58,7 @@ names(dat)[c(1:4)] <- c("Y", "Lon", "Lat", "Alt")
 
 # Eliminate predictors that exhibit mainly zeros or extreme values ----
 # (see Wolf et al., 2016, p.1535, and Eeftens et al., 2016, p.5)
-t(apply(dat[,-5], MARGIN = 2, FUN = function(x){
+t(apply(dat[,-c(4:5,20)], MARGIN = 2, FUN = function(x){
   return(c(nr.values = length(unique(x)),
            max.extreme =  isTRUE(max(x) > quantile(x, 0.9) + 3* (quantile(x, 0.9) - quantile(x, 0.1))),
            min.extreme =  isTRUE(min(x) < quantile(x, 0.1) - 3* (quantile(x, 0.9) - quantile(x, 0.1))),
@@ -70,27 +76,27 @@ nrow(dat)
 
 ## Estimate parametric model with structural predictors only (par0) ----
 
-dat0.B	<- dat[dat$AQeType == "background", -c(2:4, 10:12)]
-datB		<- dat[dat$AQeType == "background", -c(10:12)]
-dat0.TI	<- dat[(dat$AQeType == "traffic" | dat$AQeType == "industrial"), -c(2:4, 10:12)]
-datTI		<- dat[(dat$AQeType == "traffic" | dat$AQeType == "industrial"), -c(10:12)]
-dat0.A	<- dat[, -c(2:4, 10:12)]
-datA		<- dat[, -c(10:12)]
+dat0.B	<- dat[dat$AQeType == "background", ]
+datB		<- dat[dat$AQeType == "background", ]
+dat0.TI	<- dat[(dat$AQeType != "background"), ]
+datTI		<- dat[(dat$AQeType != "background"), ]
+dat0.A	<- dat
+datA		<- dat
 
 
 
-#input parameters for escapeLUR function when including only structural effects
+#input parameters for parLUR function when including only structural effects
 dirEff0	<- c(rep(1,4),-1,0,-1,rep(1,5))
 
-m0.B		<- escapeLUR(data = dat0.B, depVar = "Y", pred = paste(names(dat0.B)[-c(1:2)]), dirEff = dirEff0)
-m0.TI		<- escapeLUR(data = dat0.TI, depVar = "Y", pred = paste(names(dat0.TI)[-c(1:2)]), dirEff = dirEff0)
-m0.A		<- escapeLUR(data = dat0.A, depVar = "Y", pred = paste(names(dat0.A)[-c(1:2)]), dirEff = dirEff0)
+m0.B		<- parLUR(data = dat0.B, y = "Y", x = paste(names(dat0.B)[-c(1:5,10:12,21)]), dirEff = dirEff0)
+m0.TI		<- parLUR(data = dat0.TI, y = "Y", x = paste(names(dat0.TI)[-c(1:5,10:12,21)]), dirEff = dirEff0)
+m0.A		<- parLUR(data = dat0.A, y = "Y", x = paste(names(dat0.A)[-c(1:5,10:12,21)]), dirEff = dirEff0)
 
 
 
-xtable(summary(m0.B)$coefficients[,1:2], digits = 4)
-xtable(summary(m0.TI)$coefficients[,1:2], digits = 4)
-xtable(summary(m0.A)$coefficients[,1:2], digits = 4)
+xtable(summary(m0.B)$coefficients[,1:2], digits = 3)
+xtable(summary(m0.TI)$coefficients[,1:2], digits = 3)
+xtable(summary(m0.A)$coefficients[,1:2], digits = 3)
 
 #	AIC(m0.B); BIC(m0.B)
 
@@ -127,17 +133,17 @@ Moran.I(resid(m0.A), res.dist.inv)
 ## Estimate parametric model with structural and spatial predictors (par) ----
 
 
-#input parameters for escapeLUR function when including only structural effects
-dirEff	<- c(rep(0, times = 3), rep(1,4),-1,0,-1,rep(1,5))
+#input parameters for parLUR function when including only structural effects
+dirEff	<- c(rep(0, times = 2), -1, rep(1,4),-1,0,-1,rep(1,5))
 
-m.B		<- escapeLUR(data = datB, depVar = "Y", pred = paste(names(datB)[-c(1,5)]), dirEff = dirEff)
-m.TI		<- escapeLUR(data = datTI, depVar = "Y", pred = paste(names(datTI)[-c(1,5)]), dirEff = dirEff)
-m.A		<- escapeLUR(data = datA, depVar = "Y", pred = paste(names(datA)[-c(1,5)]), dirEff = dirEff)
+m.B		<- parLUR(data = datB, y = "Y", x = paste(names(datB)[-c(1,5,10:12,21)]), dirEff = dirEff)
+m.TI		<- parLUR(data = datTI, y = "Y", x = paste(names(datTI)[-c(1,5,10:12,21)]), dirEff = dirEff)
+m.A		<- parLUR(data = datA, y = "Y", x = paste(names(datA)[-c(1,5,10:12,21)]), dirEff = dirEff)
 
 
-xtable(summary(m.B)$coefficients[,1:2], digits = 4)
-xtable(summary(m.TI)$coefficients[,1:2], digits = 4)
-xtable(summary(m.A)$coefficients[,1:2], digits = 4)
+xtable(summary(m.B)$coefficients[,1:2], digits = 3)
+xtable(summary(m.TI)$coefficients[,1:2], digits = 3)
+xtable(summary(m.A)$coefficients[,1:2], digits = 3)
 
 #	AIC(m0.B); BIC(m0.B)
 
@@ -178,6 +184,7 @@ Moran.I(resid(m.A), res.dist.inv)
 # Model diagnostics ----
 
 m	<- m.B
+dat.m	<- datB
 
 # Variance inflation factors
 vif(m)
@@ -193,7 +200,7 @@ plot(cooks.distance(m))
 
 
 # Moran's I
-res.dist <- as.matrix(dist(cbind(datB$Lon, datB$Lat)))
+res.dist <- as.matrix(dist(cbind(dat.m$Lon, dat.m$Lat)))
 res.dist.inv <- 1/(res.dist^2)
 diag(res.dist.inv) <- 0
 Moran.I(resid(m), res.dist.inv)
@@ -204,7 +211,7 @@ Moran.I(resid(m), res.dist.inv)
 par(mfrow = c(1,2))
 plot(resid(m) ~ fitted(m), pch = 16, cex = 0.7)
 abline(h = 0, lwd = 2, col = "blue", lty = 2)
-plot(datB$Y ~ fitted(m), pch = 16, cex = 0.7)
+plot(dat.m$Y ~ fitted(m), pch = 16, cex = 0.7)
 abline(c(1,1), lwd = 2, col = "blue")
 par(mfrow = c(2,2))
 plot(m)
@@ -230,7 +237,9 @@ qqline(resid(m), col = "blue")
 
 
 
-
+###
+### Semiparametric analysis
+###
 
 
 # Deriving a semiparametric land use regression model without predictor pre-selection ----
@@ -253,6 +262,135 @@ nrow(datB)
 
 
 
+
+
+form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NULL) +
+  s(Alt, k=-1, bs="tp") +
+  s(HighDens, k=-1, bs="tp") +
+  s(LowDens, k=-1, bs="tp") +
+  s(Ind, k=-1, bs="tp") +
+  s(Transp, k=-1, bs="tp") +
+#  s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
+#  s(Airp, k=-1, bs="tp") +         		# insufficient amount of data for flexible estimation
+#  s(Constr, k=-1, bs="tp") +       		# insufficient amount of data for flexible estimation
+  s(UrbGreen, k=-1, bs="tp") +
+  s(Agri, k=-1, bs="tp") +
+  s(Forest, k=-1, bs="tp") +
+  s(PopDens, k=-1, bs="tp") +
+  s(PriRoad, k=-1, bs="tp") +
+  s(SecRoad, k=-1, bs="tp") +
+  s(FedAuto, k=-1, bs="tp") +
+  s(LocRoute, k=-1, bs="tp")
+
+
+
+
+gam2.3B	<- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=datB, family=gaussian(),
+			weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
+			select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
+
+gam.check(gam2.3B)
+summary(gam2.3B)
+par(mfrow = c(4,4))
+plot(gam2.3B)
+par(mfrow = c(1,1))
+summary(gam2.3B)$r.sq
+#	BIC(gam2.3B); AIC(gam2.3B)
+
+
+
+gam2.3TI	<- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=datTI, family=gaussian(),
+			weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
+			select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
+
+gam.check(gam2.3TI)
+summary(gam2.3TI)
+par(mfrow = c(4,4))
+plot(gam2.3TI)
+par(mfrow = c(1,1))
+summary(gam2.3TI)$r.sq
+#	BIC(gam2.3TI); AIC(gam2.3TI)
+
+
+
+gam2.3A	<- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=datA, family=gaussian(),
+			weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
+			select=TRUE, knots=NULL, sp=NULL, min.sp=NULL, H=NULL, gamma=1, paraPen=NULL, G=NULL)
+
+gam.check(gam2.3A)
+summary(gam2.3A)
+par(mfrow = c(4,4))
+plot(gam2.3A)
+par(mfrow = c(1,1))
+summary(gam2.3A)$r.sq
+#	BIC(gam2.3A); AIC(gam2.3A)
+
+
+
+
+
+
+# Model diagnositcs for semipar ----
+
+	gam2.3	<- gam2.3B
+	dat.m		<- datB
+
+	gam2.3	<- gam2.3TI
+	dat.m		<- datTI
+
+	gam2.3	<- gam2.3A
+	dat.m		<- dat
+
+
+m			<- gam2.3
+summary(m)
+
+
+# Cook's distance
+summary(cooks.distance(m))
+plot(cooks.distance(m))
+# there is no observation with Cook's distance above 1
+
+
+# Moran's I
+res.dist <- as.matrix(dist(cbind(dat.m$Lon, dat.m$Lat)))
+res.dist.inv <- 1/(res.dist^2)
+diag(res.dist.inv) <- 0
+Moran.I(resid(m), res.dist.inv)
+# the null that there is no spatial autocorrelation in the error terms cannot be rejected at any reasonable significance level
+
+
+# Heteroskedasticity
+par(mfrow = c(1,2))
+plot(resid(m) ~ fitted(m), pch = 16, cex = 0.7)
+abline(h = 0, lwd = 2, col = "blue")
+plot(dat.m$Y ~ fitted(m), pch = 16, cex = 0.7)
+abline(c(1,1), lwd = 2, col = "blue")
+par(mfrow = c(3,5))
+plot(m)
+par(mfrow = c(1,1))
+# plots indicate heteroskedasticity
+bptest(m)
+
+
+# Normality?
+qqnorm(resid(m))
+qqline(resid(m), col = "blue")
+# upper tail exhibits a deviation from normal distribution
+
+
+
+
+
+
+
+
+
+
+
+### Further estimation of semiparametric model
+
+
 # GAM with univariate spline for every predictor ----
 form.gam1 <- Y ~ s(Lon, k=-1, bs="tp") +         #  k = -1 for automatic smoothness selection
   s(Lat, k=-1, bs="tp") +
@@ -261,9 +399,9 @@ form.gam1 <- Y ~ s(Lon, k=-1, bs="tp") +         #  k = -1 for automatic smoothn
   s(LowDens, k=-1, bs="tp") +
   s(Ind, k=-1, bs="tp") +
   s(Transp, k=-1, bs="tp") +
-  #  s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
-  #  s(Airp, k=-1, bs="tp") +       		# insufficient amount of data for flexible estimation
-  #  s(Constr, k=-1, bs="tp") +     		# insufficient amount of data for flexible estimation
+#  s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
+#  s(Airp, k=-1, bs="tp") +       		# insufficient amount of data for flexible estimation
+#  s(Constr, k=-1, bs="tp") +     		# insufficient amount of data for flexible estimation
   s(UrbGreen, k=-1, bs="tp") +
   s(Agri, k=-1, bs="tp") +
   s(Forest, k=-1, bs="tp") +
@@ -296,9 +434,9 @@ form.gam2.3 <- Y ~ s(Lon, Lat, k=-1, bs="tp", fx=FALSE, xt=NULL, id=NULL, sp=NUL
   s(LowDens, k=-1, bs="tp") +
   s(Ind, k=-1, bs="tp") +
   s(Transp, k=-1, bs="tp") +
-  #  s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
-  #  s(Airp, k=-1, bs="tp") +         		# insufficient amount of data for flexible estimation
-  #  s(Constr, k=-1, bs="tp") +       		# insufficient amount of data for flexible estimation
+#  s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
+#  s(Airp, k=-1, bs="tp") +         		# insufficient amount of data for flexible estimation
+#  s(Constr, k=-1, bs="tp") +       		# insufficient amount of data for flexible estimation
   s(UrbGreen, k=-1, bs="tp") +
   s(Agri, k=-1, bs="tp") +
   s(Forest, k=-1, bs="tp") +
@@ -316,6 +454,9 @@ gam2.3 <- gam(formula=form.gam2.3, fit=TRUE, method="P-ML", data=datB, family=ga
 
 gam.check(gam2.3)
 summary(gam2.3)
+par(mfrow = c(4,4))
+plot(gam2.3)
+par(mfrow = c(1,1))
 summary(gam2.3)$r.sq
 #	BIC(gam2.3); AIC(gam2.3)
 
@@ -330,18 +471,18 @@ form.gam2.4 <- Y ~ s(Lon, Lat, k=-1, bs="tp",	fx=FALSE, xt=NULL, id=NULL, sp=NUL
   s(HighDens, k=-1, bs="tp") +
   s(LowDens, k=-1, bs="tp") +
   s(Ind, k=-1, bs="tp") +
-  # s(Transp, k=-1, bs="tp") +      		# smoothed out in gam2.3
-  # s(Seap, k=-1, bs="tp") + 				# insufficient amount of data for flexible estimation
-  # s(Airp, k=-1, bs="tp") +        		# insufficient amount of data for flexible estimation
-  # s(Constr, k=-1, bs="tp") +      		# insufficient amount of data for flexible estimation
-  # s(UrbGreen, k=-1, bs="tp") +    		# smoothed out in gam2.3
-  # s(Agri, k=-1, bs="tp") +        		# smoothed out in gam2.3
+# s(Transp, k=-1, bs="tp") +      		# smoothed out in gam2.3
+# s(Seap, k=-1, bs="tp") + 			# insufficient amount of data for flexible estimation
+# s(Airp, k=-1, bs="tp") +        		# insufficient amount of data for flexible estimation
+# s(Constr, k=-1, bs="tp") +      		# insufficient amount of data for flexible estimation
+# s(UrbGreen, k=-1, bs="tp") +    		# smoothed out in gam2.3
+# s(Agri, k=-1, bs="tp") +        		# smoothed out in gam2.3
   s(Forest, k=-1, bs="tp") +
   s(PopDens, k=-1, bs="tp") +
   s(PriRoad, k=-1, bs="tp") +
-  s(SecRoad, k=-1, bs="tp") +
+#  s(SecRoad, k=-1, bs="tp") +
   s(FedAuto, k=-1, bs="tp") #+
-  # s(LocRoute, k=-1, bs="tp")      # smoothed out in gam2.3
+# s(LocRoute, k=-1, bs="tp")      # smoothed out in gam2.3
 
 gam2.4 <- gam(formula=form.gam2.4, fit=TRUE, method="P-ML", data=datB, family=gaussian(),
 			weights=NULL, subset=NULL, offset=NULL, optimizer=c("outer", "newton"), scale=0,
@@ -349,6 +490,9 @@ gam2.4 <- gam(formula=form.gam2.4, fit=TRUE, method="P-ML", data=datB, family=ga
 
 gam.check(gam2.4)
 summary(gam2.4)
+par(mfrow = c(4,4))
+plot(gam2.4)
+par(mfrow = c(1,1))
 summary(gam2.4)$r.sq
 #	BIC(gam2.4); AIC(gam2.4)
 
@@ -360,7 +504,15 @@ summary(gam2.4)$r.sq
 
 # Model diagnositcs for semipar ----
 
-m	<- gam2.3
+#	gam2.3	<- gam2.3B
+#	gam2.3	<- gam2.3TI
+#	gam2.3	<- gam2.3A
+
+
+m			<- gam2.3
+
+summary(m)
+
 
 # Cook's distance
 summary(cooks.distance(m))

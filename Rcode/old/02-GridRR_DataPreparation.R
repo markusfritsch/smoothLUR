@@ -11,7 +11,9 @@ rm(list = ls())
 
 
 #setwd("E:/Work/20_Projekte/570_Behm-and-Haupt/R/10_data")
-#setwd("D:/Markus/Work/20_Projekte/570_Behm-and-Haupt/R/10_data")
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+
+
 
 
 

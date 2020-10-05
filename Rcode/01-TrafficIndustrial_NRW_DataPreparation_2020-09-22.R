@@ -9,8 +9,8 @@
 rm(list = ls())
 
 
-#setwd("E:/Work/20_Projekte/570_Behm-and-Haupt/R/10_data")
-# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+#	setwd("E:/Work/20_Projekte/570_Behm-and-Haupt/R/10_data")
+#	setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 
 
@@ -23,9 +23,9 @@ library(gstat)
 
 
 # EEA: AQeReporting data ----
-df.meta <- read.csv("../DATA/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
+df.meta <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
                     sep = "\t", encoding = "UTF-8")
-df.NO2 <- read.csv("../DATA/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
+df.NO2 <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
                    sep = "\t", encoding = "UTF-8")
 
 # Choose Air Pollutant of interest
@@ -48,8 +48,10 @@ df.NO2.meta <- merge(df.NO2,df.meta[,-c(1,3,4,5,8,11,12)],by="AirQualityStationE
 # Focus on non-background sites only
 df.NO2.meta.sub <- df.NO2.meta[df.NO2.meta$AirQualityStationType!="background",]
 
-unique(droplevels(df.NO2.meta$DatetimeBegin))
-unique(droplevels(df.NO2.meta$DatetimeEnd))
+#unique(droplevels(df.NO2.meta$DatetimeBegin))
+#unique(droplevels(df.NO2.meta$DatetimeEnd))
+unique(df.NO2.meta$DatetimeBegin)
+unique(df.NO2.meta$DatetimeEnd)
 
 # Focus on one year only
 df.NO2.meta.sub <- df.NO2.meta.sub[df.NO2.meta.sub$DatetimeBegin=="2015-01-01 00:00:00",]
@@ -82,7 +84,7 @@ rm(list = ls()[!ls() %in% c("df.NO2.meta.NRW")])
 
 
 # GADM: Boundaries of Germany and its federal states ----
-sPdf.boundaries.DE <- readOGR(dsn = "../DATA/Data_GADM",
+sPdf.boundaries.DE <- readOGR(dsn = "DataFull/Data_GADM",
                               layer = "DEU_adm1")
 
 
@@ -91,7 +93,7 @@ sPdf.bndry.NRW <- sPdf.boundaries.DE[sPdf.boundaries.DE$ID_1 == 10,]
 
 
 # EEA:CLC2012 layer ----
-first10.CLC12 <- readGDAL("../DATA/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+first10.CLC12 <- readGDAL("DataFull/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
                           region.dim = c(10,10))
 
 sPdf.bndry.NRW2 <- spTransform(sPdf.bndry.NRW, CRS = proj4string(first10.CLC12))
@@ -99,15 +101,15 @@ sPdf.bndry.NRW2 <- spTransform(sPdf.bndry.NRW, CRS = proj4string(first10.CLC12))
 
 bbox(sPdf.bndry.NRW2)
 #       min     max
-# x 4031313 4672526
-# y 2684076 3551246
+# x 4031313 4283898
+# y 3029642 3269981
 bbox(first10.CLC12)
 #        min      max
 # x -2700000 -2699000
 # y  5499000  5500000
 
 
-sGdf.CLC12 <- readGDAL("../DATA/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+sGdf.CLC12 <- readGDAL("DataFull/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
                        offset = c(22300,67313),
                        region.dim = c(2404, 2526))
 # offset: Number of rows and columns from the origin (usually the upper left corner) to begin reading from; presently ordered (y,x) - this may change
@@ -185,7 +187,7 @@ for(i in 1:nrow(df.NO2.meta.NRW)){
 
 # BKG (Bundesamt für Kartographie und Geodäsie) ----
 # German administrative regions
-admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
+admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
@@ -196,7 +198,7 @@ admin.regions.2015 <- readOGR(dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
 # data 'Gem15-Raumtyp.xlsx' received via E-Mail from Petra Kuhlmann on 19th July 2017
 # Raumtypen beziehen sich auf die Raumordnung von 2010
 # Die Zuordnung zu den Gemeinden bezieht sich auf den Gemeindestand 2015-12-31
-df.area2015 <- read.xlsx("../DATA/Data_BBSR/Gem15-Raumtyp.xlsx",
+df.area2015 <- read.xlsx("DataFull/Data_BBSR/Gem15-Raumtyp.xlsx",
                          header = TRUE,
                          sheetIndex = 1,
                          startRow = 3,
@@ -204,7 +206,7 @@ df.area2015 <- read.xlsx("../DATA/Data_BBSR/Gem15-Raumtyp.xlsx",
                          colIndex = seq(1,7,1),
                          encoding = "UTF-8")
 
-df.popDens2015 <- read.xlsx("../DATA/Data_BBSR/Gem15-Raumtyp.xlsx",
+df.popDens2015 <- read.xlsx("DataFull/Data_BBSR/Gem15-Raumtyp.xlsx",
                             header = TRUE,
                             sheetIndex = 2,
                             startRow = 3,
@@ -303,15 +305,15 @@ df.NO2.meta.NRW3$popDens15 <- df.NO2.meta.NRW3$z_bev15/df.NO2.meta.NRW3$fl15_sum
 # ZensusAtlas: popDens on 1x1km grid ----
 
 # this command takes some minutes
-sPdf.popDens <- readOGR(dsn = "../DATA/Zensus_Atlas_Deutschland", 
+sPdf.popDens <- readOGR(dsn = "DataFull/Data_GADM/Zensus_Atlas_Deutschland",		# M: This data set is missing!
                         layer = "Zensus_Atlas_Deutschland",
                         encoding = "UTF-8", use_iconv = TRUE)
 # see also
 # https://opendata-esri-de.opendata.arcgis.com/datasets/esri-de-content::zensus-atlas-deutschland/data
 
-sPdf.bndry.DE <- readOGR(dsn = "../DATA/Data_GADM", 
+sPdf.bndry.DE <- readOGR(dsn = "DataFull/Data_GADM", 
                          layer = "DEU_adm0", encoding = "UTF-8", use_iconv = TRUE)
-sPdf.bndry.NRW <- readOGR(dsn = "../DATA/Data_GADM",
+sPdf.bndry.NRW <- readOGR(dsn = "DataFull/Data_GADM",
                           layer = "DEU_adm1", encoding = "UTF-8", use_iconv = TRUE)
 sPdf.bndry.NRW <- sPdf.bndry.NRW[sPdf.bndry.NRW$ID_1==10,]
 
@@ -478,16 +480,16 @@ df.analysis <- df.NO2.meta.NRW3[,c(2,11,24,26:29,31:32,35,38:48,50:51,57:58,61:6
 df.analysis$ObservationDateBegin = 2015
 
 # EoI: Exchange on Information
-names(df.analysis)[c(1:3,5:20,24:34)] <- c("AQeCode", "AQeYMean", "Year", "AQeLon", "AQeLat", "AQeAlt",
+names(df.analysis)[c(1:3,5:20,24:34)] <- c("AQeCode", "Y", "Year", "Lon", "Lat", "Alt",
                                            "AQeType", "AQeArea", "AQeInletHeight",
                                            "HighDens", "LowDens", "Ind", "Transp", "Seap",
                                            "Airp", "Constr", "UrbGreen", "Agri", "Forest",
                                            "BBSRArea","BBSRArea2","BBSRpopDens", "PopDensAtlas1kmBuffer",
                                            "PopDensAtlas2kmBuffer", "PopDensAtlas3kmBuffer", "PopDensAtlasNoBuffer",
-                                           "PriRoad", "SecRoad", "NatMot", "LocRoute")
+                                           "PriRoad", "SecRoad", "FedAuto", "LocRoute")
 
-write.csv(df.analysis, file = "R/DATA/Data_built/DATA_NRW_traffic_industrial.csv")
+# write.csv(df.analysis, file = "R/DATA/Data_built/DATA_NRW_traffic_industrial.csv")
 
 
-rm(list = ls()[!ls() %in% "r.popDens.NRW"])
-save.image("R/DATA/Data_built/r.popDens.NRW.RData")
+# rm(list = ls()[!ls() %in% "r.popDens.NRW"])
+# save.image("R/DATA/Data_built/r.popDens.NRW.RData")

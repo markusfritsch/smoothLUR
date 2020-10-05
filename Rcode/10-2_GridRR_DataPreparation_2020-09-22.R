@@ -11,7 +11,7 @@ rm(list = ls())
 
 
 #setwd("E:/Work/20_Projekte/570_Behm-and-Haupt/R/10_data")
-# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+#	setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
 
 
 
@@ -34,11 +34,11 @@ library(GISTools)
 
 # Read data ----
 
-load("R/DATA/Data_built/grid.DE.NEW.RData")
-load("R/DATA/Data_built/r.popDens.NRW.RData")
+load("DataFull/Data_built/grid.DE.NEW.RData")
+load("DataFull/Data_built/r.popDens.NRW.RData")
 
 # Indicator vector containing AGS (Amtliche Gemeindeschlüssel) that refer to Rhine-Ruhr region
-ind.RR <- readRDS("R/DATA/Data_built/indRhineRuhr.rds")
+ind.RR <- readRDS("DataFull/Data_built/indRhineRuhr.rds")
 
 
 WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
@@ -52,7 +52,7 @@ df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
 
 popDens2 <- rep(NA, nrow(df.grid.RR))
 
-spdf.grid.RR <- SpatialPoints(coords = cbind(df.grid.RR$Lon, df.grid.RR$Lat),
+spdf.grid.RR <- SpatialPoints(coords = cbind(df.grid.RR$Lon.WGS84, df.grid.RR$Lat.WGS84),
                               proj4string = CRS(WGS84))
 
 spdf.grid.RR.GK3 <- spTransform(spdf.grid.RR, GK3)
@@ -78,4 +78,4 @@ df.grid.RR$popDens_Atlas_3kmBuffer <- popDens2
 
 
 # rm(list=(ls()[ls()!="df.grid.RR"]))
-# save.image("R/DATA/Data_built/grid.RR.RData")
+# save.image("DataFull/Data_built/grid.RR.RData")

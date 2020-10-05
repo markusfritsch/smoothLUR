@@ -1,3 +1,8 @@
+
+
+# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+
+
 ## Load packages ----
 
 #install.packages("rgdal")

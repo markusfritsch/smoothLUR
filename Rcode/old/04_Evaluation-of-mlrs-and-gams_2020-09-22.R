@@ -12,26 +12,32 @@ rm(list = ls())
 
 #	install.packages(mgcv)
 library(mgcv)
+library(smoothLUR)
 
 
 
-#	DATA <- read.csv("R/DATA/Data_built/DATA.csv", header=TRUE)[, -1]
-#	dat <- DATA[,c(2,5:7,11:20,26:30)]
+
+
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(2,5:8,10:24)]
+dat	<- monSitesDE[, c(2,4:7,9:24)]
 
 
-dat	<- dat[dat$AQeType == "background", ]
-#	dat	<- dat[dat$AQeType == "traffic" | dat$AQeType == "industrial", ]
+
+#	dat	<- dat[dat$AQeType == "background", ]
+#	dat	<- dat[dat$AQeType != "background", ]
 #	dat	<- dat
 
 
-#rename some columns
-names(dat)[c(1:4)] <- c("Y", "Lon", "Lat", "Alt")
 
 
 
-par1 <- lm(Y ~ PopDens + Forest + Lat + Alt + Agri + FedAuto, data = dat)
+
+#input parameters for parLUR function when including only structural effects
+dirEff	<- c(rep(0, times = 2), -1, rep(1,4),-1,0,-1,rep(1,5))
+
+par1		<- parLUR(data = datB, y = "Y", x = paste(names(datB)[-c(1,5,10:12,21)]), dirEff = dirEff)
+
+
 
 
 
@@ -72,9 +78,9 @@ df.overview[ , 4] <- round(AIC(par1, semipar)[ , 2], digits = 4)
 
 
 
-####
-# Leave-one-out-cross-validation - prediction error, adjR2, BIC, AIC ----
-####
+###
+### Leave-one-out-cross-validation - prediction error, adjR2, BIC, AIC ----
+###
 
 
 ## par1 ----
@@ -135,4 +141,7 @@ df.overview$`LOOCV adj. R^2`  <- round(sapply(X = LOOCV, FUN = function(X) {retu
                                     digits = 4)
 
 
-saveRDS(object = df.overview, file = "R/DATA/Data_built/Par1SemiparEvaluation.rds")
+
+
+
+saveRDS(object = df.overview, file = "DataFull/Data_built/Par1SemiparEvaluation.rds")

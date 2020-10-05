@@ -1,49 +1,57 @@
 
 
-# setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR/DataFull")
+#	setwd("D:/Work/20_Projekte/570_Behm-and-Fritsch/smoothLUR")
+
+
+rm(list = ls())
 
 
 ## Load packages ----
 
-#install.packages("rgdal")
+#	install.packages("rgdal")
 library(rgdal)
-#install.packages("xlsx")
+#	install.packages("xlsx")
 library(xlsx)
-#install.packages("raster")
+#	install.packages("raster")
 library(raster)
-#install.packages("gstat")
+#	install.packages("gstat")
 library(gstat)
-#install.packages("GISTools")
+#	install.packages("GISTools")
 library(GISTools)
-#install.packages("ggplot2")
+#	install.packages("ggplot2")
 library(ggplot2)
-#install.packages("ggmap")
+#	install.packages("ggmap")
 library(ggmap)
-#install.packages("ggthemes")
+#	install.packages("ggthemes")
 library(ggthemes)
+#	install.packages("latticeExtra")
+library(latticeExtra)
+
+
 
 ## Read data ----
 
-load("R/DATA/Data_built/df.grid.final.RData")
+#load("DataFull/Data_built/df.grid.final.RData")			# M: data missing
+load("DataFull/Data_built/grid.DE.RData")
 
-sGdf.CLC12 <- readGDAL("R/DATA/Data_sources/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+sGdf.CLC12 <- readGDAL("DataFull/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
                        offset = c(19480,67313),
                        region.dim = c(8700,6500))
 
-sPdf.boundaries.DE <- readOGR(dsn = "R/DATA/Data_sources/Data_GADM",
+sPdf.boundaries.DE <- readOGR(dsn = "DataFull/Data_GADM",
                               layer = "DEU_adm1",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
 
-df.meta <- read.csv("../../DATA/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
+df.meta <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
                     sep = "\t", encoding = "UTF-8")
 
-df.NO2 <- read.csv("../../DATA/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
+df.NO2 <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
                    sep = "\t", encoding = "UTF-8")
 
 
 # German administrative regions
-admin.regions.2015 <- readOGR(dsn = "../../DATA/Data_BKG/vg250-ew_ebenen",
+admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
@@ -51,8 +59,8 @@ admin.regions.2015 <- readOGR(dsn = "../../DATA/Data_BKG/vg250-ew_ebenen",
 
 
 # Derive SpatialPointsDataFrame from 'df.grid.final'
-spdf.final <- SpatialPointsDataFrame(coords = cbind(df.grid.final$Lon, df.grid.final$Lat),
-                                     data = df.grid.final,
+spdf.final <- SpatialPointsDataFrame(coords = cbind(df.grid.DE$lon.WGS84, df.grid.DE$lat.WGS84),
+                                     data = df.grid.DE,
                                      proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
 sPdf.boundaries.DE <- spTransform(sPdf.boundaries.DE, proj4string(spdf.final))
@@ -106,8 +114,8 @@ df.NO2.meta <- merge(df.NO2,df.meta[,-c(1,3,4,5,8,11,12)],by="AirQualityStationE
 # Focus on background sites only
 # df.Background <- df.NO2.meta[df.NO2.meta$AirQualityStationType=="background",]
 
-unique(droplevels(df.NO2.meta$DatetimeBegin))
-unique(droplevels(df.NO2.meta$DatetimeEnd))
+#unique(droplevels(df.NO2.meta$DatetimeBegin))
+#unique(droplevels(df.NO2.meta$DatetimeEnd))
 
 # Focus on one year only
 df.NO2.meta <- df.NO2.meta[df.NO2.meta$DatetimeBegin=="2015-01-01 00:00:00",]
@@ -137,7 +145,7 @@ ggplot(data = df.NO2.meta.NRW, aes(Longitude, Latitude, colour = AirQualityStati
 
 
 spplot(spdf.NRW.tr, "CLC12_grpd", key.space = "right", col.regions = c(brewer.pal(3, "Accent"), brewer.pal(7, "Dark2")))
-spplot(spdf.NRW, "BBSRArea")
+spplot(spdf.NRW, "BBSRpopDens")
 
 
 cuts.tmp <- quantile(spdf.NRW$BBSRpopDens, seq(from = 0, to = 1, by = 0.1))
@@ -216,7 +224,7 @@ ggplot(admin.regions.NRW.f, aes(x = long, y = lat)) +
                                               col = AirQualityStationType),
              size = 2, shape = 15) +
   scale_color_manual(name = "StationType", values = c("orange", "yellow", "purple"), aesthetics = "colour") +
-  scale_color_manual(name = "popDens", values = brewer.pal(9, "Blues"), aesthetics = "fill")
+  scale_color_manual(name = "PopDens", values = brewer.pal(9, "Blues"), aesthetics = "fill")
 
 
 
