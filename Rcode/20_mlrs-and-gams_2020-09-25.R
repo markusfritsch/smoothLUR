@@ -137,7 +137,7 @@ Moran.I(resid(m0.A), res.dist.inv)
 dirEff	<- c(rep(0, times = 2), -1, rep(1,4),-1,0,-1,rep(1,5))
 
 m.B		<- parLUR(data = datB, y = "Y", x = paste(names(datB)[-c(1,5,10:12,21)]), dirEff = dirEff)
-m.TI		<- parLUR(data = datTI, y = "Y", x = paste(names(datTI)[-c(1,5,10:12,21)]), dirEff = dirEff)
+m.TI	<- parLUR(data = datTI, y = "Y", x = paste(names(datTI)[-c(1,5,10:12,21)]), dirEff = dirEff)
 m.A		<- parLUR(data = datA, y = "Y", x = paste(names(datA)[-c(1,5,10:12,21)]), dirEff = dirEff)
 
 

@@ -1004,6 +1004,8 @@ sp.eff	<- predict(object = smoothM, newdata = df.grid.DE, type="terms")[,"s(Lon,
   predict(object = smoothM, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
 
 df.grid.DE$sp.eff	<- as.vector(sp.eff)
+range(df.grid.DE$sp.eff)
+length(df.grid.DE$sp.eff)
 
 
 p.sp.eff <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
@@ -1289,6 +1291,8 @@ df.grid.DE$smoothA[df.grid.DE$smoothA > max(dat$Y)]
 length(df.grid.DE$smoothA[df.grid.DE$smoothA > max(dat$Y)]) # 0
 length(df.grid.DE$smoothA[df.grid.DE$smoothA > max(dat$Y)])/length(df.grid.DE$smoothA)*100		# share in % of predicted values
 df.grid.DE$smoothA[df.grid.DE$smoothA > max(dat$Y)]		<- max(dat$Y)				# replace by max contained in data set
+max(df.grid.DE$smoothA)
+length(df.grid.DE$smoothA)
 
 
 
