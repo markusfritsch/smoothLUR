@@ -700,9 +700,11 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
   theme_bw() +
   xlab("") +
   ylab("") +
-  geom_point() +
-  geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE, col = "darkorange", lwd = 1.2) +
+  geom_point(col = "grey")+# brewer.pal(11, "BrBG")[7]) +
+  geom_smooth(method = "lm", lty = "dashed", se = FALSE, #col = "royalblue"
+              col = brewer.pal(11, "BrBG")[3], lwd = 1.2) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE,# col = "darkorange"
+              col = brewer.pal(11, "BrBG")[10], lwd = 1.2) +
   facet_wrap(~variable, nrow = 2, scale = "free_x") +
   theme(axis.text = element_text(size = 14),
         strip.text = element_text(size = 14),
@@ -733,9 +735,11 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
   theme_bw() +
   xlab("") +
   ylab("") +
-  geom_point() +
-  geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE, col = "darkorange", lwd = 1.2) +
+  geom_point(col = "grey")+# brewer.pal(11, "BrBG")[7]) +
+  geom_smooth(method = "lm", lty = "dashed", se = FALSE, # col = "royalblue"
+              col = brewer.pal(11, "BrBG")[3], lwd = 1.2) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE,# col = "darkorange"
+              col = brewer.pal(11, "BrBG")[10], lwd = 1.2) +
   facet_wrap(~variable, nrow = 2, scale = "free_x") +
   theme(axis.text = element_text(size = 14),
         strip.text = element_text(size = 14),
@@ -931,10 +935,10 @@ p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "PopDens", ], aes(x = x,
   ylab("") +
   geom_line(col = brewer.pal(11, "BrBG")[10],#"blue",
             lwd = 1) +
-  geom_point(data = dt.points, col = brewer.pal(9, "YlOrRd")[6],# "orangered",
+  geom_point(data = dt.points, col = brewer.pal(9, "YlOrRd")[5],# "orangered",
              size = 2.5) +
   geom_text(data = dt.points, label = c("1", "2"),
-            colour = brewer.pal(9, "YlOrRd")[6],# "orangered",
+            colour = brewer.pal(9, "YlOrRd")[5],# "orangered",
             nudge_x = -60, nudge_y = 0.5, size = 5, fontface = "bold") +
   facet_wrap(~variable) +
   theme(axis.text = element_text(size = 14),
@@ -1063,10 +1067,10 @@ df.grid2points	<- dat.Positions[1:2, c("lon.GK3", "lat.GK3")]
 
 p.sp.eff2 <- p.sp.eff +
   geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
-             pch = 19, colour =  brewer.pal(9, "YlOrRd")[6], #"orangered",
+             pch = 19, colour =  brewer.pal(9, "YlOrRd")[5], #"orangered",
              size = 2) +
   geom_text(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2")),
-            colour =  brewer.pal(9, "YlOrRd")[6],# "orangered",
+            colour =  brewer.pal(9, "YlOrRd")[5],# "orangered",
             nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
 
 
@@ -1084,8 +1088,8 @@ p.sp.eff2
 dev.off()
 
 
-png(paste("../img/SpatialEffect_popDens_", m, ".png", sep = ""), width = 900, height = 600)
-#pdf(paste("../img/SpatialEffect_popDens_", m, ".pdf", sep = ""), width = 12, height = 8)
+png(paste("../img/SpatialEffect_PopDens_", m, ".png", sep = ""), width = 900, height = 600)
+#pdf(paste("../img/SpatialEffect_PopDens_", m, ".pdf", sep = ""), width = 12, height = 8)
 ggdraw() +
   draw_plot(p.sp.eff2, 0, 0, 0.57, 1) +
   draw_plot(p.spline.popDens, 0.57, 0.25, 0.43, 0.5)

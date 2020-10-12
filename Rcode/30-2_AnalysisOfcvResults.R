@@ -86,7 +86,8 @@ dat.val2 <- data.frame(Y = c(loocvA.bg$Err.smooth, loocvA.ti$Err.smooth),
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
+    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+                       aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
           legend.title = element_blank(),
@@ -144,7 +145,8 @@ dat.val2   <- data.frame(Y = kfcvA.vec2, type = mon.site.vec)
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
+    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+                       aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
           legend.title = element_blank(),
@@ -181,12 +183,13 @@ dat.val2   <- data.frame(Y = kfcvA.vec2[ind.vec], type = mon.site.vec[ind.vec])
 (p.hist <- ggplot(dat.val2, aes(x = Y, fill = type, color = type)) +
     theme_minimal() +
     theme_classic() +
-    scale_x_continuous(breaks = seq(0, 90, by = 15), limits = c(-30, 50)) +
+    scale_x_continuous(breaks = seq(0, 90, by = 15), limits = c(-30, 250)) +
     geom_histogram(aes(y=..density..), fill = "white", position = "identity", alpha = 0.5, binwidth = 5, lwd = 1.4) +
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
+    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+                       aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
           legend.title = element_blank(),
