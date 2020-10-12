@@ -74,7 +74,10 @@ dat.all2 <- data.frame(Y = rep(c(dat.B$Y, dat.TI$Y),2),
   geom_density(alpha = 0.6, lwd = 1.2) +
   xlab(expression(paste(NO[2], " concentration level in ", mu, "g/", m^3, sep = ""))) +
   ylab("empirical density") +
-  scale_color_brewer(palette = "Dark2", aesthetics = c("fill", "colour")) +
+#  scale_color_brewer(palette = "Dark2",
+ #                    aesthetics = c("fill", "colour")) +
+    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+                       aesthetics = c("fill", "colour"))+
   theme(axis.text = element_text(size = 18),
         axis.title = element_text(size = 18),
         legend.title = element_blank(),
@@ -135,9 +138,16 @@ p.corr <- ggplot(data = corr.melt, aes(Var2, Var1, fill = value))+
   geom_tile(color = "white")+
   xlab("") +
   ylab("") +
-  scale_fill_gradient2(low = "darkblue", high = "orange", mid = "white",
-                       midpoint = 0, limit = c(-1,1), space = "Lab",
-                       name="") +
+#  scale_fill_gradient2(low = brewer.pal(11, "BrBG")[1], high = brewer.pal(11, "BrBG")[11], mid = brewer.pal(11, "BrBG")[6],
+#                       low = "darkblue", high = "orange", mid = "white",
+#                       midpoint = 0, limit = c(-1,1), space = "Lab",
+#                       name="") +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(11, "BrBG")[-6],
+                       breaks = c(-1, -0.5, 0, 0.5, 1),
+                       labels = c("-1", "-0.5", "0", "0.5", "1"),
+                       limits = c(-1,1),
+                       na.value = "white") +
   theme_minimal() +
   coord_fixed() +
   # geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
@@ -224,6 +234,7 @@ GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +u
 # BKG (Bundesamt für Kartographie und Geodäsie)
 # German administrative regions
 admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",		# M: otherwise, a conflict with GIT results
+                              #dsn = "../DATA/Data_BKG/vg250-ew_ebenen",
                               layer = "VG250_GEM",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
@@ -231,7 +242,7 @@ admin.regions.2015 <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",		# M: o
 
 
 load("DataFull/Data_built/grid.DE.RData")							# M: otherwise, a conflict with GIT results
-
+#load("Data_built/grid.DE.RData")
 
 
 
@@ -314,18 +325,19 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
     geom_point(data = spdf.tmp1@data,
                aes(x = coordinates(spdf.tmp1)[,1],
                    y = coordinates(spdf.tmp1)[,2],
-               colour = "darkorange"),
+                   colour = brewer.pal(9, "YlOrRd")[4]),# colour = "darkorange"),
                size = 1, shape = 15) +
     geom_point(data = spdf.tmp2@data,
                aes(x = coordinates(spdf.tmp2)[,1],
                    y = coordinates(spdf.tmp2)[,2],
-               colour = "darkorchid3"),
+                   colour = brewer.pal(9, "YlOrRd")[7]),#colour = "darkorchid3"),
                size = 1, shape = 15) +
-    scale_colour_manual(values = c("darkorange", "darkorchid3"),
+    scale_colour_manual(values = brewer.pal(9, "YlOrRd")[c(4,7)],# c("darkorange", "darkorchid3"),
                         name = "Type of monitoring site",
                         labels = c("background", "traffic/industrial")) +
     scale_fill_gradientn(name = "PopDens",
-                         colours = brewer.pal(9, "Blues")[-c(1,2)],
+                         colours = brewer.pal(11, "BrBG")[-c(1:7)],
+                         #                       colours = brewer.pal(9, "Blues")[-c(1,2)],
                          breaks = seq(1000, 4000, 1000),
                          labels = seq(1000, 4000, 1000),
                          limits = col.range,
@@ -340,12 +352,14 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
            color = guide_legend(order = 1)))
 
 
-p.RR2 <- p.RR +
+(p.RR2 <- p.RR +
   # north(dat.tmp, location = "bottomright", symbol = 3) +
   ggsn::scalebar(dat.tmp, dist = 20, st.size = 3, transform = FALSE,
-           dist_unit = "km", model = "WGS84", st.color = "darkgrey",
-           box.fill = c("darkgrey", "white"), box.color = "darkgrey",
-           border.size = 0.5)
+                 dist_unit = "km", model = "WGS84", st.color = brewer.pal(11, "BrBG")[3],#"darkgrey",
+                 box.fill = c(brewer.pal(11, "BrBG")[3],"white"),
+                 #darkgrey", "white"),
+                 box.color = brewer.pal(11, "BrBG")[3],#"darkgrey",
+                 border.size = 0.5))
 
 proj4string(spdf.DE)
 spdf.DE2 <- spTransform(spdf.DE, GK3)
@@ -375,21 +389,22 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
   geom_point(data = spdf.sites.back.2@data,
              aes(x = coordinates(spdf.sites.back.2)[,1],
                  y = coordinates(spdf.sites.back.2)[,2],
-                 colour = "darkorange"),
+                 colour = brewer.pal(9, "YlOrRd")[4]),# colour = "darkorange"),
              size = 1, shape = 15) +
   geom_point(data = spdf.sites.tr.ind.2@data,
              aes(x = coordinates(spdf.sites.tr.ind.2)[,1],
                  y = coordinates(spdf.sites.tr.ind.2)[,2],
-                 colour = "darkorchid3"),
+                 colour = brewer.pal(9, "YlOrRd")[7]),#colour = "darkorchid3"),
              size = 1, shape = 15) +
-  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA) +
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[6], lwd = 0.7, fill = NA) +
   scale_fill_gradientn(name = "PopDens",
-                       colours = brewer.pal(9, "Blues")[-c(1,2)],
+                       colours = brewer.pal(11, "BrBG")[-c(1:7)],
+#                       colours = brewer.pal(9, "Blues")[-c(1,2)],
                        breaks = seq(1000, 4000, 1000),
                        labels = seq(1000, 4000, 1000),
                        limits = col.range,
                        na.value = "white") +
-  scale_colour_manual(values = c("darkorange", "darkorchid3"),
+  scale_colour_manual(values = brewer.pal(9, "YlOrRd")[c(4,7)],# c("darkorange", "darkorchid3"),
                       name = "Type of monitoring site",
                       labels = c("background", "traffic/industrial")) +
   theme(legend.title = element_text(size = 14),
@@ -404,9 +419,11 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
 p.DE2 <- p.DE +
   # north(dat.tmp, location = "bottomright", symbol = 3) +
   ggsn::scalebar(dat.tmp, dist = 100, st.size = 3, transform = FALSE,
-           dist_unit = "km", model = "WGS84", st.color = "darkgrey",
-           box.fill = c("darkgrey", "white"), box.color = "darkgrey",
-           border.size = 0.5)
+                 dist_unit = "km", model = "WGS84", st.color = brewer.pal(11, "BrBG")[3],#"darkgrey",
+                 box.fill = c(brewer.pal(11, "BrBG")[3],"white"),
+                 #darkgrey", "white"),
+                 box.color = brewer.pal(11, "BrBG")[3],#"darkgrey",
+                 border.size = 0.5)
 
 
 
@@ -648,9 +665,11 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
   theme_bw() +
   xlab("") +
   ylab("") +
-  geom_point() +
-  geom_smooth(method = "lm", lty = "dashed", se = FALSE, col = "royalblue", lwd = 1.2) +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE, col = "darkorange", lwd = 1.2) +
+  geom_point(col = "grey")+# brewer.pal(11, "BrBG")[7]) +
+  geom_smooth(method = "lm", lty = "dashed", se = FALSE, #col = "royalblue",
+              col = brewer.pal(11, "BrBG")[3], lwd = 1.2) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "tp"), se = FALSE,# col = "darkorange",
+              col = brewer.pal(11, "BrBG")[10], lwd = 1.2) +
   facet_wrap(~variable, nrow = 2, scale = "free_x") +
   theme(axis.text = element_text(size = 14),
         strip.text = element_text(size = 14),
@@ -881,7 +900,8 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
   theme_bw() +
   xlab("") +
   ylab("") +
-  geom_line(col = "royalblue", lwd = 0.7) +
+  geom_line(col = brewer.pal(11, "BrBG")[10],# "royalblue",
+            lwd = 0.7) +
   geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.25) +
   facet_wrap(~variable, nrow = 4, scales = "free_x") +
   theme(axis.text = element_text(size = 14),
@@ -909,10 +929,13 @@ p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "PopDens", ], aes(x = x,
   ylim(-5,10) +
   xlab("") +
   ylab("") +
-  geom_line(col = "blue", lwd = 1) +
-  geom_point(data = dt.points, col = "orangered", size = 2.5) +
+  geom_line(col = brewer.pal(11, "BrBG")[10],#"blue",
+            lwd = 1) +
+  geom_point(data = dt.points, col = brewer.pal(9, "YlOrRd")[6],# "orangered",
+             size = 2.5) +
   geom_text(data = dt.points, label = c("1", "2"),
-            colour = "orangered", nudge_x = -60, nudge_y = 0.5, size = 5, fontface = "bold") +
+            colour = brewer.pal(9, "YlOrRd")[6],# "orangered",
+            nudge_x = -60, nudge_y = 0.5, size = 5, fontface = "bold") +
   facet_wrap(~variable) +
   theme(axis.text = element_text(size = 14),
         strip.text = element_text(size = 14))
@@ -1040,9 +1063,11 @@ df.grid2points	<- dat.Positions[1:2, c("lon.GK3", "lat.GK3")]
 
 p.sp.eff2 <- p.sp.eff +
   geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
-             pch = 19, colour = "orangered", size = 2) +
+             pch = 19, colour =  brewer.pal(9, "YlOrRd")[6], #"orangered",
+             size = 2) +
   geom_text(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2")),
-            colour = "orangered", nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
+            colour =  brewer.pal(9, "YlOrRd")[6],# "orangered",
+            nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
 
 
 
@@ -1299,7 +1324,7 @@ length(df.grid.DE$smoothA)
 # Filter grid cells referring to Rhine-Ruhr area
 df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
 
-df.grid.RR$smoothTI <- as.vector(predict(object = smoothA, newdata = df.grid.RR))
+df.grid.RR$smoothTI <- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
 
 #NO2 concentrations not supported by the underlying data
 min(dat$Y)
@@ -1471,15 +1496,19 @@ dat.Positions <- readRDS("dat.Positions.rds")
 ## Plot points 1 to 3 (of `dat.Positions`) on map
 (p.back.pred.sub2 <- p.back.pred.sub +
     geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
-               pch = 19, colour = "blue", size = 2) +
+               pch = 19, colour = brewer.pal(11, "BrBG")[10],#"blue",
+               size = 2) +
     geom_text(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2", "3")),
-              colour = "blue", nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
+              colour = brewer.pal(11, "BrBG")[10],# "blue",
+              nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
 (p.tr.ind.pred.sub2 <- p.tr.ind.pred.sub +
     geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
-               pch = 19, colour = "blue", size = 2) +
+               pch = 19, colour = brewer.pal(11, "BrBG")[10],#"blue",
+               size = 2) +
     geom_text(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2", "3")),
-              colour = "blue", nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
+              colour = brewer.pal(11, "BrBG")[10],#"blue",
+              nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
 
 png("../img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
