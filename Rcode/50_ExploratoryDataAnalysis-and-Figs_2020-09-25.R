@@ -76,7 +76,7 @@ dat.all2 <- data.frame(Y = rep(c(dat.B$Y, dat.TI$Y),2),
   ylab("empirical density") +
 #  scale_color_brewer(palette = "Dark2",
  #                    aesthetics = c("fill", "colour")) +
-    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+    scale_color_manual(values = brewer.pal(9, "BrBG")[c(1,3)],
                        aesthetics = c("fill", "colour"))+
   theme(axis.text = element_text(size = 18),
         axis.title = element_text(size = 18),
@@ -325,14 +325,14 @@ spdf.tmp2 <- spdf.sites.tr.ind.RR
     geom_point(data = spdf.tmp1@data,
                aes(x = coordinates(spdf.tmp1)[,1],
                    y = coordinates(spdf.tmp1)[,2],
-                   colour = brewer.pal(9, "YlOrRd")[4]),# colour = "darkorange"),
+                   colour = brewer.pal(9, "BrBG")[1]),
                size = 1, shape = 15) +
     geom_point(data = spdf.tmp2@data,
                aes(x = coordinates(spdf.tmp2)[,1],
                    y = coordinates(spdf.tmp2)[,2],
-                   colour = brewer.pal(9, "YlOrRd")[7]),#colour = "darkorchid3"),
+                   colour = brewer.pal(9, "BrBG")[3]),
                size = 1, shape = 15) +
-    scale_colour_manual(values = brewer.pal(9, "YlOrRd")[c(4,7)],# c("darkorange", "darkorchid3"),
+    scale_colour_manual(values = brewer.pal(9, "BrBG")[c(1,3)],
                         name = "Type of monitoring site",
                         labels = c("background", "traffic/industrial")) +
     scale_fill_gradientn(name = "PopDens",
@@ -389,12 +389,12 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
   geom_point(data = spdf.sites.back.2@data,
              aes(x = coordinates(spdf.sites.back.2)[,1],
                  y = coordinates(spdf.sites.back.2)[,2],
-                 colour = brewer.pal(9, "YlOrRd")[4]),# colour = "darkorange"),
+                 colour = brewer.pal(9, "BrBG")[1]),
              size = 1, shape = 15) +
   geom_point(data = spdf.sites.tr.ind.2@data,
              aes(x = coordinates(spdf.sites.tr.ind.2)[,1],
                  y = coordinates(spdf.sites.tr.ind.2)[,2],
-                 colour = brewer.pal(9, "YlOrRd")[7]),#colour = "darkorchid3"),
+                 colour = brewer.pal(9, "BrBG")[3]),
              size = 1, shape = 15) +
   geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[6], lwd = 0.7, fill = NA) +
   scale_fill_gradientn(name = "PopDens",
@@ -404,7 +404,7 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
                        labels = seq(1000, 4000, 1000),
                        limits = col.range,
                        na.value = "white") +
-  scale_colour_manual(values = brewer.pal(9, "YlOrRd")[c(4,7)],# c("darkorange", "darkorchid3"),
+  scale_colour_manual(values = brewer.pal(9, "BrBG")[c(1,3)],# c("darkorange", "darkorchid3"),
                       name = "Type of monitoring site",
                       labels = c("background", "traffic/industrial")) +
   theme(legend.title = element_text(size = 14),

@@ -86,7 +86,7 @@ dat.val2 <- data.frame(Y = c(loocvA.bg$Err.smooth, loocvA.ti$Err.smooth),
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+    scale_color_manual(values = brewer.pal(9, "BrBG")[c(1,3)],
                        aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
@@ -145,7 +145,7 @@ dat.val2   <- data.frame(Y = kfcvA.vec2, type = mon.site.vec)
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+    scale_color_manual(values = brewer.pal(9, "BrBG")[c(1,3)],
                        aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
@@ -188,7 +188,7 @@ dat.val2   <- data.frame(Y = kfcvA.vec2[ind.vec], type = mon.site.vec[ind.vec])
     geom_density(alpha = 0.6, lwd = 1.2) +
     xlab("prediction error") +
     ylab("empirical density") +
-    scale_color_manual(values = brewer.pal(9, "YlOrRd")[c(4,6)],
+    scale_color_manual(values = brewer.pal(9, "BrBG")[c(1,3)],
                        aesthetics = c("fill", "colour"))+
     theme(axis.text = element_text(size = 18),
           axis.title = element_text(size = 18),
