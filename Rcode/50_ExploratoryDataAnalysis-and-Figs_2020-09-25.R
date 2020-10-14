@@ -1417,7 +1417,7 @@ p.predA <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.predA2 <- p.predA +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(1, "BrBG")[11], lwd = 0.7, fill = NA)
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[1], lwd = 0.7, fill = NA)
 
 
 
@@ -1504,7 +1504,7 @@ p.predTI <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.predTI2 <- p.predTI +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(1, "BrBG")[11], lwd = 0.7, fill = NA)
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[1], lwd = 0.7, fill = NA)
 
 
 
