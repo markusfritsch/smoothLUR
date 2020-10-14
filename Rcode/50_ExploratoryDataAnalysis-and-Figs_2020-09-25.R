@@ -89,7 +89,7 @@ pdf("../img/HistogramDensitiesBackTrInd.pdf", height = 6, width = 9)
 p.hist
 dev.off()
 
-
+if(FALSE){
 (p.hist2 <- ggplot(dat.all2, aes(x = Y, fill = type, color = type)) +
     theme_minimal() +
     theme_classic() +
@@ -109,6 +109,7 @@ dev.off()
 pdf("../img/HistogramDensitiesBackTrInd2.pdf", height = 6, width = 9)
 p.hist2
 dev.off()
+}
 
 
 
@@ -640,7 +641,7 @@ dev.off()
 
 
 
-# Alternatively, with ggplot
+# With ggplot
 
 ###parB
 pred.parB <- predict(object = parB, newdata = dat.B, type = "terms")
@@ -851,29 +852,35 @@ for(j in 1:ncol(dat.pred)){
 
 
 
-#	semipar <- smoothB
-#	semipar <- smoothTI
-#	semipar <- smoothA
 
 
-pred.tmp <- predict(object = semipar, newdata = newdata.tmp, se.fit = TRUE, type = "terms")
+
+pred.tmpA <- predict(object = smoothA, newdata = newdata.tmp, se.fit = TRUE, type = "terms")
+pred.tmpB <- predict(object = smoothB, newdata = newdata.tmp, se.fit = TRUE, type = "terms")
+pred.tmpTI <- predict(object = smoothTI, newdata = newdata.tmp, se.fit = TRUE, type = "terms")
 
 
-summary(semipar)$s.table
-rownames(summary(semipar)$s.table)
+summary(smoothA)$s.table
+summary(smoothB)$s.table
+summary(smoothTI)$s.table
+rownames(summary(smoothA)$s.table)      # structure of coefficient table identical across models
 
 vec.tmp <- c(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)
-sp.tmp <- rownames(summary(semipar)$s.table)[vec.tmp]
 
-edf.tmp <- round(summary(semipar)$s.table[vec.tmp, "edf"], 2)
+
+
+#all monitoring sites
+sp.tmp <- rownames(summary(smoothA)$s.table)[vec.tmp]
+
+edf.tmp <- round(summary(smoothA)$s.table[vec.tmp, "edf"], 2)
 
 stripe.tmp <- paste(substr(sp.tmp, start = 1, stop = nchar(sp.tmp)-1),
                     ", ", edf.tmp, ")", sep = "")
 
 
 
-pred.tmp2 <- pred.tmp[[1]][,sp.tmp]
-sd.tmp <- pred.tmp[[2]][,sp.tmp]
+pred.tmp2 <- pred.tmpA[[1]][,sp.tmp]
+sd.tmp <- pred.tmpA[[2]][,sp.tmp]
 
 conf.lower <- pred.tmp2 - 2*sd.tmp
 conf.upper <- pred.tmp2 + 2*sd.tmp
@@ -897,9 +904,112 @@ colnames(newdata.tmp2.melt) <- c("pred", "x")
 
 dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
 
-#	pdf("../img/FittedSplines_ggplot_smoothB.pdf", width = 12, height = 12)
-#	pdf("../img/FittedSplines_ggplot_smoothTI.pdf", width = 12, height = 12)
-#	pdf("../img/FittedSplines_ggplot_smoothA.pdf", width = 12, height = 12)
+
+pdf("../img/FittedSplines_ggplot_smoothA.pdf", width = 12, height = 12)
+ggplot(data = dt.tmp, aes(x = x, y = value)) +
+  theme_bw() +
+  xlab("") +
+  ylab("") +
+  geom_line(col = brewer.pal(11, "BrBG")[10],# "royalblue",
+            lwd = 0.7) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.25) +
+  facet_wrap(~variable, nrow = 4, scales = "free_x") +
+  theme(axis.text = element_text(size = 14),
+        strip.text = element_text(size = 14))
+dev.off()
+
+
+
+#background
+sp.tmp <- rownames(summary(smoothB)$s.table)[vec.tmp]
+
+edf.tmp <- round(summary(smoothB)$s.table[vec.tmp, "edf"], 2)
+
+stripe.tmp <- paste(substr(sp.tmp, start = 1, stop = nchar(sp.tmp)-1),
+                    ", ", edf.tmp, ")", sep = "")
+
+
+
+pred.tmp2 <- pred.tmpB[[1]][,sp.tmp]
+sd.tmp <- pred.tmpB[[2]][,sp.tmp]
+
+conf.lower <- pred.tmp2 - 2*sd.tmp
+conf.upper <- pred.tmp2 + 2*sd.tmp
+
+newdata.tmp2 <- newdata.tmp[,substr(sp.tmp, start = 3, stop = nchar(sp.tmp)-1)]
+
+
+# transform in long format
+pred.tmp2.melt <- reshape2::melt(pred.tmp2)
+conf.lower.melt <- reshape2::melt(conf.lower)
+conf.upper.melt <- reshape2::melt(conf.upper)
+
+pred.conf <- cbind(pred.tmp2.melt[,-1], conf.lower.melt[,3], conf.upper.melt[,3])
+names(pred.conf) <- c("variable", "value", "lwr", "upr")
+
+levels(pred.conf$variable)
+levels(pred.conf$variable) <- stripe.tmp
+
+newdata.tmp2.melt <- reshape2::melt(newdata.tmp2)
+colnames(newdata.tmp2.melt) <- c("pred", "x")
+
+dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
+dt.tmpB <- cbind(pred.conf, newdata.tmp2.melt)
+
+
+pdf("../img/FittedSplines_ggplot_smoothB.pdf", width = 12, height = 12)
+ggplot(data = dt.tmp, aes(x = x, y = value)) +
+  theme_bw() +
+  xlab("") +
+  ylab("") +
+  geom_line(col = brewer.pal(11, "BrBG")[10],# "royalblue",
+            lwd = 0.7) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.25) +
+  facet_wrap(~variable, nrow = 4, scales = "free_x") +
+  theme(axis.text = element_text(size = 14),
+        strip.text = element_text(size = 14))
+dev.off()
+
+
+
+
+#traffic/industrial
+sp.tmp <- rownames(summary(smoothTI)$s.table)[vec.tmp]
+
+edf.tmp <- round(summary(smoothTI)$s.table[vec.tmp, "edf"], 2)
+
+stripe.tmp <- paste(substr(sp.tmp, start = 1, stop = nchar(sp.tmp)-1),
+                    ", ", edf.tmp, ")", sep = "")
+
+
+
+pred.tmp2 <- pred.tmpTI[[1]][,sp.tmp]
+sd.tmp <- pred.tmpTI[[2]][,sp.tmp]
+
+conf.lower <- pred.tmp2 - 2*sd.tmp
+conf.upper <- pred.tmp2 + 2*sd.tmp
+
+newdata.tmp2 <- newdata.tmp[,substr(sp.tmp, start = 3, stop = nchar(sp.tmp)-1)]
+
+
+# transform in long format
+pred.tmp2.melt <- reshape2::melt(pred.tmp2)
+conf.lower.melt <- reshape2::melt(conf.lower)
+conf.upper.melt <- reshape2::melt(conf.upper)
+
+pred.conf <- cbind(pred.tmp2.melt[,-1], conf.lower.melt[,3], conf.upper.melt[,3])
+names(pred.conf) <- c("variable", "value", "lwr", "upr")
+
+levels(pred.conf$variable)
+levels(pred.conf$variable) <- stripe.tmp
+
+newdata.tmp2.melt <- reshape2::melt(newdata.tmp2)
+colnames(newdata.tmp2.melt) <- c("pred", "x")
+
+dt.tmp <- cbind(pred.conf, newdata.tmp2.melt)
+
+
+pdf("../img/FittedSplines_ggplot_smoothTI.pdf", width = 12, height = 12)
 ggplot(data = dt.tmp, aes(x = x, y = value)) +
   theme_bw() +
   xlab("") +
@@ -918,17 +1028,15 @@ dev.off()
 
 
 
-
-
-### only draw for semipar <- smoothB!
+### only required for smoothB
 
 
 dat.Positions <- readRDS("dat.Positions.rds")
 dt.points <- data.frame(x = dat.Positions[1:2, "PopDens"],
-                        value = c(predict(object = semipar,
+                        value = c(predict(object = smoothB,
                                           newdata = dat.Positions[1:2, ], type="terms")[,"s(PopDens)"]))
 
-p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "PopDens", ], aes(x = x, y = value)) +
+p.spline.popDens <- ggplot(data = dt.tmpB[dt.tmp$pred == "PopDens", ], aes(x = x, y = value)) +
   theme_bw() +
   ylim(-5,10) +
   xlab("") +
@@ -946,8 +1054,8 @@ p.spline.popDens <- ggplot(data = dt.tmp[dt.tmp$pred == "PopDens", ], aes(x = x,
 
 
 
-pdf("../img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
-#pdf("img/MargEffect_semipar_PopDens.pdf", width = 6, height = 4)
+pdf("../img/MargEffect_smoothB_PopDens.pdf", width = 6, height = 4)
+#pdf("img/MargEffect_smoothB_PopDens.pdf", width = 6, height = 4)
 p.spline.popDens
 dev.off()
 
@@ -994,22 +1102,7 @@ dat.TI <- dat[dat$AQeType != "background", ]
 
 
 
-#	m	<- "smoothB"
-#	m	<- "smoothTI"
-#	m	<- "smoothA"
 
-
-
-
-smoothM <- smoothLUR(data = if(m == "smoothB"){dat.B} else{if(m == "smoothTI"){dat.TI} else{dat}}
-                     ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
-					,"Seap", "Airp", "Constr"
-					,"UrbGreen", "Agri", "Forest", "PopDens"
-					,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
-                     ,spVar1 = "Lon"
-                     ,spVar2 = "Lat"
-                     ,y = "Y"
-                     ,thresh = 0.95)
 
 
 # Filter administrative regions referring to Rhine-Ruhr area
@@ -1027,37 +1120,23 @@ names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 # Filter grid cells referring to Rhine-Ruhr area
 df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
 
-sp.eff	<- predict(object = smoothM, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
-  predict(object = smoothM, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
-
-df.grid.DE$sp.eff	<- as.vector(sp.eff)
-range(df.grid.DE$sp.eff)
-length(df.grid.DE$sp.eff)
 
 
-p.sp.eff <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
-  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
-  xlab("") +
-  ylab("") +
-  coord_fixed(1) +
-  geom_tile(aes(fill = sp.eff), width = 1000, height = 1000, na.rm = TRUE) +
-  scale_fill_gradientn(name = "",
-                       colours = brewer.pal(11, "BrBG")[-6],
-                       breaks = c(-13, -11, -9, -7, -5, -3, -1, 1, 3, 5),
-                       labels = c("-13", "-11", " -9", " -7", " -5", " -3", " -1",
-                                  "   1", "   3", "   5"),
-                       limits = range(df.grid.DE$sp.eff),
-                       na.value = "white") +
-  theme(legend.text  = element_text(size = 17),
-        legend.background = element_blank(),
-        legend.position = "bottom",
-        legend.box = "vertical",
-        axis.ticks = element_blank()) +
-  guides(fill = guide_colourbar(barwidth = 20))
-  #theme(legend.title = element_text(size = 14),
-  #      legend.text  = element_text(size = 14),
-  #      legend.background = element_blank()) +
-  #guides(fill = guide_colourbar(barheight = 15))
+df.grid.DE$smoothA.sp	<- predict(object = smoothA, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
+  predict(object = smoothA, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
+
+df.grid.DE$smoothB.sp	<- predict(object = smoothB, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
+  predict(object = smoothA, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
+
+df.grid.DE$smoothTI.sp	<- predict(object = smoothTI, newdata = df.grid.DE, type="terms")[,"s(Lon,Lat)"] +
+  predict(object = smoothA, newdata = df.grid.DE, type="terms")[,"s(Alt)"]
+
+
+#common color scheme
+(brks.sp <- seq(from = min(df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
+             to = max(df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
+             length.out = 11))
+brks2.sp <- seq(-12, 8, 4)
 
 
 
@@ -1065,7 +1144,31 @@ dat.Positions <- readRDS("dat.Positions.rds")
 #dat.Positions <- readRDS("Data_built/dat.Positions.rds")
 df.grid2points	<- dat.Positions[1:2, c("lon.GK3", "lat.GK3")]
 
-p.sp.eff2 <- p.sp.eff +
+
+
+#all monitoring sites
+p.sp.effA <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
+  xlab("") +
+  ylab("") +
+  coord_fixed(1) +
+  geom_tile(aes(fill = smoothA.sp), width = 1000, height = 1000, na.rm = TRUE) +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(11, "BrBG")[-6],
+                       breaks = brks2.sp,
+                       labels = brks2.sp,
+                       limits = range(brks.sp),
+                       na.value = "white") +
+  theme(legend.text  = element_text(size = 17),
+        legend.background = element_blank(),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        axis.ticks = element_blank()) +
+  guides(fill = guide_colourbar(barwidth = 20))
+
+
+
+p.sp.effA2 <- p.sp.effA +
   geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
              pch = 19, colour =  brewer.pal(9, "YlOrRd")[5], #"orangered",
              size = 2) +
@@ -1075,25 +1178,131 @@ p.sp.eff2 <- p.sp.eff +
 
 
 
-png(paste("../img/SpatialEffect1_", m, ".png", sep = ""), width = 450, height = 675)
-#pdf(paste("../img/SpatialEffect1_", m, ".pdf", sep = ""), width = 6, height = 9)
-p.sp.eff
+png("../img/SpatialEffect1_A.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect1_A.png", width = 6, height = 9)
+p.sp.effA
+dev.off()
+
+
+png("../img/SpatialEffect2_A.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect2_A.pdf", width = 6, height = 9)
+p.sp.effA2
 dev.off()
 
 
 
-png(paste("../img/SpatialEffect2_", m, ".png", sep = ""), width = 450, height = 675)
-#pdf(paste("../img/SpatialEffect2_", m, ".pdf", sep = ""), width = 6, height = 9)
-p.sp.eff2
+
+
+
+
+
+
+#background
+p.sp.effB <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
+  xlab("") +
+  ylab("") +
+  coord_fixed(1) +
+  geom_tile(aes(fill = smoothB.sp), width = 1000, height = 1000, na.rm = TRUE) +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(11, "BrBG")[-6],
+                       breaks = brks2.sp,
+                       labels = brks2.sp,
+                       limits = range(brks.sp),
+                       na.value = "white") +
+  theme(legend.text  = element_text(size = 17),
+        legend.background = element_blank(),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        axis.ticks = element_blank()) +
+  guides(fill = guide_colourbar(barwidth = 20))
+
+
+
+p.sp.effB2 <- p.sp.effB +
+  geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
+             pch = 19, colour =  brewer.pal(9, "YlOrRd")[5], #"orangered",
+             size = 2) +
+  geom_text(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2")),
+            colour =  brewer.pal(9, "YlOrRd")[5],# "orangered",
+            nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
+
+
+
+png("../img/SpatialEffect1_B.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect1_B.png", width = 6, height = 9)
+p.sp.effB
 dev.off()
 
 
-png(paste("../img/SpatialEffect_PopDens_", m, ".png", sep = ""), width = 900, height = 600)
-#pdf(paste("../img/SpatialEffect_PopDens_", m, ".pdf", sep = ""), width = 12, height = 8)
+png("../img/SpatialEffect2_B.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect2_B.pdf", width = 6, height = 9)
+p.sp.effB2
+dev.off()
+
+
+png("../img/SpatialEffect_PopDens_B.png", width = 900, height = 600)
+#pdf("../img/SpatialEffect_PopDens_B.pdf", width = 12, height = 8)
 ggdraw() +
-  draw_plot(p.sp.eff2, 0, 0, 0.57, 1) +
+  draw_plot(p.sp.effB2, 0, 0, 0.57, 1) +
   draw_plot(p.spline.popDens, 0.57, 0.25, 0.43, 0.5)
 dev.off()
+
+
+
+
+
+
+#traffic/industrial
+p.sp.effTI <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
+  xlab("") +
+  ylab("") +
+  coord_fixed(1) +
+  geom_tile(aes(fill = smoothTI.sp), width = 1000, height = 1000, na.rm = TRUE) +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(11, "BrBG")[-6],
+                       breaks = brks2.sp,
+                       labels = brks2.sp,
+                       limits = range(brks.sp),
+                       na.value = "white") +
+  theme(legend.text  = element_text(size = 17),
+        legend.background = element_blank(),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        axis.ticks = element_blank()) +
+  guides(fill = guide_colourbar(barwidth = 20))
+
+
+
+p.sp.effTI2 <- p.sp.effTI +
+  geom_point(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3),
+             pch = 19, colour =  brewer.pal(9, "YlOrRd")[5], #"orangered",
+             size = 2) +
+  geom_text(data = df.grid2points, aes(x = lon.GK3, y = lat.GK3, label = c("1", "2")),
+            colour =  brewer.pal(9, "YlOrRd")[5],# "orangered",
+            nudge_x = -10000, nudge_y = 10000, size = 5, fontface = "bold")
+
+
+
+png("../img/SpatialEffect1_TI.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect1_TI.png", width = 6, height = 9)
+p.sp.effTI
+dev.off()
+
+
+png("../img/SpatialEffect2_TI.png", width = 450, height = 675)
+#pdf("../img/SpatialEffect2_TI.pdf", width = 6, height = 9)
+p.sp.effTI2
+dev.off()
+
+
+
+
+
+
+
+
 
 
 
@@ -1106,207 +1315,14 @@ dev.off()
 ###
 
 
-###smoothB
-
-
+df.grid.DE$smoothA	<- as.vector(predict(object = smoothA, newdata = df.grid.DE))
 df.grid.DE$smoothB	<- as.vector(predict(object = smoothB, newdata = df.grid.DE))
-
-
-#NO2 concentrations not supported by the underlying data
-min(dat.B$Y)
-df.grid.DE$smoothB[df.grid.DE$smoothB < 0]
-df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]
-length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]) # 383
-length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
-df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]		<- min(dat.B$Y)				# replace by min contained in data set
-
-
-max(dat.B$Y)
-df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]
-length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]) # 2
-length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
-df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]		<- max(dat.B$Y)				# replace by max contained in data set
-
-
-
-# Filter grid cells referring to Rhine-Ruhr area
-df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
-
-df.grid.RR$smoothTI <- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
-
-#NO2 concentrations not supported by the underlying data
-min(dat.TI$Y)
-length(df.grid.RR$smoothTI[df.grid.RR$smoothTI < min(dat.TI$Y)])
-max(dat.TI$Y)
-length(df.grid.RR$smoothTI[df.grid.RR$smoothTI > max(dat.TI$Y)])
-
-(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.RR$smoothTI),
-             to = max(df.grid.DE$smoothB, df.grid.RR$smoothTI),
-             length.out = 11))
-brks2 <- seq(10, 60, 10)
-
-p.back.pred <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
-  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
-  xlab("") +
-  ylab("") +
-  coord_fixed(1) +
-#  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
-  geom_tile(aes(fill = smoothB), width = 1000, height = 1000, na.rm = TRUE) +
-  scale_fill_gradientn(name = "",
-                       colours = brewer.pal(9, "YlOrRd")[-1],
-                       breaks = brks2,
-                       labels = brks2,
-                       limits = range(brks),
-                       na.value = "white") +
-  theme(legend.text  = element_text(size = 17),
-        legend.background = element_blank(),
-        legend.position = "bottom",
-        legend.box = "vertical",
-        axis.ticks = element_blank()) +
-  guides(fill = guide_colourbar(barwidth = 20))
-  # theme(legend.title = element_text(size = 14),
-  #       legend.text  = element_text(size = 14),
-  #       legend.background = element_blank()) +
-  # guides(fill = guide_colourbar(barheight = 15))
-
-
-
-admin.bndry.RR <- spTransform(admin.regions.RR, GK3)
-admin.bndry.RR.f <- fortify(admin.bndry.RR, region = "ID")
-bndry.tmp <- admin.bndry.RR.f
-
-names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
-p.back.pred2 <- p.back.pred +
-  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA)
-
-
-png("../img/PredBack_RR.png", width = 450, height = 675)
-#pdf("../img/PredBack_RR.pdf", width = 6, height = 9)
-p.back.pred2
-dev.off()
-
-
-png("../img/SpEff_PredBack.png", width = 900, height = 675)
-#pdf("../img/SpEff_PredBack.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred, nrow = 1)
-dev.off()
-
-png("../img/SpEff_PredBack2.png", width = 900, height = 675)
-#pdf("../img/SpEff_PredBack2.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred2, nrow = 1)
-dev.off()
-
-
-
-
-
-
-
-###smoothTI
-
-
 df.grid.DE$smoothTI	<- as.vector(predict(object = smoothTI, newdata = df.grid.DE))
 
 
-#NO2 concentrations not supported by the underlying data
-min(dat.TI$Y)
-df.grid.DE$smoothTI[df.grid.DE$smoothTI < 0]
-df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]
-length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]) # 2921
-length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)])/length(df.grid.DE$smoothTI)*100		# share in % of predicted values
-df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]		<- min(dat.TI$Y)				# replace by min contained in data set
-
-
-max(dat.TI$Y)
-df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]
-length(df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]) # 0
-length(df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)])/length(df.grid.DE$smoothTI)*100		# share in % of predicted values
-df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]		<- max(dat.TI$Y)				# replace by max contained in data set
-
-
-
-# Filter grid cells referring to Rhine-Ruhr area
-df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
-
-df.grid.RR$smoothTI <- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
 
 #NO2 concentrations not supported by the underlying data
-min(dat.TI$Y)
-length(df.grid.RR$smoothTI[df.grid.RR$smoothTI < min(dat.TI$Y)])
-max(dat.TI$Y)
-length(df.grid.RR$smoothTI[df.grid.RR$smoothTI > max(dat.TI$Y)])
-
-(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.RR$smoothTI),
-             to = max(df.grid.DE$smoothB, df.grid.RR$smoothTI),
-             length.out = 11))
-brks2 <- seq(10, 60, 10)
-
-p.back.pred <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
-  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
-  xlab("") +
-  ylab("") +
-  coord_fixed(1) +
-#  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
-  geom_tile(aes(fill = smoothTI), width = 1000, height = 1000, na.rm = TRUE) +
-  scale_fill_gradientn(name = "",
-                       colours = brewer.pal(9, "YlOrRd")[-1],
-                       breaks = brks2,
-                       labels = brks2,
-                       limits = range(brks),
-                       na.value = "white") +
-  theme(legend.text  = element_text(size = 17),
-        legend.background = element_blank(),
-        legend.position = "bottom",
-        legend.box = "vertical",
-        axis.ticks = element_blank()) +
-  guides(fill = guide_colourbar(barwidth = 20))
-  # theme(legend.title = element_text(size = 14),
-  #       legend.text  = element_text(size = 14),
-  #       legend.background = element_blank()) +
-  # guides(fill = guide_colourbar(barheight = 15))
-
-
-
-admin.bndry.RR <- spTransform(admin.regions.RR, GK3)
-admin.bndry.RR.f <- fortify(admin.bndry.RR, region = "ID")
-bndry.tmp <- admin.bndry.RR.f
-
-names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
-p.back.pred2 <- p.back.pred +
-  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA)
-
-
-png("../img/PredTI_RR.png", width = 450, height = 675)
-#pdf("../img/PredTI_RR.pdf", width = 6, height = 9)
-p.back.pred2
-dev.off()
-
-
-png("../img/SpEff_PredTI.png", width = 900, height = 675)
-#pdf("../img/SpEff_PredTI.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred, nrow = 1)
-dev.off()
-
-png("../img/SpEff_PredTI2.png", width = 900, height = 675)
-#pdf("../img/SpEff_PredTI2.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred2, nrow = 1)
-dev.off()
-
-
-
-
-
-
-
-
-
-###smoothA
-
-
-df.grid.DE$smoothA	<- as.vector(predict(object = smoothA, newdata = df.grid.DE))
-
-
-#NO2 concentrations not supported by the underlying data
+#all monitoring sites
 min(dat$Y)
 df.grid.DE$smoothA[df.grid.DE$smoothA < 0]
 df.grid.DE$smoothA[df.grid.DE$smoothA < min(dat$Y)]
@@ -1325,28 +1341,65 @@ length(df.grid.DE$smoothA)
 
 
 
-# Filter grid cells referring to Rhine-Ruhr area
-df.grid.RR <- df.grid.DE[df.grid.DE$AGS %in% ind.RR, ]
+#background
+min(dat.B$Y)
+df.grid.DE$smoothB[df.grid.DE$smoothB < 0]
+df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]
+length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]) # 383
+length(df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
+df.grid.DE$smoothB[df.grid.DE$smoothB < min(dat.B$Y)]		<- min(dat.B$Y)				# replace by min contained in data set
 
-df.grid.RR$smoothTI <- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
 
-#NO2 concentrations not supported by the underlying data
-min(dat$Y)
-length(df.grid.RR$smoothA[df.grid.RR$smoothA < min(dat$Y)])
-max(dat$Y)
-length(df.grid.RR$smoothA[df.grid.RR$smoothA > max(dat$Y)])
+max(dat.B$Y)
+df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]
+length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]) # 2
+length(df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)])/length(df.grid.DE$smoothB)*100		# share in % of predicted values
+df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]		<- max(dat.B$Y)				# replace by max contained in data set
 
-(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.RR$smoothTI),
-             to = max(df.grid.DE$smoothB, df.grid.RR$smoothTI),
+
+
+#traffic/industrial
+min(dat.TI$Y)
+df.grid.DE$smoothTI[df.grid.DE$smoothTI < 0]
+df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]
+length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]) # 2921
+length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)])/length(df.grid.DE$smoothTI)*100		# share in % of predicted values
+df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]		<- min(dat.TI$Y)				# replace by min contained in data set
+
+
+max(dat.TI$Y)
+df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]
+length(df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]) # 0
+length(df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)])/length(df.grid.DE$smoothTI)*100		# share in % of predicted values
+df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]		<- max(dat.TI$Y)				# replace by max contained in data set
+
+
+
+
+#common color scheme
+(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.DE$smoothTI),
+             to = max(df.grid.DE$smoothB, df.grid.DE$smoothTI),
              length.out = 11))
-brks2 <- seq(10, 60, 10)
+brks2 <- seq(10, 70, 20)
 
-p.back.pred <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+
+
+#boundaries of RR region
+admin.bndry.RR <- spTransform(admin.regions.RR, GK3)
+admin.bndry.RR.f <- fortify(admin.bndry.RR, region = "ID")
+bndry.tmp <- admin.bndry.RR.f
+
+
+
+
+
+###smoothA
+p.predA <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
   ylab("") +
   coord_fixed(1) +
-#  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
+  #  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
   geom_tile(aes(fill = smoothA), width = 1000, height = 1000, na.rm = TRUE) +
   scale_fill_gradientn(name = "",
                        colours = brewer.pal(9, "YlOrRd")[-1],
@@ -1360,38 +1413,110 @@ p.back.pred <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
         legend.box = "vertical",
         axis.ticks = element_blank()) +
   guides(fill = guide_colourbar(barwidth = 20))
-  # theme(legend.title = element_text(size = 14),
-  #       legend.text  = element_text(size = 14),
-  #       legend.background = element_blank()) +
-  # guides(fill = guide_colourbar(barheight = 15))
 
-
-
-admin.bndry.RR <- spTransform(admin.regions.RR, GK3)
-admin.bndry.RR.f <- fortify(admin.bndry.RR, region = "ID")
-bndry.tmp <- admin.bndry.RR.f
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
-p.back.pred2 <- p.back.pred +
-  geom_polygon(data = bndry.tmp, color = "orangered", lwd = 0.7, fill = NA)
+p.predA2 <- p.predA +
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
 
-
-png("../img/PredA_RR.png", width = 450, height = 675)
-#pdf("../img/PredA_RR.pdf", width = 6, height = 9)
-p.back.pred2
-dev.off()
 
 
 png("../img/SpEff_PredA.png", width = 900, height = 675)
 #pdf("../img/SpEff_PredA.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred, nrow = 1)
+plot_grid(p.sp.effA, p.predA, nrow = 1)
 dev.off()
 
 png("../img/SpEff_PredA2.png", width = 900, height = 675)
 #pdf("../img/SpEff_PredA2.pdf", width = 12, height = 9)
-plot_grid(p.sp.eff, p.back.pred2, nrow = 1)
+plot_grid(p.sp.effA, p.predA2, nrow = 1)
 dev.off()
 
+
+
+
+
+
+###smoothB
+p.predB <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
+  xlab("") +
+  ylab("") +
+  coord_fixed(1) +
+#  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothB), width = 1000, height = 1000, na.rm = TRUE) +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(9, "YlOrRd")[-1],
+                       breaks = brks2,
+                       labels = brks2,
+                       limits = range(brks),
+                       na.value = "white") +
+  theme(legend.text  = element_text(size = 17),
+        legend.background = element_blank(),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        axis.ticks = element_blank()) +
+  guides(fill = guide_colourbar(barwidth = 20))
+
+
+names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
+p.predB2 <- p.predB +
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
+
+
+
+png("../img/SpEff_PredBack.png", width = 900, height = 675)
+#pdf("../img/SpEff_PredBack.pdf", width = 12, height = 9)
+plot_grid(p.sp.effB, p.predB, nrow = 1)
+dev.off()
+
+png("../img/SpEff_PredBack2.png", width = 900, height = 675)
+#pdf("../img/SpEff_PredBack2.pdf", width = 12, height = 9)
+plot_grid(p.sp.effB, p.predB2, nrow = 1)
+dev.off()
+
+
+
+
+
+
+
+###smoothTI
+p.predTI <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
+  ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
+  xlab("") +
+  ylab("") +
+  coord_fixed(1) +
+#  geom_tile(aes(fill = gam.pred), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothTI), width = 1000, height = 1000, na.rm = TRUE) +
+  scale_fill_gradientn(name = "",
+                       colours = brewer.pal(9, "YlOrRd")[-1],
+                       breaks = brks2,
+                       labels = brks2,
+                       limits = range(brks),
+                       na.value = "white") +
+  theme(legend.text  = element_text(size = 17),
+        legend.background = element_blank(),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        axis.ticks = element_blank()) +
+  guides(fill = guide_colourbar(barwidth = 20))
+
+
+names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
+p.predTI2 <- p.predTI +
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
+
+
+
+png("../img/SpEff_PredTI.png", width = 900, height = 675)
+#pdf("../img/SpEff_PredTI.pdf", width = 12, height = 9)
+plot_grid(p.sp.effTI, p.predTI, nrow = 1)
+dev.off()
+
+png("../img/SpEff_PredTI2.png", width = 900, height = 675)
+#pdf("../img/SpEff_PredTI2.pdf", width = 12, height = 9)
+plot_grid(p.sp.effTI, p.predTI2, nrow = 1)
+dev.off()
 
 
 
@@ -1409,12 +1534,17 @@ dev.off()
 ###
 
 
-p.back.pred.sub <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
+df.grid.RR$smoothA	<- as.vector(predict(object = smoothA, newdata = df.grid.RR))
+df.grid.RR$smoothB	<- as.vector(predict(object = smoothB, newdata = df.grid.RR))
+df.grid.RR$smoothTI	<- as.vector(predict(object = smoothTI, newdata = df.grid.RR))
+
+
+p.predA.RR <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
   ylab("") +
   coord_fixed(1) +
-  geom_tile(aes(fill = smoothB), width = 1000, height = 1000, na.rm = TRUE) +
+  geom_tile(aes(fill = smoothA), width = 1000, height = 1000, na.rm = TRUE) +
   scale_fill_gradientn(name = "",
                        colours = brewer.pal(9, "YlOrRd")[-1],
                        breaks = brks2,
@@ -1427,13 +1557,10 @@ p.back.pred.sub <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
         legend.box = "vertical",
         axis.ticks = element_blank()) +
   guides(fill = guide_colourbar(barwidth = 20))
-# theme(legend.title = element_text(size = 14),
-#         legend.text  = element_text(size = 14),
-#         legend.background = element_blank()) +
-#   guides(fill = guide_colourbar(barheight = 15))
 
 
-p.back.pred.sub2 <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
+
+p.predB.RR <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing() +  #theme_bw() +
   xlab("") +
   ylab("") +
@@ -1455,7 +1582,7 @@ p.back.pred.sub2 <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
 
 
 
-(p.tr.ind.pred.sub <- ggplot(df.grid.RR, aes(lon.GK3, y = lat.GK3)) +
+p.predTI.RR <- ggplot(df.grid.RR, aes(lon.GK3, y = lat.GK3)) +
   ggmap::theme_nothing() +  #theme_bw() +
   xlab("") +
   ylab("") +
@@ -1472,23 +1599,23 @@ p.back.pred.sub2 <- ggplot(df.grid.RR, aes(x = lon.GK3, y = lat.GK3)) +
           legend.position = "bottom",
           legend.box = "vertical",
           axis.ticks = element_blank()) +
-    guides(fill = guide_colourbar(barwidth = 20)))
-#  guides(fill = guide_colourbar(barheight = 15)))
+    guides(fill = guide_colourbar(barwidth = 20))
+#  guides(fill = guide_colourbar(barheight = 15))
 
 
 library(ggpubr)
 png("../img/PredBackTrIndRR.png", width = 900, height = 600)
 #pdf("../img/PredBackTrIndRR.pdf", width = 12, height = 8)
 #plot_grid(p.back.pred.sub, p.tr.ind.pred.sub, rel_widths = c(0.51, 0.45))
-ggarrange(p.back.pred.sub, p.tr.ind.pred.sub, widths = c(1,1), common.legend = TRUE, legend = "bottom")
+ggarrange(p.predB.RR, p.predTI.RR, widths = c(1,1), common.legend = TRUE, legend = "bottom")
 dev.off()
 
 
 png("../img/PredBackDERR.png", width = 900, height = 750)
-ggarrange(p.back.pred2, p.back.pred.sub, widths = c(1,1), common.legend = TRUE, legend = "bottom")
+ggarrange(p.predB2, p.predB.RR, widths = c(1,1), common.legend = TRUE, legend = "bottom")
 dev.off()
 
-ggarrange(p.back.pred2, p.back.pred.sub, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
+ggarrange(p.predB2, p.predB.RR, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
   ggexport(filename = "../img/PredBackDERR.pdf", width = 12, height = 10)
 #  ggexport(filename = "img/PredBackDERR.pdf", width = 12, height = 10)
 
@@ -1498,7 +1625,7 @@ dat.Positions <- readRDS("dat.Positions.rds")
 
 
 ## Plot points 1 to 3 (of `dat.Positions`) on map
-(p.back.pred.sub2 <- p.back.pred.sub +
+(p.predB.RR2 <- p.predB.RR +
     geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
                pch = 19, colour = brewer.pal(11, "BrBG")[10],#"blue",
                size = 2) +
@@ -1506,7 +1633,7 @@ dat.Positions <- readRDS("dat.Positions.rds")
               colour = brewer.pal(11, "BrBG")[10],# "blue",
               nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
-(p.tr.ind.pred.sub2 <- p.tr.ind.pred.sub +
+(p.predTI.RR2 <- p.predTI.RR +
     geom_point(data = dat.Positions, aes(x = lon.GK3, y = lat.GK3),
                pch = 19, colour = brewer.pal(11, "BrBG")[10],#"blue",
                size = 2) +
@@ -1516,11 +1643,11 @@ dat.Positions <- readRDS("dat.Positions.rds")
 
 
 png("../img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
-ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom")
+ggarrange(p.predB.RR2, p.predTI.RR2, widths = c(1,1), common.legend = TRUE, legend = "bottom")
 #plot_grid(p.back.pred.sub2, p.tr.ind.pred.sub2, rel_widths = c(0.51, 0.45))
 dev.off()
 
-ggarrange(p.back.pred.sub2, p.tr.ind.pred.sub2, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
+ggarrange(p.predB.RR2, p.predTI.RR2, widths = c(1,1), common.legend = TRUE, legend = "bottom") %>%
   ggexport(filename = "../img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
 #  ggexport(filename = "img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 6)
 
