@@ -397,7 +397,7 @@ p.DE <- ggplot(dat.tmp, aes(x = long, y = lat)) +
                  y = coordinates(spdf.sites.tr.ind.2)[,2],
                  colour = brewer.pal(9, "BrBG")[3]),
              size = 1, shape = 15) +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[6], lwd = 0.7, fill = NA) +
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[1], lwd = 0.7, fill = NA) +
   scale_fill_gradientn(name = "PopDens",
                        colours = brewer.pal(11, "BrBG")[-c(1:7)],
 #                       colours = brewer.pal(9, "Blues")[-c(1,2)],
@@ -1417,7 +1417,7 @@ p.predA <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.predA2 <- p.predA +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
+  geom_polygon(data = bndry.tmp, color = brewer.pal(1, "BrBG")[11], lwd = 0.7, fill = NA)
 
 
 
@@ -1460,7 +1460,7 @@ p.predB <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.predB2 <- p.predB +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
+  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[1], lwd = 0.7, fill = NA)
 
 
 
@@ -1504,7 +1504,7 @@ p.predTI <- ggplot(df.grid.DE, aes(x = lon.GK3, y = lat.GK3)) +
 
 names(bndry.tmp)[1:2] <- c("lon.GK3", "lat.GK3")
 p.predTI2 <- p.predTI +
-  geom_polygon(data = bndry.tmp, color = brewer.pal(11, "BrBG")[11], lwd = 0.7, fill = NA)
+  geom_polygon(data = bndry.tmp, color = brewer.pal(1, "BrBG")[11], lwd = 0.7, fill = NA)
 
 
 
