@@ -1133,8 +1133,8 @@ df.grid.DE$smoothTI.sp	<- predict(object = smoothTI, newdata = df.grid.DE, type=
 
 
 #common color scheme
-(brks.sp <- seq(from = min(df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
-             to = max(df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
+(brks.sp <- seq(from = min(df.grid.DE$smoothA.sp, df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
+             to = max(df.grid.DE$smoothA.sp, df.grid.DE$smoothB.sp, df.grid.DE$smoothTI.sp),
              length.out = 11))
 brks2.sp <- seq(-12, 8, 4)
 
@@ -1362,7 +1362,7 @@ df.grid.DE$smoothB[df.grid.DE$smoothB > max(dat.B$Y)]		<- max(dat.B$Y)				# repl
 min(dat.TI$Y)
 df.grid.DE$smoothTI[df.grid.DE$smoothTI < 0]
 df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]
-length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]) # 2921
+length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]) # 2923
 length(df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)])/length(df.grid.DE$smoothTI)*100		# share in % of predicted values
 df.grid.DE$smoothTI[df.grid.DE$smoothTI < min(dat.TI$Y)]		<- min(dat.TI$Y)				# replace by min contained in data set
 
@@ -1377,8 +1377,8 @@ df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(dat.TI$Y)]		<- max(dat.TI$Y)				# 
 
 
 #common color scheme
-(brks <- seq(from = min(df.grid.DE$smoothB, df.grid.DE$smoothTI),
-             to = max(df.grid.DE$smoothB, df.grid.DE$smoothTI),
+(brks <- seq(from = min(df.grid.DE$smoothA, df.grid.DE$smoothB, df.grid.DE$smoothTI),
+             to = max(df.grid.DE$smoothA, df.grid.DE$smoothB, df.grid.DE$smoothTI),
              length.out = 11))
 brks2 <- seq(10, 70, 20)
 
