@@ -8,9 +8,6 @@
 #' \code{looCV}.
 #'
 #' @references
-#' Fritsch and Behm (2020): Modeling the effects of agglomeration
-#' areas and connecting infrastructure in land use regression --
-#' Specification, estimation, and interpretations. Working paper.
 #'
 #' @docType package
 #' @name smoothLUR

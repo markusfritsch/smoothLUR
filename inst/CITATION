@@ -1,5 +1,5 @@
 bibentry(bibtype = "unpublished",
-	title = "{Modeling the effects of agglomeration areas and connecting infrastructure in land use regression -- Specification, estimation, and interpretations}",
+	title = "{Agglomeration and infrastructure effects in land use regression models for air pollution -- Specification, estimation, and interpretations}",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
 	note = "Working paper",
