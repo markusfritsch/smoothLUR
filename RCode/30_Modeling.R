@@ -32,10 +32,11 @@ datTI <- dat[dat$AQeType!="background",]
 
 
 
+
 ###
-### LUR modeling based on parametric polynomials ----
+### LUR modeling based on parametric polynomials (predictor pre-selection according to ESCAPE procedure)
 ###
-# With predictor pre-selection according to ESCAPE procedure
+
 
 parA <- parLUR(data = datA
                ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
@@ -97,9 +98,8 @@ Moran.I(resid(parTI), res.dist.inv)
 
 
 ###
-### LUR modeling based on additive regression smoother ----
+### LUR modeling based on additive regression smoother (no pre-selection of predictors)
 ###
-# Without predictor pre-selection
 
 
 smoothA  <- smoothLUR(data = datA

@@ -42,7 +42,7 @@ datTI		<- dat[dat$AQeType != "background", ]
 
 
 ###
-## leave-one-out cross-validation
+### Leave-one-out cross-validation
 ###
 
 loocv.b <- kFoldCV(data = datB
@@ -77,7 +77,7 @@ adjR2_looCV_smooth_b	<- mean(sapply(loocv.b$ls.models, FUN = function(f) summary
 
 
 ###
-## 10-fold cross-validation
+### 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -131,7 +131,7 @@ mean(adjR2_TenFoldCV_par_b); mean(adjR2_TenFoldCV_smooth_b)
 
 
 ###
-## Hold-out validation
+### Hold-out validation
 ###
 
 # can easily be derived based on the results of 10-fold CV by using only Fold1 as test sample
@@ -153,7 +153,7 @@ mean(adjR2_HoldOutCV_par_b); mean(adjR2_HoldOutCV_smooth_b)
 
 
 ###
-## Stratified 10-fold cross-validation
+### Stratified 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -207,7 +207,7 @@ mean(adjR2_StratTenFoldCV_par_b); mean(adjR2_StratTenFoldCV_smooth_b)
 
 
 ###
-## Stratified hold-out validation
+### Stratified hold-out validation
 ###
 
 # can easily be derived based on the results of stratified hold-out CV by using only Fold1 as test sample
@@ -225,6 +225,7 @@ mean(mae_StratHoldOutCV_par_b); mean(mae_StratHoldOutCV_smooth_b)
 mean(adjR2_StratHoldOutCV_par_b); mean(adjR2_StratHoldOutCV_smooth_b)
 
 
+save.image("cvResultsB_2021-01-27.RData")
 
 
 
@@ -240,7 +241,7 @@ mean(adjR2_StratHoldOutCV_par_b); mean(adjR2_StratHoldOutCV_smooth_b)
 
 
 ###
-## leave-one-out cross-validation
+### Leave-one-out cross-validation
 ###
 loocv.TI <- kFoldCV(data = datTI
                    ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
@@ -274,7 +275,7 @@ adjR2_looCV_smooth_TI	<- mean(sapply(loocv.TI$ls.models, FUN = function(f) summa
 
 
 ###
-## 10-fold cross-validation
+### 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -328,7 +329,7 @@ mean(adjR2_TenFoldCV_par_TI); mean(adjR2_TenFoldCV_smooth_TI)
 
 
 ###
-## Hold-out validation
+### Hold-out validation
 ###
 
 # can easily be derived based on the results of 10-fold CV by using only Fold1 as test sample
@@ -351,7 +352,7 @@ mean(adjR2_HoldOutCV_par_TI); mean(adjR2_HoldOutCV_smooth_TI)
 
 
 ###
-## Stratified 10-fold cross-validation
+### Stratified 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -406,7 +407,7 @@ mean(adjR2_StratTenFoldCV_par_TI); mean(adjR2_StratTenFoldCV_smooth_TI)
 
 
 ###
-## Stratified hold-out validation
+### Stratified hold-out validation
 ###
 
 # can easily be derived based on the results of stratified hold-out CV by using only Fold1 as test sample
@@ -424,19 +425,22 @@ mean(mae_StratHoldOutCV_par_TI); mean(mae_StratHoldOutCV_smooth_TI)
 mean(adjR2_StratHoldOutCV_par_TI); mean(adjR2_StratHoldOutCV_smooth_TI)
 
 
+save.image("cvResultsTI_2021-01-27.RData")
+
+
 
 
 
 
 
 #####################
-## All sites
+### All sites
 #####################
 
 
 
 ###
-## leave-one-out cross-validation
+### Leave-one-out cross-validation
 ###
 
 loocv.A <- kFoldCV(data = dat
@@ -471,7 +475,7 @@ adjR2_looCV_smooth_A	<- mean(sapply(loocv.A$ls.models, FUN = function(f) summary
 
 
 ###
-## 10-fold cross-validation
+### 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -525,7 +529,7 @@ mean(adjR2_TenFoldCV_par_A); mean(adjR2_TenFoldCV_smooth_A)
 
 
 ###
-## Hold-out validation
+### Hold-out validation
 ###
 
 # can easily be derived based on the results of 10-fold CV by using only Fold1 as test sample
@@ -548,7 +552,7 @@ mean(adjR2_HoldOutCV_par_A); mean(adjR2_HoldOutCV_smooth_A)
 
 
 ###
-## Stratified 10-fold cross-validation
+### Stratified 10-fold cross-validation
 ###
 
 # Apply function kFoldCV for seed values 1 to 100
@@ -601,7 +605,7 @@ mean(adjR2_StratTenFoldCV_par_A); mean(adjR2_StratTenFoldCV_smooth_A)
 
 
 ###
-## Stratified hold-out validation
+### Stratified hold-out validation
 ###
 
 # can easily be derived based on the results of stratified hold-out CV by using only Fold1 as test sample
@@ -617,3 +621,7 @@ adjR2_StratHoldOutCV_smooth_A	<- sapply(listStratTenFoldCV.A, FUN = function(s) 
 mean(rmse_StratHoldOutCV_par_A); mean(rmse_StratHoldOutCV_smooth_A)
 mean(mae_StratHoldOutCV_par_A); mean(mae_StratHoldOutCV_smooth_A)
 mean(adjR2_StratHoldOutCV_par_A); mean(adjR2_StratHoldOutCV_smooth_A)
+
+
+save.image("cvResultsA_2021-01-27.RData")
+

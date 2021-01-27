@@ -233,7 +233,7 @@ spdf.grid3$Altitude <- extract(raster.Alt, spdf.grid3)
 spdf.grid.final <- spdf.grid3
 
 names(spdf.grid.final)
-df.grid.final <- spdf.grid.final@data[ , c(6,2:5,25,7:16,17,20:24)]
+df.grid.final <- spdf.grid.final@data[ , c(7,2:5,26,8:17,18,21:25)]
 names(df.grid.final) <- c("ID", "Lon.GK3", "Lat.GK3", "Lon.WGS84", "Lat.WGS84", "Alt",
                           "HighDens", "LowDens", "Ind", "Transp", "Seap",
                           "Airp", "Constr", "UrbGreen", "Agri", "Forest",
