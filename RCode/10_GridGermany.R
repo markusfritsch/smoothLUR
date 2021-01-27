@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 ########################################################################################################
 ### Set up 1x1km spatial grid across Germany (i.e., derive predictor values for each grid cell center
 ########################################################################################################
+=======
+#########################################################################
+### Set up 1x1km spatial grid for prediction across Germany,
+### i.e. derive values of predictor variables for each grid cell center
+#########################################################################
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
 
 
 
@@ -22,11 +29,19 @@ library(sp)
 
 # Read data ----
 
+<<<<<<< HEAD
 sPdf.Boundaries.DE <- readOGR(dsn = "data/Data_GADM",
                               layer = "DEU_adm0",
                               encoding = "UTF-8",
                               use_iconv = TRUE)
 sGdf.CLC12 <- readGDAL(fname = "data/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+=======
+sPdf.Boundaries.DE <- readOGR(dsn = "DataFull/Data_GADM",
+                              layer = "DEU_adm0",
+                              encoding = "UTF-8",
+                              use_iconv = TRUE)
+sGdf.CLC12 <- readGDAL("DataFull/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
                        offset = c(19480,67313),
                        region.dim = c(8700,6500))
 sPdf.Boundaries.DE <- spTransform(sPdf.Boundaries.DE,
@@ -98,10 +113,17 @@ if(FALSE){
   }
 
 
+<<<<<<< HEAD
   write.csv(CLC.Grid, "data/Data_built/Attribute_CLC.csv", row.names = FALSE)
 }
 
 CLC.Grid <- read.csv("data/Data_built/Attribute_CLC.csv")
+=======
+  write.csv(CLC.Grid, "Data_built/Attribute_CLC.csv")
+}
+
+CLC.Grid <- read.csv("Data_built/Attribute_CLC.csv")[,-1]
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
 
 table(spdf.grid@data$layer == CLC.Grid$ID)
 spdf.grid.tmp <- spdf.grid
@@ -112,7 +134,11 @@ spdf.grid@data <- cbind(spdf.grid.tmp@data, CLC.Grid)
 
 # Data on population density ----
 
+<<<<<<< HEAD
 sPdf.Municipalities <- readOGR(dsn = "data/Data_BKG/vg250-ew_ebenen",
+=======
+sPdf.Municipalities <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
                                layer = "VG250_GEM",
                                encoding = "UTF-8",
                                use_iconv = TRUE)
@@ -144,7 +170,11 @@ spdf.grid2  <- subset(spdf.grid, !is.na(spdf.grid$AGS))
 # Data on traffic ----
 
 if(FALSE){
+<<<<<<< HEAD
   sLdf.Roads <- readOGR(dsn = "data/Data_EuroGeographics/EGM_10-1-0SHP_20171110/DATA/Countries/DE", layer = "RoadL",
+=======
+  sLdf.Roads <- readOGR(dsn = "DataFull/Data_EuroGeographics/EGM_10-1-0SHP_20171110/DATA/Countries/DE", layer = "RoadL",
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
                         encoding = "UTF-8",use_iconv = TRUE)
   sLdf.Roads <- spTransform(sLdf.Roads, CRS = proj4string(sGdf.CLC12))
 
@@ -187,6 +217,7 @@ if(FALSE){
   write.csv(spdf.spdf.grid2@data[280001:300000, ], file = "Attribute_Road_280001to300000.csv")
 }
 
+<<<<<<< HEAD
 Roads1  <- read.csv("data/Data_built/Attribute_Road_1to20000.csv")[,-1]
 Roads2  <- read.csv("data/Data_built/Attribute_Road_20001to40000.csv")[,-1]
 Roads3  <- read.csv("data/Data_built/Attribute_Road_40001to60000.csv")[,-1]
@@ -205,6 +236,26 @@ Roads15 <- read.csv("data/Data_built/Attribute_Road_280001to300000.csv")[,-1]
 Roads16 <- read.csv("data/Data_built/Attribute_Road_300001to320000.csv")[,-1]
 Roads17 <- read.csv("data/Data_built/Attribute_Road_320001to340000.csv")[,-1]
 Roads18 <- read.csv("data/Data_built/Attribute_Road_340001to356793.csv")[,-1]
+=======
+Roads1  <- read.csv("Data_built/Attribute_Road_1to20000.csv")[,-1]
+Roads2  <- read.csv("Data_built/Attribute_Road_20001to40000.csv")[,-1]
+Roads3  <- read.csv("Data_built/Attribute_Road_40001to60000.csv")[,-1]
+Roads4  <- read.csv("Data_built/Attribute_Road_60001to80000.csv")[,-1]
+Roads5  <- read.csv("Data_built/Attribute_Road_80001to100000.csv")[,-1]
+Roads6  <- read.csv("Data_built/Attribute_Road_100001to120000.csv")[,-1]
+Roads7  <- read.csv("Data_built/Attribute_Road_120001to140000.csv")[,-1]
+Roads8  <- read.csv("Data_built/Attribute_Road_140001to160000.csv")[,-1]
+Roads9  <- read.csv("Data_built/Attribute_Road_160001to180000.csv")[,-1]
+Roads10 <- read.csv("Data_built/Attribute_Road_180001to200000.csv")[,-1]
+Roads11 <- read.csv("Data_built/Attribute_Road_200001to220000.csv")[,-1]
+Roads12 <- read.csv("Data_built/Attribute_Road_220001to240000.csv")[,-1]
+Roads13 <- read.csv("Data_built/Attribute_Road_240001to260000.csv")[,-1]
+Roads14 <- read.csv("Data_built/Attribute_Road_260001to280000.csv")[,-1]
+Roads15 <- read.csv("Data_built/Attribute_Road_280001to300000.csv")[,-1]
+Roads16 <- read.csv("Data_built/Attribute_Road_300001to320000.csv")[,-1]
+Roads17 <- read.csv("Data_built/Attribute_Road_320001to340000.csv")[,-1]
+Roads18 <- read.csv("Data_built/Attribute_Road_340001to356793.csv")[,-1]
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
 
 
 RoadsComplete <- rbind(Roads1, Roads2, Roads3, Roads4, Roads5, Roads6,
@@ -218,7 +269,11 @@ spdf.grid3 <- merge(spdf.grid3, RoadsComplete[,c(2,21:24)],
 
 
 # Data on altitude ----
+<<<<<<< HEAD
 sGdf.Alt <- readGDAL("data/Data_BKG/DGM/dgm200.gk3.gridascii/dgm200/dgm200_gk3.asc")
+=======
+sGdf.Alt <- readGDAL("DataFull/Data_BKG/DGM/dgm200.gk3.gridascii/dgm200/dgm200_gk3.asc")
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
 proj4string(sGdf.Alt) <- "+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +datum=potsdam +units=m +no_defs +ellps=bessel +towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7"
 
 raster.Alt <- raster(sGdf.Alt)
@@ -248,4 +303,8 @@ df.grid.final$indRegions[nchar(df.grid.final$AGS) != 7] <- substr(df.grid.final$
 
 # df.grid.DE <- df.grid.final
 # rm(list=(ls()[ls()!="df.grid.DE"]))
+<<<<<<< HEAD
 # save.image("data/Data_built/grid.DE.RData")
+=======
+# save.image("Data_built/grid.DE.RData")
+>>>>>>> 10b46e97d58dcbd1354e02f86ecf27239a3a0e6e
