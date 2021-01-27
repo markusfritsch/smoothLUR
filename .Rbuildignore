@@ -3,20 +3,34 @@
 .smoothLUR.Rproj
 
 00_old
-DataFull
-Rcode
-data/Data_built
-data/Data_sources
 
-indRhineRuhr.rds
+data/Data_BBSR
+data/Data_BKG
+data/Data_built
+data/Data_CLC12
+data/Data_EuroGeographics
+data/Data_GADM
+data/Data_sources
+data/DE_AQeReporting_2013-2015
+
+
+cvResultsA.RData
+cvResultsA_2020-09-25.RData
+cvResultsB.RData
+cvResultsB_2020-09-25.RData
+cvResultsTI.RData.RData
+cvResultsTI_2020-09-25.RData
+
 dat.Positions.rds
 DATA_MonitoringSites_DE.csv
 gitCommands.txt
+grid.DE.RData
+indRhineRuhr.rds
 
 ValidationResultsTI.RData
 cvResultsA.RData
 cvResultsB.RData
-cvResultsTI.RData
+
 grid.DE.RData
 
 ^.*\.Rproj$

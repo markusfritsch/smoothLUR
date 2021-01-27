@@ -15,16 +15,16 @@ library(sp)
 
 
 # EEA: AQeReporting data ----
-df.meta <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
+df.meta <- read.csv("data/DE_AQeReporting_2013-2015/DE_2013-2015_metadata.csv",
                     sep = "\t", encoding = "UTF-8")
-df.NO2 <- read.csv("DataFull/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
+df.NO2 <- read.csv("data/DE_AQeReporting_2013-2015/DE_8_2013-2015_aggregated_timeseries.csv",
                    sep = "\t", encoding = "UTF-8")
 
 
 # Choose Air Pollutant of interest
 df.meta <- df.meta[df.meta$AirPollutant=="NO2",]
 
-# Subset to sites contained in df.NO2
+# Subset sites contained in df.NO2
 df.meta <- df.meta[df.meta$AirQualityStationEoICode%in%unique(df.NO2$AirQualityStationEoICode),]
 
 # Choose Aggregation Process
@@ -55,11 +55,14 @@ df.NO2.meta$Year <- 2015
 
 
 # Data on land use; EEA:CLC2012 layer ----
-sGdf.CLC12 <- readGDAL("DataFull/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
+GDALinfo("data/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif")
+sGdf.CLC12 <- readGDAL("data/Data_CLC12/g100_clc12_V18_5a/g100_clc12_V18_5.tif",
                        offset = c(19480,67313),
                        region.dim = c(8700,6500))
 # CRS Name: EUR_ETRS89/LAEA1052 corresponds to EPSG:3035
 
+proj4string(sGdf.CLC12)
+WKT <- wkt(sGdf.CLC12)
 
 # Calculate shares of grouped land use classes within buffer of radius r
 
@@ -106,22 +109,22 @@ for(i in 1:nrow(df.NO2.meta)){
 
 # Data on population density; BKG (Bundesamt für Kartographie und Geodäsie) ----
 # German administrative regions at municipality level
-sPdf.Municipalities <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
+sPdf.Municipalities <- readOGR(dsn = "data/Data_BKG/vg250-ew_ebenen",
                                layer = "VG250_GEM",
                                encoding = "UTF-8",
                                use_iconv = TRUE)
 names(sPdf.Municipalities)
 # for our analysis the following variables are relevant
 # AGS: official municipality key (Amtlicher Gemeindeschlüssel)
-# -> 1.-2. digit: identification number of the federal state
-# -> 3. digit: identification number of the administrative district (Regierungsbezirk),
-# -> 4.-5. digit: identification number of the district or county (Kreis)
+# -> 1.-2. digit: identification number of federal state
+# -> 3. digit: identification number of administrative district (Regierungsbezirk),
+# -> 4.-5. digit: identification number of district or county (Kreis)
 # -> 6.-8. digit: community identification number (Gemeinde)
 # EWZ: number of inhabitants
 sPdf.Municipalities <- sPdf.Municipalities[,c("AGS", "EWZ")]
 
 # Calculate area of each polygon in 'sPdf.Municipalities' and add column to 'sPdf.Municipalities@data'
-proj4string(sPdf.Municipalities) # unit=m
+proj4string(sPdf.Municipalities) # units=m
 # gArea() returns area in m^2, divide by 1000*1000 to get area in km^2
 sPdf.Municipalities$Area_km2 <- gArea(sPdf.Municipalities, byid = TRUE) / 1000000
 
@@ -131,7 +134,8 @@ summary(sPdf.Municipalities$PopDens)
 proj4string(sPdf.Municipalities)
 proj4string(sp.sites)
 
-df.NO2.meta2 <- cbind(df.NO2.meta,over(spTransform(sp.sites,CRS(proj4string(sPdf.Municipalities))),sPdf.Municipalities))
+df.NO2.meta2 <- cbind(df.NO2.meta, over(spTransform(x = sp.sites,CRSobj = CRS(proj4string(sPdf.Municipalities))),
+                                       spTransform(x = sPdf.Municipalities, CRSobj = CRS(proj4string(sPdf.Municipalities)))))
 summary(df.NO2.meta2$PopDens)
 df.NO2.meta2[is.na(df.NO2.meta2$PopDens),]
 # Search on the internet for monitoring sites "DESN024" and "DEMV031" -> they are located in Klingenthal and Rostock, respectively
@@ -148,7 +152,7 @@ names(sPdf.Municipalities)
 df.NO2.meta2[df.NO2.meta2$AQeCode=="DESN024",20:23] <- sPdf.Municipalities@data[sPdf.Municipalities$AGS=="14523160",]
 df.NO2.meta2[df.NO2.meta2$AQeCode=="DEMV031",20:23] <- sPdf.Municipalities@data[sPdf.Municipalities$AGS=="13003000",][-1,]
 
-# Drop columns not further required...
+# Drop columns no longer required...
 df.NO2.meta2 <- df.NO2.meta2[,-c(21,22)]
 
 
@@ -179,7 +183,7 @@ ind.RR <- c(k.ME, k.UN, k.EN, k.MK, k.RE, k.BM, k.NE, k.SU, k.GL, k.VIE, k.WES, 
 
 
 # Data on traffic; EuroGeographics ----
-sLdf.Roads.DE <- readOGR(dsn = "DataFull/Data_EuroGeographics/EGM_10-1-0SHP_20171110/DATA/Countries/DE", layer = "RoadL",
+sLdf.Roads.DE <- readOGR(dsn = "data/Data_EuroGeographics/EGM_10-1-0SHP_20171110/DATA/Countries/DE", layer = "RoadL",
                          encoding = "UTF-8",use_iconv = TRUE)
 class(sLdf.Roads.DE)
 proj4string(sLdf.Roads.DE)
@@ -199,7 +203,8 @@ BufferSites <- gBuffer(spdf.sites2, byid = TRUE,
 # gIntersects: buffer and line segment have at least one point in common
 # gContains: buffer contains line segment
 
-Test.RoadSubset <- gIntersects(spTransform(BufferSites,proj4string(sLdf.Roads.DE)),sLdf.Roads.DE,byid = TRUE)
+Test.RoadSubset <- gIntersects(spTransform(x = BufferSites,CRSobj = CRS(proj4string(sLdf.Roads.DE))),
+                               spTransform(x = sLdf.Roads.DE, CRSobj = CRS(proj4string(sLdf.Roads.DE))),byid = TRUE)
 dim(Test.RoadSubset)
 # [1] 62448   403
 # -> columns are related to buffers around monitoring sites
@@ -244,4 +249,4 @@ df.NO2.meta2$indRegions <- NA
 df.NO2.meta2$indRegions[nchar(df.NO2.meta2$AGS) == 7] <- substr(df.NO2.meta2$AGS[nchar(df.NO2.meta2$AGS) == 7], 1, 1)
 df.NO2.meta2$indRegions[nchar(df.NO2.meta2$AGS) != 7] <- substr(df.NO2.meta2$AGS[nchar(df.NO2.meta2$AGS) != 7], 1, 2)
 
-write.csv(df.NO2.meta2, file = "DATA_MonitoringSites_DE.csv")
+write.csv(df.NO2.meta2, file = "DATA_MonitoringSites_DE.csv", row.names = FALSE)

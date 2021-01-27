@@ -2,32 +2,36 @@
 .Rhistory
 .Rapp.history
 
-
 # Session Data files
 .RData
 *.Rproj
 *.RData
 
-
 # RStudio files
 .Rproj.user/
 .Ruserdata
-
 
 # image directories
 /img
 
 # data directories
-/DataFull/
-/Data_built
-/Data_sources
+/data/Data_BBSR
+/data/Data_BKG
 /data/Data_built
+/data/Data_CLC12
+/data/Data_EuroGeographics
+/data/Data_GADM
 /data/Data_sources
+/data/DE_AQeReporting_2013-2015
+
 
 # old material
 /00_old
 
-
-gitCommands.txt
+# other files
+.Rbuildignore
+dat.Positions.rds
 DATA_MonitoringSites_DE.csv
+gitCommands.txt
 indRhineRuhr.rds
+
