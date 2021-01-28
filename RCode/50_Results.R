@@ -311,6 +311,7 @@ plot_grid(p.sp.effA, p.predA2, nrow = 1)
 rm(list = ls())
 
 load("cvResultsA.RData")
+load("cvResultsA_2021-01-27.RData")
 
 
 ## LOOCV prediction errors
@@ -352,171 +353,21 @@ p.hist
 
 
 
-###
-### Figure 8: Satellite and map images for grid cells centered around three points ----
-### Table 7: Structural predictors of three locations ----
-### Table 8: Prediciton for three locations ----
-###
 
-rm(list = ls())
-
-load("Data_built/grid.DE.RData")
-names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
-
-dat.Positions <- data.frame(matrix(NA, nrow = 3, ncol = ncol(df.grid.DE)+1))
-names(dat.Positions) <- c("Name", names(df.grid.DE))
-
-# 1) Cologne city centre, close to main station (urban)
-# Look on GoogleMaps for coordinates close to Cologne main station and filter respective cells from 'df.grid.DE'
-# View(df.grid.DE[6.95 < df.grid.DE$Lon & df.grid.DE$Lon < 6.96 & 50.93 < df.grid.DE$Lat & df.grid.DE$Lat < 50.94, ])
-dat.Positions[1,1] <- "Cologne City Centre"
-dat.Positions[1,-1] <-  df.grid.DE[df.grid.DE$ID == "295827", ]
-
-# 2) South-east of Mühlheim an der Ruhr (rural)
-#View(df.grid.DE[6.90 < df.grid.DE$Lon & df.grid.DE$Lon < 6.91 & 51.40 < df.grid.DE$Lat & df.grid.DE$Lat < 51.41, ])
-dat.Positions[2,1] <- "MuehlheimRuhr"
-dat.Positions[2,-1] <-  df.grid.DE[df.grid.DE$ID == "262025", ]
-
-# 3) Suburb of Dortmund
-# View(df.grid.DE[7.47 < df.grid.DE$Lon & df.grid.DE$Lon < 7.48 & 51.49 < df.grid.DE$Lat & df.grid.DE$Lat < 51.50, ])
-dat.Positions[3,1] <- "Dortmund"
-dat.Positions[3,-1] <-  df.grid.DE[df.grid.DE$ID == "256215", ]
-
-
-
-
-
-
-WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
-
-df.tmp <- dat.Positions[1,]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
-                          proj4string = CRS(GK3))
-grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
-                          cellsize = c(1000, 1000),
-                          cells.dim = c(1, 1))
-grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
-b <- bbox(grid.tmp)
-sp.b <- SpatialPoints(t(b), CRS(GK3))
-sp.b2 <- spTransform(sp.b, WGS84)
-b
-bbox(sp.b)
-b2 <- qbbox(lat = coordinates(sp.b2)[,2],
-            lon = coordinates(sp.b2)[,1])
-
-# Sys.setenv(LANG = "en")
-# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre.png", type = "google-s")
-# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre2.png", type = "google")
-
-
-
-df.tmp <- dat.Positions[2,]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
-                          proj4string = CRS(GK3))
-
-grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
-                          cellsize = c(1000, 1000),
-                          cells.dim = c(1, 1))
-grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
-b <- bbox(grid.tmp)
-sp.b <- SpatialPoints(t(b), CRS(GK3))
-sp.b2 <- spTransform(sp.b, WGS84)
-b
-bbox(sp.b)
-b2 <- qbbox(lat = coordinates(sp.b2)[,2],
-            lon = coordinates(sp.b2)[,1])
-
-#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim.png", type = "google-s")
-#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim2.png", type = "google")
-
-
-df.tmp <- dat.Positions[3,]
-spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
-                          proj4string = CRS(GK3))
-
-grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
-                          cellsize = c(1000, 1000),
-                          cells.dim = c(1, 1))
-grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
-
-b <- bbox(grid.tmp)
-sp.b <- SpatialPoints(t(b), CRS(GK3))
-sp.b2 <- spTransform(sp.b, WGS84)
-b
-bbox(sp.b)
-b2 <- qbbox(lat = coordinates(sp.b2)[,2],
-            lon = coordinates(sp.b2)[,1])
-
-#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund.png", type = "google-s")
-#GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund2.png", type = "google")
-
-
-
-
-
-## Derive predictions from LUR models based on additive regression smoothers for the three locations
-
-load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
-datB  <- dat[dat$AQeType == "background", ]
-datTI <- dat[dat$AQeType != "background", ]
-
-smoothA <- smoothLUR(data = dat
-                     ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
-                            #					,"Seap", "Airp", "Constr"
-                            ,"UrbGreen", "Agri", "Forest", "PopDens"
-                            , "PriRoad", "SecRoad", "FedAuto", "LocRoute")
-                     ,spVar1 = "Lon"
-                     ,spVar2 = "Lat"
-                     ,y = "Y"
-                     ,thresh = 0.95)
-
-
-smoothB <- smoothLUR(data = datB
-                     ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
-                            #					,"Seap", "Airp", "Constr"
-                            ,"UrbGreen", "Agri", "Forest", "PopDens"
-                            ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
-                     ,spVar1 = "Lon"
-                     ,spVar2 = "Lat"
-                     ,y = "Y"
-                     ,thresh = 0.95)
-
-
-smoothTI <- smoothLUR(data = datTI
-                      ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
-                             #					,"Seap", "Airp", "Constr"
-                             ,"UrbGreen", "Agri", "Forest", "PopDens"
-                             ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
-                      ,spVar1 = "Lon"
-                      ,spVar2 = "Lat"
-                      ,y = "Y"
-                      ,thresh = 0.95)
-
-
-
-dat.Positions$smoothB  <- predict(object = smoothB, newdata = dat.Positions)
-dat.Positions$smoothTI <- predict(object = smoothTI, newdata = dat.Positions)
-dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
-
-#saveRDS(object = dat.Positions, file = "Data_built/dat.Positions.rds")
 
 
 
 
 
 ###
-### Figure 7: Interpolation maps derived from smoothB and smoothTI across Rhine-Ruhr metropolitan region ----
-### smoothB (smoothTI) refers to LUR model based on additive regression smoothers
-### using data observed at background (traffic/industrial) monitoring sites
+### Fig.7: Interpolation maps derived from smoothB and smoothTI across Rhine-Ruhr metropolitan region (smoothB (smoothTI) refers to LUR model based on additive regression smoothers using data observed at background (traffic/industrial) monitoring sites)
 ###
 
 rm(list = ls())
 
 
 # Load grid over Germany
-load("Data_built/grid.DE.RData")
+load("data/Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
@@ -661,10 +512,169 @@ ggarrange(p.predB.RR2, p.predTI.RR2, widths = c(1,1), common.legend = TRUE, lege
 
 
 
+
+
+
+
+
+
+
 ###
-### Figure B.9: Partial residual plots derived from parB ----
-### parB refers to LUR model based on parametric polyonomials
-### using data observed at background monitoring sites
+### Fig.8: Satellite and map images for grid cells centered around three points; Tab.7: Structural predictors of three locations; Tab.8: Prediciton for three locations ----
+###
+
+rm(list = ls())
+
+load("data/Data_built/grid.DE.RData")
+names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
+
+dat.Positions <- data.frame(matrix(NA, nrow = 3, ncol = ncol(df.grid.DE)+1))
+names(dat.Positions) <- c("Name", names(df.grid.DE))
+
+# 1) Cologne city centre, close to main station (urban)
+# Look on GoogleMaps for coordinates close to Cologne main station and filter respective cells from 'df.grid.DE'
+# View(df.grid.DE[6.95 < df.grid.DE$Lon & df.grid.DE$Lon < 6.96 & 50.93 < df.grid.DE$Lat & df.grid.DE$Lat < 50.94, ])
+dat.Positions[1,1] <- "Cologne City Centre"
+dat.Positions[1,-1] <-  df.grid.DE[df.grid.DE$ID == "295827", ]
+
+# 2) South-east of Mühlheim an der Ruhr (rural)
+#View(df.grid.DE[6.90 < df.grid.DE$Lon & df.grid.DE$Lon < 6.91 & 51.40 < df.grid.DE$Lat & df.grid.DE$Lat < 51.41, ])
+dat.Positions[2,1] <- "MuehlheimRuhr"
+dat.Positions[2,-1] <-  df.grid.DE[df.grid.DE$ID == "262025", ]
+
+# 3) Suburb of Dortmund
+# View(df.grid.DE[7.47 < df.grid.DE$Lon & df.grid.DE$Lon < 7.48 & 51.49 < df.grid.DE$Lat & df.grid.DE$Lat < 51.50, ])
+dat.Positions[3,1] <- "Dortmund"
+dat.Positions[3,-1] <-  df.grid.DE[df.grid.DE$ID == "256215", ]
+
+
+
+
+
+
+WGS84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+GK3 <- "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
+
+df.tmp <- dat.Positions[1,]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
+                          proj4string = CRS(GK3))
+grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
+                          cellsize = c(1000, 1000),
+                          cells.dim = c(1, 1))
+grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
+b <- bbox(grid.tmp)
+sp.b <- SpatialPoints(t(b), CRS(GK3))
+sp.b2 <- spTransform(sp.b, WGS84)
+b
+bbox(sp.b)
+b2 <- qbbox(lat = coordinates(sp.b2)[,2],
+            lon = coordinates(sp.b2)[,1])
+
+# Sys.setenv(LANG = "en")
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre.png", type = "google-s")
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre2.png", type = "google")
+
+
+
+df.tmp <- dat.Positions[2,]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
+                          proj4string = CRS(GK3))
+
+grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
+                          cellsize = c(1000, 1000),
+                          cells.dim = c(1, 1))
+grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
+b <- bbox(grid.tmp)
+sp.b <- SpatialPoints(t(b), CRS(GK3))
+sp.b2 <- spTransform(sp.b, WGS84)
+b
+bbox(sp.b)
+b2 <- qbbox(lat = coordinates(sp.b2)[,2],
+            lon = coordinates(sp.b2)[,1])
+
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim.png", type = "google-s")
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapMuehlheim2.png", type = "google")
+
+
+df.tmp <- dat.Positions[3,]
+spdf.tmp <- SpatialPoints(coords = cbind(df.tmp$Lon.GK3, df.tmp$Lat.GK3),
+                          proj4string = CRS(GK3))
+
+grid.topo <- GridTopology(cellcentre.offset = coordinates(spdf.tmp)[1,],
+                          cellsize = c(1000, 1000),
+                          cells.dim = c(1, 1))
+grid.tmp <- SpatialGrid(grid.topo, proj4string = GK3)
+
+b <- bbox(grid.tmp)
+sp.b <- SpatialPoints(t(b), CRS(GK3))
+sp.b2 <- spTransform(sp.b, WGS84)
+b
+bbox(sp.b)
+b2 <- qbbox(lat = coordinates(sp.b2)[,2],
+            lon = coordinates(sp.b2)[,1])
+
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund.png", type = "google-s")
+# GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapDortmund2.png", type = "google")
+
+
+
+
+
+## Derive predictions from LUR models based on additive regression smoothers for the three locations
+
+load("data/monSitesDE.rda")
+dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+datB  <- dat[dat$AQeType == "background", ]
+datTI <- dat[dat$AQeType != "background", ]
+
+smoothA <- smoothLUR(data = dat
+                     ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
+                            #					,"Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "PopDens"
+                            , "PriRoad", "SecRoad", "FedAuto", "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,y = "Y"
+                     ,thresh = 0.95)
+
+
+smoothB <- smoothLUR(data = datB
+                     ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
+                            #					,"Seap", "Airp", "Constr"
+                            ,"UrbGreen", "Agri", "Forest", "PopDens"
+                            ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+                     ,spVar1 = "Lon"
+                     ,spVar2 = "Lat"
+                     ,y = "Y"
+                     ,thresh = 0.95)
+
+
+smoothTI <- smoothLUR(data = datTI
+                      ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
+                             #					,"Seap", "Airp", "Constr"
+                             ,"UrbGreen", "Agri", "Forest", "PopDens"
+                             ,"PriRoad", "SecRoad", "FedAuto", "LocRoute")
+                      ,spVar1 = "Lon"
+                      ,spVar2 = "Lat"
+                      ,y = "Y"
+                      ,thresh = 0.95)
+
+
+
+dat.Positions$smoothB  <- predict(object = smoothB, newdata = dat.Positions)
+dat.Positions$smoothTI <- predict(object = smoothTI, newdata = dat.Positions)
+dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
+
+#saveRDS(object = dat.Positions, file = "data/Data_built/dat.Positions.rds")
+
+
+
+
+
+
+
+###
+### Fig.B.9: Partial residual plots derived from parB (LUR model based on parametric polyonomials using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -720,9 +730,7 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
 
 
 ###
-### Figure B.10: Partial effects of smoothB ----
-### smoothB refers to LUR model based on additive regression smoothers
-### using data observed at background monitoring sites
+### Fig.B.10: Partial effects of smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -808,16 +816,14 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
 
 
 ###
-### Figure B.11: Interpolation maps derived from smoothB ----
-### smoothB refers to LUR model based on additive regression smoothers
-### using data observed at background monitoring sites
+### Fig.B.11: Interpolation maps derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
 
 
 # Load grid over Germany
-load("Data_built/grid.DE.RData")
+load("data/Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
@@ -969,7 +975,7 @@ p.predB <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
 
 # Data on population density; BKG (Bundesamt für Kartographie und Geodäsie)
 # German administrative regions at municipality level
-sPdf.Municipalities <- readOGR(dsn = "DataFull/Data_BKG/vg250-ew_ebenen",
+sPdf.Municipalities <- readOGR(dsn = "data/Data_BKG/vg250-ew_ebenen",
                                layer = "VG250_GEM",
                                encoding = "UTF-8",
                                use_iconv = TRUE)
@@ -1008,9 +1014,7 @@ plot_grid(p.sp.effB, p.predB2, nrow = 1)
 
 
 ###
-### Figure B.12, right plot: s_{u,p}(PopDens) derived from smoothB ----
-### smoothB referst to LUR model based on additive regression smoothers
-### using data observed at background monitoring sites
+### Fig.B.12, right plot: s_{u,p}(PopDens) derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -1078,17 +1082,16 @@ p.spline.popDens
 
 
 
+
 ###
-### Figure B.12, left plot: Estimated spatial effect in smoothB with two locations ----
-### smoothA (smoothB) refers to LUR model based on additive regression smoothers
-### using data observed at all (background) monitoring sites
+### Fig.B.12, left plot: Estimated spatial effect in smoothB with two locations (smoothA (smoothB) refers to LUR model based on additive regression smoothers using data observed at all (background) monitoring sites)
 ###
 
 rm(list = ls())
 
 
 # Load grid over Germany
-load("Data_built/grid.DE.RData")
+load("data/Data_built/grid.DE.RData")
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
