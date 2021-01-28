@@ -27,6 +27,7 @@ load("data/monSitesDE.rda")
 dat	<- monSitesDE[, c(2,4:7,9:24)]
 
 datA  <- dat
+datA$LonLat  <- dat$Lon*dat$Lat
 datB  <- dat[dat$AQeType=="background",]
 datTI <- dat[dat$AQeType!="background",]
 
@@ -46,6 +47,14 @@ parA <- parLUR(data = datA
                ,y = "Y"
                ,dirEff = c(0,0,-1,1,1,1,1,-1,0,-1,1,1,1,1,1)
                ,thresh = 0.95)
+parA2 <- parLUR(data = datA
+                ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
+                       #				, "Seap", "Airp", "Constr"
+                       ,"UrbGreen", "Agri", "Forest", "PopDens"
+                       ,"PriRoad", "SecRoad", "FedAuto", "LocRoute", "LonLat")
+                ,y = "Y"
+                ,dirEff = c(0,0,-1,1,1,1,1,-1,0,-1,1,1,1,1,1,0)
+                ,thresh = 0.95)
 parB <- parLUR(data = datB
                ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
                       #				, "Seap", "Airp", "Constr"
@@ -64,6 +73,7 @@ parTI <- parLUR(data = datTI
                ,thresh = 0.95)
 
 xtable(summary(parA)$coefficients[,1:2], digits = 3); round(summary(parA)$adj.r.squared, 2)
+xtable(summary(parA2)$coefficients[,1:2], digits = 3); round(summary(parA2)$adj.r.squared, 2)
 xtable(summary(parB)$coefficients[,1:2], digits = 3); round(summary(parB)$adj.r.squared, 2)
 xtable(summary(parTI)$coefficients[,1:2], digits = 3); round(summary(parTI)$adj.r.squared, 2)
 
@@ -74,6 +84,7 @@ res.dist.inv <- 1/(res.dist^2)
 diag(res.dist.inv) <- 0
 Moran.I(resid(parA), res.dist.inv)
 # the null that there is no spatial autocorrelation in the error terms is rejected at every reasonable significance level
+Moran.I(resid(parA2), res.dist.inv)
 
 
 # Moran's I: background
