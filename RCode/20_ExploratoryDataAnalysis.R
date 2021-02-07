@@ -197,7 +197,7 @@ p.DE2 <- p.DE +
 
 
 
-# png("../img/MonitoringSitesPopDens_RR_3.png", width = 900, height = 675)
+# png("../img/MonitoringSitesPopDens_RR_3.png", width = 1151, height = 777) #width = 900, height = 675)
 # #pdf("../img/MonitoringSitesPopDens_RR_3.pdf", width = 13, height = 8)
 ggdraw() +
  draw_plot(p.DE2, 0, 0, 0.5, 1) +
