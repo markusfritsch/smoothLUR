@@ -504,11 +504,12 @@ dat.Positions <- readRDS("dat.Positions.rds")
               colour = brewer.pal(11, "BrBG")[10],
               nudge_x = -2500, nudge_y = 2500, size = 5, fontface = "bold"))
 
+p.predBTI.RR2 <- ggarrange(p.predB.RR2, p.predTI.RR2, widths = c(1,1), common.legend = TRUE, legend = "bottom")
+
 #png("../img/PredBackTrIndRRWithPointsSP.png", width = 900, height = 600)
-ggarrange(p.predB.RR2, p.predTI.RR2, widths = c(1,1), common.legend = TRUE, legend = "bottom")
+#pdf("../img/PredBackTrIndRRWithPointsSP.pdf", width = 12, height = 8)
+p.predBTI.RR2
 #dev.off()
-
-
 
 
 
@@ -573,7 +574,6 @@ b2 <- qbbox(lat = coordinates(sp.b2)[,2],
 # Sys.setenv(LANG = "en")
 # GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre.png", type = "google-s")
 # GetMap.bbox(lonR = b2$lonR, latR = b2$latR, destfile = "../img/MapCologneCityCentre2.png", type = "google")
-
 
 
 df.tmp <- dat.Positions[2,]
