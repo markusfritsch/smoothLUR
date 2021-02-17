@@ -6,7 +6,7 @@
 #' 23 variables for 356,793 grid cells, which characterize the area
 #' covered by the grid cells. Details on the data sources and how the
 #' data were obtained are provided in
-#' \insertCite{Fritsch2021smooth;textual}{smoothLURdiB}.
+#' \insertCite{Fritsch2021diB;textual}{smoothLUR}.
 #'
 #' The data given for each grid cell include longitude, latitude, and
 #' altitude. Additional information which characterizes the area

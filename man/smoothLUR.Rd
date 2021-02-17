@@ -36,16 +36,16 @@ An object of class `smoothLUR` with the following elements:
 It has `...`, `...`, and `...` methods.
 }
 \description{
-The smoothLUR package provides functions for smooth land use
-regression modeling and parametric benchmarks to reproduce
-the results reported in Fritsch and Behm (2020).
+The smoothLUR package provides functions and datasets for
+smooth land use regression modeling and parametric benchmarks
+to reproduce the results reported in Fritsch and Behm (2021).
 The main functions of the package are \code{smoothLUR},
 \code{parLUR}, and the evaluation functions \code{kFoldCV} and
 \code{looCV}.
 
 \code{smoothLUR} fits a smooth land use regression (LUR) model
     using the gam() function from the mgcv package. The procedure
-    is outlined in \insertCite{Fritsch2020smooth;textual}{smoothLUR}
+    is outlined in \insertCite{Fritsch2021smooth;textual}{smoothLUR}
 }
 \examples{
 \dontrun{

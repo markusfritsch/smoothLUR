@@ -3,8 +3,18 @@ bibentry(bibtype = "unpublished",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
 	note = "Working paper",
-	year = "2020",
+	year = "2021",
 	header = "For citing the article corresponding to smoothLUR in publication use:"
+	)
+
+bibentry(bibtype = "unpublished",
+	title = "{Data for modeling nitrogen dioxide concentration levels across
+Germany}",
+	author = c(person("Markus", "Fritsch"),
+		person("Svenia", "Behm")),
+	note = "Working paper",
+	year = "2021",
+	header = "For citing the article corresponding to the datasets in publication use:"
 	)
 
 bibentry(bibtype = "manual",

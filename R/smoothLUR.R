@@ -15,7 +15,7 @@
 #'
 #' \code{smoothLUR} fits a smooth land use regression (LUR) model
 #'     using the gam() function from the mgcv package. The procedure
-#'     is outlined in \insertCite{Fritsch2020smooth;textual}{smoothLUR}
+#'     is outlined in \insertCite{Fritsch2021smooth;textual}{smoothLUR}
 #'
 #' @aliases smoothLUR
 #' @param data A data set which contains the dependent variable and

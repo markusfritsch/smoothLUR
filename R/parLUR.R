@@ -16,11 +16,11 @@
 #'
 #' \code{parLUR} fits a parametric land use regression (LUR) model employing
 #'    parametric polynomials in a forward stepwise approach. The function
-#'    allows to carry out the ESCAPE procedure outlined in
+#'    allows to carry out the ESCAPE procedure outlined in, for example,
 #'    \insertCite{Beelen.2013;textual}{smoothLUR},
 #'    \insertCite{Eeftens.2016;textual}{smoothLUR},
 #'    \insertCite{Wolf.2017;textual}{smoothLUR}, and
-#'    \insertCite{Fritsch2020smooth;textual}{smoothLUR}.
+#'    \insertCite{Fritsch2021smooth;textual}{smoothLUR}.
 #'
 #' @aliases parLUR
 #' @param data A data set which contains the dependent variable and the

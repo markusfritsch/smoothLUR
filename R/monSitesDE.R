@@ -6,7 +6,7 @@
 #' at 403 monitoring sites and meta-data on the location and the
 #' area surrounding the monitoring sites. Details on the data
 #' sources and how the data were obtained are provided in
-#' \insertCite{Fritsch2021smooth;textual}{smoothLURdiB}.
+#' \insertCite{Fritsch2021diB;textual}{smoothLUR}.
 #'
 #' The meta-data on the location include longitude, latitude, and
 #' altitude. The surrounding area is characterized by computing
