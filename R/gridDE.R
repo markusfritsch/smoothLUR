@@ -1,0 +1,89 @@
+#' Grid data for Germany on land use, population density, and road lengths
+#'
+#' Data on land use, population density, and road lengths for different
+#' types of roads employed in \insertCite{Fritsch2021smooth;textual}{smoothLUR}.
+#' The dataset represents Germany on a 1\,x\,1\,km grid and contains
+#' 23 variables for 356,793 grid cells, which characterize the area
+#' covered by the grid cells. Details on the data sources and how the
+#' data were obtained are provided in
+#' \insertCite{Fritsch2021smooth;textual}{smoothLURdiB}.
+#'
+#' The data given for each grid cell include longitude, latitude, and
+#' altitude. Additional information which characterizes the area
+#' covered by the grid cells is given via fractions of various land
+#' cover classes, population density, and the length of the road
+#' traffic network.
+#'
+#' @name gridDE
+#'
+#' @docType data
+#'
+#' @usage data(gridDE)
+#'
+#' @format A dataset with 356793 rows and 23 variables containing:
+#' \describe{
+#' \item{ID}{grid cell identifier}
+#' \item{Lon.GK3}{geocoordinate longitude (Gauss-Kr\"uger) at which
+#'    the monitoring site is located}
+#' \item{Lat.GK3}{geocoordinate latitude (Gauss-Kr\"uger) at which
+#'    the monitoring site is located}
+#' \item{Lon.WGS84}{geocoordinate longitude (decimal degrees) at which
+#'    the monitoring site is located}
+#' \item{Lat.WGS84}{geocoordinate latitude (decimal degrees) at which
+#'    the monitoring site is located}
+#' \item{Alt}{altitude (meter above sea level) at which the
+#'    monitoring site is located}
+#' \item{HighDens}{proportion of high density residential area
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{LowDens}{proportion of low density residential area
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{Ind}{proportion of industrial area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{Transp}{proportion of area attributed to transport within
+#'    a buffer of radius 1km around the monitoring site}
+#' \item{Seap}{proportion of area attributed to seaport within a
+#'    buffer of radius 1km around the monitoring site}
+#' \item{Airp}{proportion of area attributed to airport within a
+#'    buffer of radius 1km around the monitoring site}
+#' \item{Constr}{proportion of area attributed to construction
+#'    within a buffer of radius 1km around the monitoring site}
+#' \item{UrbGreen}{proportion of area attributed to urban green
+#'    spaces within a buffer of radius 1km around the monitoring
+#'    site}
+#' \item{Agri}{proportion of agricultural area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{Forest}{proportion of forestry area within a buffer of
+#'    radius 1km around the monitoring site}
+#' \item{PopDens}{population density (inhabitants per km^2) at
+#'    municipality key level}
+#' \item{PriRoad}{primary roads (length in meter) within buffer of
+#'    radius 1km around the monitoring site}
+#' \item{SecRoad}{secondary roads (length in meter) within buffer
+#'    of radius 1km around the monitoring site}
+#' \item{FedAuto}{federal autobahn (length in meter) within buffer
+#'    of radius 1km around the monitoring site}
+#' \item{LocRoute}{local routes (length in meter) within buffer of
+#'    radius 1km around the monitoring site}
+#' \item{IndRegions}{German federal state in which the monitoring
+#'    site is located}
+#' }
+#'
+#' @keywords datasets
+#'
+#' @references
+#' \insertAllCited{}
+#'
+#' @source \href{http://land.copernicus.eu/pan-european/corine-land-cover/clc-2012/view}{European Environmental Agency: CORINE land cover (CLC) 2015 raster data - version 18.5.1 (09/2016)}
+#' @source \href{https://eurogeographics.org/maps-for-europe/open-data/}{EuroGeographics: Euroglobalmap (egm), v9.0}
+#' @source \href{https://gdz.bkg.bund.de/index.php/default/digitale-geodaten.html}{Federal Government for Geo-Information and Geodesy, DGM200 GK3 GRID-ASCII, GeoBasis-DE / BKG 2015}
+#' @source \href{https://gdz.bkg.bund.de/index.php/default/digitale-geodaten.html}{Federal Government for Geo-Information and Geodesy, VG250-EW Ebenen GK3 Shape, GeoBasis-DE /BKG 2015}
+#'
+#' @examples
+#' \dontrun{
+#'   data(gridDE, package = "smoothLUR")
+#'   pol <- gridDE$FedAuto
+#'   typ <- as.factor(gridDE$IndRegions)
+#'   \donttest{plot(y = pol, x = typ)}
+#' }
+#'
+NULL

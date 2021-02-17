@@ -2,7 +2,7 @@ Package: smoothLUR
 Type: Package
 Title: Smooth Land Use Regression Modeling
 Version: 0.1.1
-Date: 2021-01-28
+Date: 2021-02-17
 Authors@R: c(person("Markus", "Fritsch", role = c("aut", "cre"),
 		email = "Markus.Fritsch@uni-Passau.de"),
 	person("Svenia", "Behm", role = c("aut"),
@@ -18,7 +18,7 @@ Suggests: testthat (>= 2.3.2),
 	R.rsp (>= 0.44.0)
 RdMacros: Rdpack
 LazyData: true
-Description: Functions for smooth land use regression (LUR) modeling.
+Description: Functions and data for smooth land use regression (LUR) modeling.
 License: GPL (>=2)
 URL: https://github.com/markusfritsch/smoothLUR
 BugReports: https://github.com/markusfritsch/smoothLUR/issues

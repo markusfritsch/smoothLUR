@@ -1,10 +1,12 @@
 #' Average NO2 pollution level data for German monitoring sites
 #'
 #' Data on average NO2 pollution levels for German monitoring sites
-#' for 2015 used in \insertCite{Fritsch2020smooth;textual}{smoothLUR}.
+#' for 2015 used in \insertCite{Fritsch2021smooth;textual}{smoothLUR}.
 #' The dataset contains NO2 pollution concentration levels recorded
 #' at 403 monitoring sites and meta-data on the location and the
-#' area surrounding the monitoring sites.
+#' area surrounding the monitoring sites. Details on the data
+#' sources and how the data were obtained are provided in
+#' \insertCite{Fritsch2021smooth;textual}{smoothLURdiB}.
 #'
 #' The meta-data on the location include longitude, latitude, and
 #' altitude. The surrounding area is characterized by computing
@@ -67,8 +69,8 @@
 #'    of radius 1km around the monitoring site}
 #' \item{LocRoute}{local routes (length in meter) within buffer of
 #'    radius 1km around the monitoring site}
-#' \item{IndRegions}{indicator for the German federal state the
-#'    monitoring site is located in}
+#' \item{IndRegions}{German federal state in which the monitoring
+#'    site is located}
 #' }
 #'
 #' @keywords datasets
