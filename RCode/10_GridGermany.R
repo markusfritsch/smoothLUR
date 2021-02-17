@@ -240,9 +240,9 @@ names(df.grid.final) <- c("ID", "Lon.GK3", "Lat.GK3", "Lon.WGS84", "Lat.WGS84", 
                           "AGS", "PopDens", "PriRoad", "SecRoad", "FedAuto", "LocRoute")
 
 # Add column of type factor indicating the municipality
-df.grid.final$indRegions <- NA
-df.grid.final$indRegions[nchar(df.grid.final$AGS) == 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) == 7], 1, 1)
-df.grid.final$indRegions[nchar(df.grid.final$AGS) != 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) != 7], 1, 2)
+df.grid.final$IndRegions <- NA
+df.grid.final$IndRegions[nchar(df.grid.final$AGS) == 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) == 7], 1, 1)
+df.grid.final$IndRegions[nchar(df.grid.final$AGS) != 7] <- substr(df.grid.final$AGS[nchar(df.grid.final$AGS) != 7], 1, 2)
 
 
 # df.grid.DE <- df.grid.final

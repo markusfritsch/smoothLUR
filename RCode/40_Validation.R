@@ -497,7 +497,7 @@ for(l in 1:100){
 			,seed = l
 			,k = 10
 			,strat = FALSE
-			,indRegions = "indRegions"
+			,indRegions = "IndRegions"
 			,loocv = FALSE
   			)
 }
