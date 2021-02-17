@@ -8,9 +8,7 @@
 library(data.table)
 library(ggplot2)
 library(RColorBrewer)
-#library(rgdal)
-#library(rgeos)
-#library(sp)
+library(sp)
 library(cowplot)
 
 
