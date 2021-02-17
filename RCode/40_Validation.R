@@ -22,7 +22,7 @@ library(smoothLUR)
 
 
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat	<- monSitesDE
 
 
 

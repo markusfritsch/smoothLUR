@@ -30,7 +30,7 @@ library(sp)
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat	<- monSitesDE
 
 smoothA <- smoothLUR(data = dat
                      ,x = c("Lon", "Lat", "Alt", "HighDens", "LowDens", "Ind", "Transp"
@@ -124,7 +124,7 @@ names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
 load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 
@@ -315,7 +315,7 @@ load("cvResultsA_2021-01-27.RData")
 
 
 ## LOOCV prediction errors
-loocvA <- cbind(loocv.A$df.err, monSitesDE[,c(1,7)])
+loocvA <- cbind(loocv.A$df.err, monSitesDE[,c(1,8)])
 
 
 loocvA.bg <- loocvA[loocvA$AQeType == "background", ]
@@ -374,7 +374,7 @@ names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
 load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 
@@ -623,7 +623,7 @@ b2 <- qbbox(lat = coordinates(sp.b2)[,2],
 ## Derive predictions from LUR models based on additive regression smoothers for the three locations
 
 load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 
@@ -680,7 +680,7 @@ dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	 <- monSitesDE[, c(1,2,4:7,9:24)]
+dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
 parB <- parLUR(data = datB
@@ -736,7 +736,7 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	 <- monSitesDE[, c(1,2,4:7,9:24)]
+dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
 smoothB <- smoothLUR(data = datB
@@ -830,7 +830,7 @@ names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
 load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 
@@ -1020,7 +1020,7 @@ plot_grid(p.sp.effB, p.predB2, nrow = 1)
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	 <- monSitesDE[, c(1,2,4:7,9:24)]
+dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
 smoothB <- smoothLUR(data = datB
@@ -1097,7 +1097,7 @@ df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland const
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 load("data/monSitesDE.rda")
-dat  	<- monSitesDE[, c(1,2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 

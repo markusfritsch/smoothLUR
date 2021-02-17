@@ -24,7 +24,7 @@ library(smoothLUR)
 
 
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(2,4:7,9:24)]
+dat	<- monSitesDE
 
 datA  <- dat
 datA$LonLat  <- dat$Lon*dat$Lat

@@ -41,7 +41,7 @@ sPdf.Municipalities <- readOGR(dsn = "data/Data_BKG/vg250-ew_ebenen",
 load("data/Data_built/grid.DE.RData")
 load("data/monSitesDE.rda")
 
-dat  	<- monSitesDE[, c(2,4:7,9:24)]
+dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
 
@@ -214,7 +214,7 @@ ggdraw() +
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(2,4:7,9:24)]
+dat	<- monSitesDE
 
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
@@ -234,7 +234,7 @@ nrow(datTI); mean(datTI$Y); sd(datTI$Y); fivenum(datTI$Y)
 rm(list = ls())
 
 load("data/monSitesDE.rda")
-dat	<- monSitesDE[, c(2,4:7,9:24)]
+dat	<- monSitesDE
 
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
