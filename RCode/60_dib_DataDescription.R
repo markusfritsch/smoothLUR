@@ -50,7 +50,6 @@ dat	<- monSitesDE
 
 dat.long <- melt(dat[,c(2,7,10:19,21:25)])
 dat.long$AQeType <- dat$AQeType
-dat.long$`Type of monitoring sites`<- ifelse(dat.long$AQeType=="background","Background","Traffic/Industrial")
 
 p.box <- ggplot(data = dat.long, aes(x = variable, y = value, fill = AQeType, color = AQeType)) +
   theme_bw() +
@@ -72,6 +71,31 @@ pdf("../img/BoxplotsVariablesMonSitesDE.pdf",width = 12, height = 9)
 p.box
 dev.off()
 
+
+dat.long2 <- rbind(dat.long[,c(1:2)],dat.long[,c(1:2)])
+dat.long2$AQeType <- NA
+dat.long2$AQeType[1:6851] <- dat.long[,3]
+dat.long2$AQeType[6852:13702] <- "All"
+
+p.box2 <- ggplot(data = dat.long2, aes(x = variable, y = value, fill = AQeType, color = AQeType)) +
+  theme_bw() +
+  xlab("") +
+  ylab("") +
+  geom_boxplot(fill=NA,lwd=0.75) +
+  facet_wrap(~variable,scale="free",nrow = 6)+
+  scale_color_manual(values = brewer.pal(9, "BrBG")[c(9,1,2,3)],
+                     aesthetics = c("fill", "colour"))+
+  theme(axis.text.y = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.text = element_text(size = 14),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.075))
+
+pdf("../img/BoxplotsVariablesMonSitesDE2.pdf",width = 12, height = 9)
+p.box2
+dev.off()
 
 
 
