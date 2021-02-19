@@ -75,7 +75,7 @@ dev.off()
 dat.long2 <- rbind(dat.long[,c(1:2)],dat.long[,c(1:2)])
 dat.long2$AQeType <- NA
 dat.long2$AQeType[1:6851] <- dat.long[,3]
-dat.long2$AQeType[6852:13702] <- "All"
+dat.long2$AQeType[6852:13702] <- "all"
 
 p.box2 <- ggplot(data = dat.long2, aes(x = variable, y = value, fill = AQeType, color = AQeType)) +
   theme_bw() +
@@ -89,7 +89,7 @@ p.box2 <- ggplot(data = dat.long2, aes(x = variable, y = value, fill = AQeType, 
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         strip.text = element_text(size = 14),
-        legend.title = element_text(size = 14),
+        legend.title = element_blank(),
         legend.text = element_text(size = 14),
         legend.position = c(0.8, 0.075))
 
