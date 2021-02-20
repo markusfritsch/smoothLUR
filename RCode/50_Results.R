@@ -24,7 +24,7 @@ library(sp)
 
 
 ###
-### Fig.4: Partial effects of smoothA (LUR model based on additive regression smoothers using data observed at all monitoring sites)
+### Fig.5: Partial effects of smoothA (LUR model based on additive regression smoothers using data observed at all monitoring sites)
 ###
 
 rm(list = ls())
@@ -110,7 +110,7 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
 
 
 ###
-### Fig.5: Interpolation maps derived from smoothA (LUR model based on additive regression smoothers using data observed at all monitoring sites)
+### Fig.6: Interpolation maps derived from smoothA (LUR model based on additive regression smoothers using data observed at all monitoring sites)
 ###
 
 rm(list = ls())
@@ -175,7 +175,7 @@ df.grid.DE$smoothTI.sp	<- predict(object = smoothTI, newdata = df.grid.DE, type=
 brks2.sp <- seq(-12, 8, 4)
 
 
-#estimated spatial effect in smoothA (left plot in Figure 5)
+#estimated spatial effect in smoothA (left plot in Figure 6)
 p.sp.effA <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
@@ -242,7 +242,7 @@ df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(datTI$Y)]		<- max(datTI$Y)				# re
 brks2 <- seq(10, 70, 20)
 
 
-###map visualizing conditional mean annual NO2 concentration levels derived from smoothA (right plot in Figure 5)
+###map visualizing conditional mean annual NO2 concentration levels derived from smoothA (right plot in Figure 6)
 p.predA <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +
   xlab("") +
@@ -305,7 +305,7 @@ plot_grid(p.sp.effA, p.predA2, nrow = 1)
 
 
 ###
-### Fig.6: Histogram and empirical density curve for LOOCV prediction errors (at background & traffic/industrial monitoring sites for LUR model based on additive regression smoothers smoothA)
+### Fig.7: Histogram and empirical density curve for LOOCV prediction errors (at background & traffic/industrial monitoring sites for LUR model based on additive regression smoothers smoothA)
 ###
 
 rm(list = ls())
@@ -360,7 +360,7 @@ p.hist
 
 
 ###
-### Fig.7: Interpolation maps derived from smoothB and smoothTI across Rhine-Ruhr metropolitan region (smoothB (smoothTI) refers to LUR model based on additive regression smoothers using data observed at background (traffic/industrial) monitoring sites)
+### Fig.8: Interpolation maps derived from smoothB and smoothTI across Rhine-Ruhr metropolitan region (smoothB (smoothTI) refers to LUR model based on additive regression smoothers using data observed at background (traffic/industrial) monitoring sites)
 ###
 
 rm(list = ls())
@@ -521,7 +521,7 @@ p.predBTI.RR2
 
 
 ###
-### Fig.8: Satellite and map images for grid cells centered around three points; Tab.7: Structural predictors of three locations; Tab.8: Prediciton for three locations ----
+### Fig.9: Satellite and map images for grid cells centered around three points; Tab.7: Structural predictors of three locations; Tab.8: Prediciton for three locations ----
 ###
 
 rm(list = ls())
@@ -674,7 +674,7 @@ dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
 
 
 ###
-### Fig.B.9: Partial residual plots derived from parB (LUR model based on parametric polyonomials using data observed at background monitoring sites)
+### Fig.B.10: Partial residual plots derived from parB (LUR model based on parametric polyonomials using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -730,7 +730,7 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
 
 
 ###
-### Fig.B.10: Partial effects of smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
+### Fig.B.11: Partial effects of smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -816,7 +816,7 @@ ggplot(data = dt.tmp, aes(x = x, y = value)) +
 
 
 ###
-### Fig.B.11: Interpolation maps derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
+### Fig.B.12: Interpolation maps derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -881,7 +881,7 @@ df.grid.DE$smoothTI.sp	<- predict(object = smoothTI, newdata = df.grid.DE, type=
 brks2.sp <- seq(-12, 8, 4)
 
 
-#estimated spatial effect in smoothB (left plot in Figure B.11)
+#estimated spatial effect in smoothB (left plot in Figure B.12)
 p.sp.effB <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +  #theme_bw() +
   xlab("") +
@@ -949,7 +949,7 @@ df.grid.DE$smoothTI[df.grid.DE$smoothTI > max(datTI$Y)]		<- max(datTI$Y)				# re
 brks2 <- seq(10, 70, 20)
 
 
-###map visualizing conditional mean annual NO2 concentration levels derived from smoothA (right plot in Figure 5)
+###map visualizing conditional mean annual NO2 concentration levels derived from smoothA (right plot in Figure 6)
 p.predB <- ggplot(df.grid.DE, aes(x = Lon.GK3, y = Lat.GK3)) +
   ggmap::theme_nothing(legend = TRUE) +
   xlab("") +
@@ -1014,7 +1014,7 @@ plot_grid(p.sp.effB, p.predB2, nrow = 1)
 
 
 ###
-### Fig.B.12, right plot: s_{u,p}(PopDens) derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
+### Fig.B.13, right plot: s_{u,p}(PopDens) derived from smoothB (LUR model based on additive regression smoothers using data observed at background monitoring sites)
 ###
 
 rm(list = ls())
@@ -1084,7 +1084,7 @@ p.spline.popDens
 
 
 ###
-### Fig.B.12, left plot: Estimated spatial effect in smoothB with two locations (smoothA (smoothB) refers to LUR model based on additive regression smoothers using data observed at all (background) monitoring sites)
+### Fig.B.13, left plot: Estimated spatial effect in smoothB with two locations (smoothA (smoothB) refers to LUR model based on additive regression smoothers using data observed at all (background) monitoring sites)
 ###
 
 rm(list = ls())

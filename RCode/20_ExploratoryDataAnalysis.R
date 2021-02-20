@@ -227,7 +227,7 @@ nrow(datTI); mean(datTI$Y); sd(datTI$Y); fivenum(datTI$Y)
 
 
 ###
-### Fig.2: Histogram with empirical density curve ----
+### Fig.3: Histogram with empirical density curve ----
 ###
 
 
@@ -267,7 +267,7 @@ dat.all <- data.frame(Y = c(datB$Y, datTI$Y),
 
 
 ###
-### Fig.3: Pairwise Bravais-Pearson correlations ----
+### Fig.4: Pairwise Bravais-Pearson correlations ----
 ###
 
 names(dat)
