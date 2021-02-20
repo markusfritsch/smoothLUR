@@ -244,7 +244,7 @@ for(i in 1:nrow(df.NO2.meta2)){
 
 
 
-# Add column of type factor indicating the municipality; this is required for stratified sampling in validation
+# Add column of type factor indicating the federal state; this is required for stratified sampling in validation
 df.NO2.meta2$IndRegions <- NA
 df.NO2.meta2$IndRegions[nchar(df.NO2.meta2$AGS) == 7] <- substr(df.NO2.meta2$AGS[nchar(df.NO2.meta2$AGS) == 7], 1, 1)
 df.NO2.meta2$IndRegions[nchar(df.NO2.meta2$AGS) != 7] <- substr(df.NO2.meta2$AGS[nchar(df.NO2.meta2$AGS) != 7], 1, 2)
