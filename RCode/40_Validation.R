@@ -21,7 +21,7 @@ library(smoothLUR)
 
 
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 

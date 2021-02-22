@@ -10,18 +10,19 @@ library(ggplot2)
 library(RColorBrewer)
 library(sp)
 library(cowplot)
+library(smoothLUR)
 
 
 
 
 ###
-### Table 3: Descriptives of continous variables in monSitesDE ----
+### Table 3: Descriptives of continuous variables in monSitesDE ----
 ###
 
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 MEAN <- round(apply(dat[,c(2,7,10:19,21:25)],
@@ -39,13 +40,14 @@ FIVENUM <- round(apply(dat[,c(2,7,10:19,21:25)],
 
 
 
+
 ###
 ### Fig.1: Boxplots of continuous variables in monSitesDE depending AQeType ----
 ###
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 dat.long <- melt(dat[,c(2,7,10:19,21:25)])
@@ -67,9 +69,9 @@ p.box <- ggplot(data = dat.long, aes(x = variable, y = value, fill = AQeType, co
         legend.text = element_text(size = 16),
         legend.position = c(0.8, 0.075))
 
-pdf("../img/BoxplotsVariablesMonSitesDE.pdf",width = 12, height = 9)
+#pdf("../img/BoxplotsVariablesMonSitesDE.pdf",width = 12, height = 9)
 p.box
-dev.off()
+#dev.off()
 
 
 dat.long2 <- rbind(dat.long[,c(1:2)],dat.long[,c(1:2)])
@@ -93,9 +95,11 @@ p.box2 <- ggplot(data = dat.long2, aes(x = variable, y = value, fill = AQeType, 
         legend.text = element_text(size = 14),
         legend.position = c(0.8, 0.075))
 
-pdf("../img/BoxplotsVariablesMonSitesDE2.pdf",width = 12, height = 9)
+#pdf("../img/BoxplotsVariablesMonSitesDE2.pdf",width = 12, height = 9)
 p.box2
-dev.off()
+#dev.off()
+
+
 
 
 
@@ -105,7 +109,7 @@ dev.off()
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
@@ -135,11 +139,9 @@ p.MonSites <- ggplot(data=dat,aes(x=Lon,y=Lat,color=Y))+
   guides(color = guide_colourbar(barheight = 14, barwidth = 2))
 
 
-pdf("../img/MonSitesTypeNO2Level.pdf", width = 12, height = 8)
+#pdf("../img/MonSitesTypeNO2Level.pdf", width = 12, height = 8)
 p.MonSites
-dev.off()
-
-
+#dev.off()
 
 
 
@@ -151,7 +153,8 @@ dev.off()
 
 rm(list = ls())
 
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 
 
 # Derive SpatialPointsDataFrame from 'df.grid.DE'
@@ -306,8 +309,8 @@ dat.tmp$lat  <- coordinates(spdf.DE2)[,2]
 
 
 
-png("../img/GridVariables.png",width = 900, height = 1500)
-pdf("../img/GridVariables.pdf",width = 12, height = 20)
+#png("../img/GridVariables.png",width = 900, height = 1500)
+#pdf("../img/GridVariables.pdf",width = 12, height = 20)
 ggdraw() +
   draw_plot(p.DE.Alt, 0, 0.66, 0.5, 0.33) +
   draw_plot(p.DE.LowDens, 0.5, 0.66, 0.5, 0.33) +
@@ -315,4 +318,4 @@ ggdraw() +
   draw_plot(p.DE.Forest, 0.5,0.33,0.5,0.33) +
   draw_plot(p.DE.PriRoad, 0,0,0.5,0.33) +
   draw_plot(p.DE.FedAuto, 0.5,0,0.5,0.33)
-dev.off()
+#dev.off()

@@ -4,26 +4,25 @@ bibentry(bibtype = "unpublished",
 		person("Svenia", "Behm")),
 	note = "Working paper",
 	year = "2021",
-	header = "For citing the article corresponding to smoothLUR in publication use:"
+	header = "For citing the article and results in publication use:"
 	)
 
 bibentry(bibtype = "unpublished",
-	title = "{Data for modeling nitrogen dioxide concentration levels across
-Germany}",
+	title = "{Data for modeling nitrogen dioxide concentration levels across Germany}",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
 	note = "Working paper",
 	year = "2021",
-	header = "For citing the article corresponding to the datasets in publication use:"
+	header = "For citing the datasets in publication use:"
 	)
 
 bibentry(bibtype = "manual",
-	title = "{smoothLUR} -- A package for smooth land use regression modeling",
+	title = "{smoothLUR} -- Functions and data for smooth land use regression modeling",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
-	note = "{R package version 0.1.0}",
-	year = "2020",
+	note = "{R package version 0.1.1}",
+	year = "2021",
 	url = "https://github.com/markusfritsch/smoothLUR",
-	header = "For citing smoothLUR in publication use:"
+	header = "For citing the package in publication use:"
 	)
 

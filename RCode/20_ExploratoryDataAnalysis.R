@@ -38,8 +38,11 @@ sPdf.Municipalities <- readOGR(dsn = "data/Data_BKG/vg250-ew_ebenen",
                                use_iconv = TRUE)
 
 
-load("data/Data_built/grid.DE.RData")
-load("data/monSitesDE.rda")
+data(gridDE)
+data(monSitesDE)
+
+df.grid.DE <- gridDE
+
 
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
@@ -213,7 +216,7 @@ ggdraw() +
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 datB  <- dat[dat$AQeType == "background", ]
@@ -233,7 +236,7 @@ nrow(datTI); mean(datTI$Y); sd(datTI$Y); fivenum(datTI$Y)
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 datB  <- dat[dat$AQeType == "background", ]
@@ -271,7 +274,7 @@ dat.all <- data.frame(Y = c(datB$Y, datTI$Y),
 ###
 
 names(dat)
-corr.DE <- round(cor(dat[,c(2:4, 6:9, 13:20)]), digits = 2)
+corr.DE <- round(cor(dat[,c(5:7, 10:13, 17:19, 21:25)]), digits = 2)
 corr.DE[lower.tri(corr.DE)] <- NA
 corr.melt <- reshape2::melt(corr.DE, na.rm = TRUE)
 

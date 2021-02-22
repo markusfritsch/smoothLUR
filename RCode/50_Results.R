@@ -29,7 +29,7 @@ library(sp)
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	<- monSitesDE
 
 smoothA <- smoothLUR(data = dat
@@ -43,7 +43,7 @@ smoothA <- smoothLUR(data = dat
                      ,thresh = 0.95)
 
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-dat.pred <- dat[, c(3:5,7:10,14:21)]
+dat.pred <- dat[, c(5:7,10:13,17:19,21:25)]
 colnames(newdata.tmp) <- colnames(dat.pred)
 for(j in 1:ncol(dat.pred)){
   newdata.tmp[,j] <- seq(min(dat.pred[,j]), max(dat.pred[,j]), length.out = 1000)
@@ -117,13 +117,14 @@ rm(list = ls())
 
 
 # Load grid over Germany
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
@@ -310,12 +311,17 @@ plot_grid(p.sp.effA, p.predA2, nrow = 1)
 
 rm(list = ls())
 
-load("cvResultsA.RData")
+#load("cvResultsA.RData")
 load("cvResultsA_2021-01-27.RData")
+#load("cvResultsB_2021-01-27.RData")
+#load("cvResultsTI_2021-01-27.RData")
+data(monSitesDE)
 
 
 ## LOOCV prediction errors
 loocvA <- cbind(loocv.A$df.err, monSitesDE[,c(1,8)])
+loocvB <- cbind(loocv.B$df.err, monSitesDE[monSitesDE$AQeType == "background",c(1,8)])
+loocvTI <- cbind(loocv.TI$df.err, monSitesDE[monSitesDE$AQeType != "background",c(1,8)])
 
 
 loocvA.bg <- loocvA[loocvA$AQeType == "background", ]
@@ -367,13 +373,14 @@ rm(list = ls())
 
 
 # Load grid over Germany
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
@@ -526,7 +533,8 @@ p.predBTI.RR2
 
 rm(list = ls())
 
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 dat.Positions <- data.frame(matrix(NA, nrow = 3, ncol = ncol(df.grid.DE)+1))
@@ -622,7 +630,7 @@ b2 <- qbbox(lat = coordinates(sp.b2)[,2],
 
 ## Derive predictions from LUR models based on additive regression smoothers for the three locations
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
@@ -679,7 +687,7 @@ dat.Positions$smoothA  <- predict(object = smoothA, newdata = dat.Positions)
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
@@ -735,7 +743,7 @@ ggplot(data = dat.scatter, aes(x = observed, y = partial.residual, group = varia
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
@@ -751,7 +759,7 @@ smoothB <- smoothLUR(data = datB
 
 
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-dat.pred <- datB[, c(3:5,7:10,14:21)]
+dat.pred <- datB[, c(5:7,10:13,17:19,21:25)]
 colnames(newdata.tmp) <- colnames(dat.pred)
 for(j in 1:ncol(dat.pred)){
   newdata.tmp[,j] <- seq(min(dat.pred[,j]), max(dat.pred[,j]), length.out = 1000)
@@ -823,13 +831,14 @@ rm(list = ls())
 
 
 # Load grid over Germany
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]
@@ -1019,7 +1028,7 @@ plot_grid(p.sp.effB, p.predB2, nrow = 1)
 
 rm(list = ls())
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat	 <- monSitesDE
 datB <- dat[dat$AQeType == "background", ]
 
@@ -1035,7 +1044,7 @@ smoothB <- smoothLUR(data = datB
 
 
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-dat.pred <- datB[, c(3:5,7:10,14:21)]
+dat.pred <- datB[, c(5:7,10:13,17:19,21:25)]
 colnames(newdata.tmp) <- colnames(dat.pred)
 for(j in 1:ncol(dat.pred)){
   newdata.tmp[,j] <- seq(min(dat.pred[,j]), max(dat.pred[,j]), length.out = 1000)
@@ -1091,12 +1100,13 @@ rm(list = ls())
 
 
 # Load grid over Germany
-load("data/Data_built/grid.DE.RData")
+data(gridDE)
+df.grid.DE <- gridDE
 names(df.grid.DE)
 df.grid.DE <- df.grid.DE[df.grid.DE$AGS!="01056025", ] # exclude Helgoland constituted of two small islands
 names(df.grid.DE)[c(4,5)] <- c("Lon", "Lat")
 
-load("data/monSitesDE.rda")
+data(monSitesDE)
 dat  	<- monSitesDE
 datB  <- dat[dat$AQeType == "background", ]
 datTI <- dat[dat$AQeType != "background", ]

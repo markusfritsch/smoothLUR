@@ -3,7 +3,7 @@
 \docType{package}
 \name{smoothLUR}
 \alias{smoothLUR}
-\title{smoothLUR: A package for smooth land use regression modeling}
+\title{smoothLUR: Functions and data for smooth land use regression modeling}
 \usage{
 smoothLUR(data, x, spVar1, spVar2, y, thresh = 0.95)
 }
@@ -38,10 +38,11 @@ It has `...`, `...`, and `...` methods.
 \description{
 The smoothLUR package provides functions and datasets for
 smooth land use regression modeling and parametric benchmarks
-to reproduce the results reported in Fritsch and Behm (2021).
-The main functions of the package are \code{smoothLUR},
-\code{parLUR}, and the evaluation functions \code{kFoldCV} and
-\code{looCV}.
+to reproduce the results reported in Fritsch and Behm (2021a).
+The main functions of the package are \code{parLUR},
+\code{smoothLUR}, and the evaluation functions \code{kFoldCV}
+and \code{looCV}. Details on the included datasets are
+provided in Fritsch and Behm (2021b)
 
 \code{smoothLUR} fits a smooth land use regression (LUR) model
     using the gam() function from the mgcv package. The procedure
