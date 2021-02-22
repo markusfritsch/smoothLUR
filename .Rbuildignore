@@ -16,10 +16,16 @@ data/DE_AQeReporting_2013-2015
 
 cvResultsA.RData
 cvResultsA_2020-09-25.RData
+cvResultsA_2021-01-27.RData
+cvResultsA_2021-02-22.RData
 cvResultsB.RData
 cvResultsB_2020-09-25.RData
+cvResultsB_2021-01-27.RData
+cvResultsB_2021-02-22.RData
 cvResultsTI.RData.RData
 cvResultsTI_2020-09-25.RData
+cvResultsTI_2021-01-27.RData
+cvResultsTI_2021-02-22.RData
 
 dat.Positions.rds
 DATA_MonitoringSites_DE.csv

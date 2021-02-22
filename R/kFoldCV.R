@@ -40,7 +40,7 @@
 #'    zero values; if the share is exceeded, the corresponding
 #'    potential predictor is excluded.
 #' @param seed A numeric value that defines the seed for random
-#'    sampling.
+#'    sampling (defaults to 42).
 #' @param k An integer denoting the number of folds to use in
 #'    cross-validation (defaults to 10).
 #' @param strat A boolean value that indicates whether stratified
@@ -50,8 +50,9 @@
 #'    cross-validation which is a k-fold CV with `k` equal to the
 #'    number of rows in `data` desired.
 #' @param indRegions A character string that indicates the name of
-#'    the variable referring to the geographical regions; this
-#'    variable is required to perform spatial stratified sampling.
+#'    the variable referring to the geographic regions; this
+#'    variable is required to perform spatial stratified sampling;
+#'    defaults to NULL.
 #' @return An object of class `kfcvLUR` with the following elements:
 #'
 #' \item{df.err}{data.frame with four columns: ID (Id of monitoring
@@ -92,10 +93,10 @@ kFoldCV <- function(
   ,y
   ,dirEff
   ,thresh = 0.95
-  ,seed
+  ,seed = 42
   ,k = 10
   ,strat = FALSE
-  ,indRegions = "indRegions"
+  ,indRegions = NULL
   ,loocv = FALSE
 ){
 

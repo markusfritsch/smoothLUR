@@ -13,10 +13,10 @@ kFoldCV(
   y,
   dirEff,
   thresh = 0.95,
-  seed,
+  seed = 42,
   k = 10,
   strat = FALSE,
-  indRegions = "indRegions",
+  indRegions = NULL,
   loocv = FALSE
 )
 }
@@ -56,7 +56,7 @@ zero values; if the share is exceeded, the corresponding
 potential predictor is excluded.}
 
 \item{seed}{A numeric value that defines the seed for random
-sampling.}
+sampling (defaults to 42).}
 
 \item{k}{An integer denoting the number of folds to use in
 cross-validation (defaults to 10).}
@@ -66,8 +66,9 @@ sampling is desired (stratified spatially w.r.t. German federal
 states).}
 
 \item{indRegions}{A character string that indicates the name of
-the variable referring to the geographical regions; this
-variable is required to perform spatial stratified sampling.}
+the variable referring to the geographic regions; this
+variable is required to perform spatial stratified sampling;
+defaults to NULL.}
 
 \item{loocv}{A boolean value that indicates whether a leave-one-out
 cross-validation which is a k-fold CV with `k` equal to the

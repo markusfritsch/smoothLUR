@@ -313,9 +313,9 @@ rm(list = ls())
 
 #load("cvResultsA.RData")
 load("cvResultsA_2021-01-27.RData")
-#load("cvResultsB_2021-01-27.RData")
-#load("cvResultsTI_2021-01-27.RData")
+#load("cvResultsB_2021-02-22.RData")
 data(monSitesDE)
+monSitesDE <- monSitesDE[match(dat$AQeCode, monSitesDE$AQeCode), ]    #ensure that employed data are sorted as in (cross-)validation
 
 
 ## LOOCV prediction errors
@@ -759,7 +759,8 @@ smoothB <- smoothLUR(data = datB
 
 
 newdata.tmp <- data.frame(matrix(NA, nrow = 1000, ncol = 18))
-dat.pred <- datB[, c(5:7,10:13,17:19,21:25)]
+dat.pred <- dat[, c(5:7,10:13,17:19,21:25)]
+#dat.pred <- datB[, c(5:7,10:13,17:19,21:25)]      # to plot for the support of background monitoring sites
 colnames(newdata.tmp) <- colnames(dat.pred)
 for(j in 1:ncol(dat.pred)){
   newdata.tmp[,j] <- seq(min(dat.pred[,j]), max(dat.pred[,j]), length.out = 1000)
