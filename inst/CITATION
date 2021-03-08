@@ -1,9 +1,9 @@
-bibentry(bibtype = "unpublished",
+bibentry(bibtype = "article",
 	title = "{Agglomeration and infrastructure effects in land use regression models for air pollution -- Specification, estimation, and interpretations}",
 	author = c(person("Markus", "Fritsch"),
 		person("Svenia", "Behm")),
-	note = "Working paper",
-	year = "2021",
+	journal = "Atmospheric Environment",
+	year = "to appear",
 	header = "For citing the article and results in publication use:"
 	)
 
