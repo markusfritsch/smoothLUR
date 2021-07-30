@@ -8,3 +8,6 @@ To install the package please use:
 library(devtools)
 install_github("markusfritsch/smoothLUR")
 ```
+
+To cite, please use:  
+[![DOI](https://zenodo.org/badge/283972614.svg)](https://zenodo.org/badge/latestdoi/283972614)
