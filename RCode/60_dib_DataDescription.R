@@ -11,6 +11,7 @@ library(RColorBrewer)
 library(sp)
 library(cowplot)
 library(smoothLUR)
+library(ggmap)
 
 
 
@@ -96,6 +97,7 @@ p.box2 <- ggplot(data = dat.long2, aes(x = variable, y = value, fill = AQeType, 
         legend.position = c(0.8, 0.075))
 
 #pdf("../img/BoxplotsVariablesMonSitesDE2.pdf",width = 12, height = 9)
+#postscript("../img/BoxplotsVariablesMonSitesDE2.eps",width = 12, height = 9, horizontal = FALSE)
 p.box2
 #dev.off()
 
@@ -140,6 +142,7 @@ p.MonSites <- ggplot(data=dat,aes(x=Lon,y=Lat,color=Y))+
 
 
 #pdf("../img/MonSitesTypeNO2Level.pdf", width = 12, height = 8)
+#postscript("../img/MonSitesTypeNO2Level.eps", width = 12, height = 8, horizontal = FALSE)
 p.MonSites
 #dev.off()
 
