@@ -115,8 +115,10 @@ smoothLUR <- function(
   names.dat <- names(dat)
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
-  dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(length(unique(x)) > 8))})]
+  dat.cont <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(length(unique(x)) > 8))})]
   # 9 parameters have to be estimated by default for each univariate thin plate regression spline
+  dat.discr <- dat[, x.discr]
+  dat <- cbind(dat.cont, dat.discr)
   names.dat[!(names.dat %in% names(dat))]
   predAdj <- x[x %in% names(dat)]
 
