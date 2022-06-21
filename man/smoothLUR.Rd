@@ -5,15 +5,19 @@
 \alias{smoothLUR}
 \title{smoothLUR: Functions and data for smooth land use regression modeling}
 \usage{
-smoothLUR(data, x, spVar1, spVar2, y, thresh = 0.95)
+smoothLUR(data, x, x.discr, spVar1, spVar2, y, thresh = 0.95)
 }
 \arguments{
 \item{data}{A data set which contains the dependent variable and
 the potential predictors.}
 
 \item{x}{A character vector stating the variable names of the
-potential predictors (names have to match the column names of
-`data`).}
+potential continuous predictors (names have to match the column
+names of `data`).}
+
+\item{x.discr}{A character vector stating the variable names of the
+potential discrete predictors (names have to match the column
+names of `data`).}
 
 \item{spVar1}{A character vector stating the variable name referring
 to longitude (name has to match the column name of `data`).}

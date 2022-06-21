@@ -25,4 +25,4 @@ BugReports: https://github.com/markusfritsch/smoothLUR/issues
 VignetteBuilder: R.rsp
 Encoding: UTF-8
 Classification/JEL: C21, C51, C52, Q15, Q53
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
