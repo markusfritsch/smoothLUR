@@ -104,35 +104,52 @@
 smoothLUR <- function(
     data
     ,x
-    ,x.discr
+    ,x.discr = NA
     ,spVar1
     ,spVar2
     ,y
     ,thresh = 0.95
   ){
 
-  dat <- data.frame(subset(x = data, select = c(y, x, x.discr)))
-  names.dat <- names(dat)
+  if(!is.na(x.discr[1])){
+    names.dat <- c(y, x, x.discr)
+  } else{
+    names.dat <- c(y, x)
+  }
+  dat <- data.frame(subset(x = data, select = names.dat))
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
   dat.cont <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(length(unique(x)) > 8))})]
   # 9 parameters have to be estimated by default for each univariate thin plate regression spline
-  dat.discr <- dat[, x.discr]
-  dat <- cbind(dat.cont, dat.discr)
+
+  if(!is.na(x.discr[1])){
+    dat.discr <- dat[, x.discr]
+    dat <- cbind(dat.cont, dat.discr)
+  } else{
+    dat <- dat.cont
+  }
+  
   names.dat[!(names.dat %in% names(dat))]
   predAdj <- x[x %in% names(dat)]
 
-  y <- dat[, y]
-  X <- subset(x = dat, select = c(x[x %in% names(dat)], x.discr[x.discr %in% names(dat)]))
+  Y <- dat[, y]
 
-  names.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2)]
-  names.cont.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x.discr)]
-  names.discr.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x)]
-
-  form.tmp <- stats::as.formula(paste("y ~ s(",spVar1, ",", spVar2,",k = -1, bs=\"tp\") + ", # bivariate spline for longitude and latitude always considered in the model
-                               paste0("s(", names.cont.tmp, ",k=8, bs=\"tp\")", collapse = "+"), "+", # continuous predictor names
-                               paste0(names.discr.tmp, collapse = "+"), # discrete predictor names
-                               sep = ""))
+  if(!is.na(x.discr[1])){
+    X <- subset(x = dat, select = c(x[x %in% names(dat)], x.discr[x.discr %in% names(dat)]))
+    names.cont.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x.discr)]
+    names.discr.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x)]
+    form.tmp <- stats::as.formula(paste("Y ~ s(",spVar1, ",", spVar2,",k = -1, bs=\"tp\") + ", # bivariate spline for longitude and latitude always considered in the model
+                                        paste0("s(", names.cont.tmp, ",k=8, bs=\"tp\")", collapse = "+"), "+", # continuous predictor names
+                                        paste0(names.discr.tmp, collapse = "+"), # discrete predictor names
+                                        sep = ""))    
+  } else{
+    X <- subset(x = dat, select = c(x[x %in% names(dat)]))
+    names.cont.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2)]
+    form.tmp <- stats::as.formula(paste("Y ~ s(",spVar1, ",", spVar2,",k = -1, bs=\"tp\") + ", # bivariate spline for longitude and latitude always considered in the model
+                                        paste0("s(", names.cont.tmp, ",k=8, bs=\"tp\")", collapse = "+"), # continuous predictor names
+                                        sep = ""))
+        
+  }  
   # to enable 10-fold CV for traffic/industrial sites the parameter k has to be reduced,
   # otherwise the error message
   # "Fehler in gam(formula = form.tmp, fit = TRUE, method = "P-ML", data = cbind(y,  :

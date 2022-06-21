@@ -5,7 +5,7 @@
 \alias{smoothLUR}
 \title{smoothLUR: Functions and data for smooth land use regression modeling}
 \usage{
-smoothLUR(data, x, x.discr, spVar1, spVar2, y, thresh = 0.95)
+smoothLUR(data, x, x.discr = NA, spVar1, spVar2, y, thresh = 0.95)
 }
 \arguments{
 \item{data}{A data set which contains the dependent variable and
