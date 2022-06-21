@@ -21,8 +21,11 @@
 #' @param data A data set which contains the dependent variable and
 #'    the potential predictors.
 #' @param x A character vector stating the variable names of the
-#'    potential predictors (names have to match the column names of
-#'    `data`).
+#'    potential continuous predictors (names have to match the column
+#'    names of `data`).
+#' @param x.discr A character vector stating the variable names of the
+#'    potential discrete predictors (names have to match the column
+#'    names of `data`).     
 #' @param spVar1 A character vector stating the variable name referring
 #'    to longitude (name has to match the column name of `data`).
 #' @param spVar2 A character vector stating the variable name referring
@@ -101,13 +104,14 @@
 smoothLUR <- function(
     data
     ,x
+    ,x.discr
     ,spVar1
     ,spVar2
     ,y
     ,thresh = 0.95
   ){
 
-  dat <- data.frame(subset(x = data, select = c(y, x)))
+  dat <- data.frame(subset(x = data, select = c(y, x, x.discr)))
   names.dat <- names(dat)
 
   dat <- dat[, apply(X = dat, MARGIN = 2, FUN = function(x){ return(c(sum(x == 0)/length(x) < thresh))})]
@@ -117,12 +121,15 @@ smoothLUR <- function(
   predAdj <- x[x %in% names(dat)]
 
   y <- dat[, y]
-  X <- subset(x = dat, select = x[x %in% names(dat)])
+  X <- subset(x = dat, select = c(x[x %in% names(dat)], x.discr[x.discr %in% names(dat)]))
 
   names.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2)]
+  names.cont.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x.discr)]
+  names.discr.tmp <- names(X)[!names(X) %in% c(spVar1, spVar2, x)]
 
   form.tmp <- stats::as.formula(paste("y ~ s(",spVar1, ",", spVar2,",k = -1, bs=\"tp\") + ", # bivariate spline for longitude and latitude always considered in the model
-                               paste0("s(", names.tmp, ",k=8, bs=\"tp\")", collapse = "+"), # Here we can put any vector of predictor names.
+                               paste0("s(", names.cont.tmp, ",k=8, bs=\"tp\")", collapse = "+"), "+", # continuous predictor names
+                               paste0(names.discr.tmp, collapse = "+"), # discrete predictor names
                                sep = ""))
   # to enable 10-fold CV for traffic/industrial sites the parameter k has to be reduced,
   # otherwise the error message

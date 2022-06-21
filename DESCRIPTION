@@ -1,8 +1,8 @@
 Package: smoothLUR
 Type: Package
 Title: Functions and data for smooth Land Use Regression Modeling
-Version: 0.1.1
-Date: 2021-02-22
+Version: 0.1.2
+Date: 2022-06-21
 Authors@R: c(person("Markus", "Fritsch", role = c("aut", "cre"),
 		email = "Markus.Fritsch@uni-Passau.de"),
 	person("Svenia", "Behm", role = c("aut"),
