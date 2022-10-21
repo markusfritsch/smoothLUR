@@ -1,8 +1,8 @@
 Package: smoothLUR
 Type: Package
 Title: Functions and data for smooth Land Use Regression Modeling
-Version: 0.1.2
-Date: 2022-06-21
+Version: 0.1.3
+Date: 2022-10-21
 Authors@R: c(person("Markus", "Fritsch", role = c("aut", "cre"),
 		email = "Markus.Fritsch@uni-Passau.de"),
 	person("Svenia", "Behm", role = c("aut"),
@@ -25,4 +25,4 @@ BugReports: https://github.com/markusfritsch/smoothLUR/issues
 VignetteBuilder: R.rsp
 Encoding: UTF-8
 Classification/JEL: C21, C51, C52, Q15, Q53
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1

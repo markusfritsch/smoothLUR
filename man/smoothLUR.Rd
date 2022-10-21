@@ -98,8 +98,6 @@ AIC(m1)
 }
 }
 \references{
-
-
 \insertAllCited{}
 }
 \seealso{
